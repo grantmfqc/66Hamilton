@@ -55,11 +55,13 @@ function init() {
       const name = document.getElementById('input-name').value.trim();
       const email = document.getElementById('input-email').value.trim();
       const org = document.getElementById('input-org').value.trim();
+      const phone = document.getElementById('input-phone').value.trim();
+      const pref = document.getElementById('input-pref').value;
       
       const formData = new FormData(e.target);
       const turnstileToken = formData.get('cf-turnstile-response');
 
-      if (!name || !isValidEmail(email) || !turnstileToken) {
+      if (!name || !isValidEmail(email) || !phone || !turnstileToken) {
         formError.textContent = "Please fill in all fields and verify you are human.";
         formError.classList.remove('hidden');
         return;
@@ -73,7 +75,7 @@ function init() {
         const response = await fetch('/api/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, org, token: turnstileToken })
+          body: JSON.stringify({ name, email, org, phone, pref, token: turnstileToken })
         });
         
         const result = await response.json();

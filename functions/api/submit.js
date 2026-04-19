@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { name, email, org, token } = data;
+    const { name, email, org, phone, pref, token } = data;
 
     // 1. Verify Cloudflare Turnstile token
     if (!token) {
@@ -28,7 +28,9 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: 'System Error: RESEND_API_KEY is missing in Cloudflare Dashboard.' }), { status: 500 });
     }
 
-    const resendRes = await fetch('https://api.resend.com/emails', {
+    const securePdfUrl = 'https://premiumservice.ai/assets/prospectus_SECURE_9a8B4f2X.pdf';
+
+    const emailToProspect = fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
@@ -37,7 +39,6 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
           to: email,
-          bcc: 'grant@orcacom.co.nz', // Alert owner
           subject: 'The Hamilton Residence - Exclusive Prospectus',
           html: `
             <!DOCTYPE html>
@@ -65,10 +66,10 @@ export async function onRequestPost(context) {
                   <p>Dear ${name},</p>
                   <p>Thank you for your enquiry regarding Apartment 1, 66 Hamilton Road, Herne Bay.</p>
                   <p>As requested, please find your exclusive digital prospectus attached to this email. It contains comprehensive details regarding the residence, including floor plans, inclusions, and lease terms.</p>
-                  <a href="https://premiumservice.ai/assets/prospectus.pdf" class="btn">VIEW PROSPECTUS ONLINE</a>
+                  <a href="${securePdfUrl}" class="btn">VIEW PROSPECTUS ONLINE</a>
                 </div>
                 <div class="footer">
-                  This communication is intended for ${email} (${org || 'Private Enquiry'}).<br/>
+                  This communication is intended for ${email}.<br/>
                   &copy; ${new Date().getFullYear()} The Hamilton Residence. All rights reserved.
                 </div>
               </div>
@@ -78,16 +79,43 @@ export async function onRequestPost(context) {
           attachments: [
             {
               filename: 'The_Hamilton_Residence_Prospectus.pdf',
-              path: 'https://premiumservice.ai/assets/prospectus.pdf'
+              path: securePdfUrl
             }
           ]
         })
-      });
-      if (!resendRes.ok) {
-        console.error('Failed to send email via Resend', await resendRes.text());
-        // Continue to return success to the user even if email delivery fails,
-        // or you could return an error here depending on preference.
-      }
+    });
+
+    const emailToOwner = fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
+          to: 'grant@orcacom.co.nz',
+          subject: `New Prospectus Request: ${name}`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px;">
+              <h2 style="color: #C9A96E;">New Prospectus Download</h2>
+              <p>Someone has just downloaded the prospectus for 66 Hamilton Road.</p>
+              <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%; max-width: 500px;">
+                <tr><th style="text-align: left; width: 30%;">Name</th><td>${name}</td></tr>
+                <tr><th style="text-align: left;">Email</th><td>${email}</td></tr>
+                <tr><th style="text-align: left;">Phone</th><td>${phone}</td></tr>
+                <tr><th style="text-align: left;">Organisation</th><td>${org || 'N/A'}</td></tr>
+                <tr><th style="text-align: left;">Prefers</th><td>${pref}</td></tr>
+              </table>
+            </div>
+          `
+        })
+    });
+
+    const [resendRes, ownerRes] = await Promise.all([emailToProspect, emailToOwner]);
+
+    if (!resendRes.ok) {
+      console.error('Failed to send email via Resend', await resendRes.text());
+    }
 
     // Return success
     return new Response(JSON.stringify({ success: true }), { status: 200 });

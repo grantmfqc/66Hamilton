@@ -524,19 +524,32 @@
         <div class="pform-row">
           <div class="pform-group">
             <label for="input-name">Full Name</label>
-            <input type="text" id="input-name" name="name" placeholder="e.g. Sarah Mitchell" autocomplete="name"
-              required />
+            <input type="text" id="input-name" name="name" placeholder="e.g. Sarah Mitchell" autocomplete="name" required />
           </div>
           <div class="pform-group">
             <label for="input-email">Corporate Email</label>
-            <input type="email" id="input-email" name="email" placeholder="e.g. sarah@company.com" autocomplete="email"
-              required />
+            <input type="email" id="input-email" name="email" placeholder="e.g. sarah@company.com" autocomplete="email" required />
           </div>
         </div>
+        
+        <div class="pform-row">
+          <div class="pform-group">
+            <label for="input-phone">Phone Number</label>
+            <input type="tel" id="input-phone" name="phone" placeholder="e.g. +64 21 000 0000" autocomplete="tel" required />
+          </div>
+          <div class="pform-group">
+            <label for="input-pref">Preferred Contact Method</label>
+            <select id="input-pref" name="pref" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.95rem; margin-top: 8px;" required>
+              <option value="Email" style="background: var(--bg-card); color: white;">Email</option>
+              <option value="Phone" style="background: var(--bg-card); color: white;">Phone Call</option>
+              <option value="Text/WhatsApp" style="background: var(--bg-card); color: white;">Text / WhatsApp</option>
+            </select>
+          </div>
+        </div>
+
         <div class="pform-group pform-group--full">
           <label for="input-org">Organisation <span class="optional">(optional)</span></label>
-          <input type="text" id="input-org" name="org" placeholder="e.g. Deloitte NZ, Screen Auckland, MBIE…"
-            autocomplete="organization" />
+          <input type="text" id="input-org" name="org" placeholder="e.g. Deloitte NZ, Screen Auckland, MBIE…" autocomplete="organization" />
         </div>
         <div class="pform-group pform-group--full"
           style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
