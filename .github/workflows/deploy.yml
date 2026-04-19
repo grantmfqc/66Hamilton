@@ -25,11 +25,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Setup Pages
-        uses: actions/pages-github-pages-action@v4
-        with:
-          # This action is a bit older, let's use the newer recommended steps
-          # for static sites.
-          static_site_generator: next # Not actually using next, but the action handles it
+        uses: actions/configure-pages@v4
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
