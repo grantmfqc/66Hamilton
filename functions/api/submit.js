@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'The Hamilton Residence <prospectus@premiumservice.ai>',
+          from: 'The Hamilton Residence <prospectus@contact.premiumservices.ai>',
           to: email,
           bcc: 'grant@orcacom.co.nz', // Alert owner
           subject: 'The Hamilton Residence - Prospectus',
