@@ -1,8 +1,7 @@
 // ── SUPABASE CONFIGURATION ──────────────────────────────────────────────────
 // Replace these with your actual Supabase project details
-const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
-const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
-
+const SUPABASE_URL = 'https://vgcrioslaqcrimrdchin.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Cw5imAxvIhxnKZC4ThK41Q_kcWhpsKE';
 const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // ── NAVBAR scroll effect ──────────────────────────────────────────────────
@@ -50,10 +49,10 @@ let submittedOrg = '';
 // Step 1 → Send OTP via Supabase
 step1.addEventListener('submit', async (e) => {
   e.preventDefault();
-  
-  const name  = document.getElementById('input-name').value.trim();
+
+  const name = document.getElementById('input-name').value.trim();
   const email = document.getElementById('input-email').value.trim();
-  const org   = document.getElementById('input-org').value.trim();
+  const org = document.getElementById('input-org').value.trim();
 
   if (!name || !isValidEmail(email)) {
     formError.textContent = "Please enter a valid name and corporate email.";
@@ -133,7 +132,7 @@ otpDigits.forEach((digit, i) => {
 step2.addEventListener('submit', async (e) => {
   e.preventDefault();
   const token = [...otpDigits].map(d => d.value).join('');
-  
+
   if (token.length < 6) return;
 
   otpError.classList.add('hidden');
@@ -154,9 +153,9 @@ step2.addEventListener('submit', async (e) => {
     const { error: dbError } = await supabase
       .from('leads')
       .insert([
-        { 
-          full_name: submittedName, 
-          email: submittedEmail, 
+        {
+          full_name: submittedName,
+          email: submittedEmail,
           organisation: submittedOrg,
           created_at: new Date().toISOString()
         }
