@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: 'System Error: RESEND_API_KEY is missing in Cloudflare Dashboard.' }), { status: 500 });
     }
 
-    const securePdfUrl = 'https://premiumservice.ai/assets/prospectus_SECURE_9a8B4f2X.pdf';
+    const securePdfUrl = 'https://www.premiumservice.ai/assets/prospectus_SECURE_9a8B4f2X.pdf';
 
     const emailToProspect = fetch('https://api.resend.com/emails', {
         method: 'POST',
