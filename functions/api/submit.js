@@ -75,13 +75,7 @@ export async function onRequestPost(context) {
               </div>
             </body>
             </html>
-          `,
-          attachments: [
-            {
-              filename: 'The_Hamilton_Residence_Prospectus.pdf',
-              path: securePdfUrl
-            }
-          ]
+          `
         })
     });
 
