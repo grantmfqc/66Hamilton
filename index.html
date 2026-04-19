@@ -13,7 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="index.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body>
@@ -515,11 +515,11 @@
       <p class="section-eyebrow" style="color: var(--accent-gold);">Private Enquiry</p>
       <h2 class="section-title" style="color: var(--text-primary);">Access the Full<br /><em>Prospectus.</em></h2>
       <p class="section-body" style="color: var(--text-muted); max-width:500px; margin: 0 auto 3rem;">Enter your name
-        and corporate email address. We will send a secure one-time verification code, after which the complete digital
-        prospectus — including floor plans, full amenity list, and pricing — will be delivered directly to your inbox.
+        and corporate email address. Once we verify you are human, the complete digital prospectus — including floor
+        plans, full amenity list, and pricing — will be delivered directly to your inbox.
       </p>
 
-      <!-- Step 1: Name + Email -->
+      <!-- Step 1: Name + Email + Turnstile -->
       <form id="form-step1" class="pform" novalidate>
         <div class="pform-row">
           <div class="pform-group">
@@ -538,33 +538,15 @@
           <input type="text" id="input-org" name="org" placeholder="e.g. Deloitte NZ, Screen Auckland, MBIE…"
             autocomplete="organization" />
         </div>
-        <div id="form-error" class="form-error hidden">Please enter a valid name and email address.</div>
+        <div class="pform-group pform-group--full" style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+          <!-- Replace this sitekey with your actual Cloudflare Turnstile Sitekey -->
+          <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+        </div>
+        <div id="form-error" class="form-error hidden">Please complete all fields and verify you are human.</div>
         <button type="submit" class="pform-submit" id="btn-send-code">
-          <span class="btn-label">Send Verification Code</span>
+          <span class="btn-label">Request Prospectus</span>
           <span class="btn-arrow">→</span>
         </button>
-      </form>
-
-      <!-- Step 2: OTP -->
-      <form id="form-step2" class="pform hidden" novalidate>
-        <p class="otp-instruction">A 6-digit code has been sent to <strong id="otp-email-display"></strong>. Please
-          enter it below to access the prospectus.</p>
-        <div class="otp-inputs" id="otp-inputs">
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-          <div class="otp-separator">—</div>
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-          <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]" />
-        </div>
-        <div id="otp-error" class="form-error hidden">That code doesn't match. Please check your email and try again.
-        </div>
-        <button type="submit" class="pform-submit" id="btn-verify">
-          <span class="btn-label">Verify &amp; Send Prospectus</span>
-          <span class="btn-arrow">→</span>
-        </button>
-        <button type="button" class="pform-back" id="btn-back">← Use a different email</button>
       </form>
 
       <!-- Step 3: Success -->
