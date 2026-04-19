@@ -1,29 +1,29 @@
-// ── SUPABASE CONFIGURATION ──────────────────────────────────────────────────
+// Supabase Configuration
 const SUPABASE_URL = 'https://vgcrioslaqcrimrdchin.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Cw5imAxvIhxnKZC4ThK41Q_kcWhpsKE';
 
 let supabase = null;
-try {
-  if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  } else {
-    console.error("Supabase library not found. Check your index.html script tag.");
-  }
-} catch (e) {
-  console.error("Supabase initialization failed:", e);
-}
 
-// ── INIT FUNCTION ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("DOM Content Loaded — Initializing Premium Residence Site");
+  console.log("App initializing...");
 
-  // ── NAVBAR scroll effect ──────────────────────────────────────────────────
+  // Initialize Supabase
+  try {
+    if (window.supabase) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log("Supabase connected.");
+    }
+  } catch (e) {
+    console.error("Supabase error:", e);
+  }
+
+  // Navbar
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
     if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 60);
   });
 
-  // ── HERO parallax ─────────────────────────────────────────────────────────
+  // Hero Parallax
   const heroBg = document.getElementById('hero-bg');
   window.addEventListener('scroll', () => {
     if (heroBg) {
@@ -31,9 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  // ── REVEAL on scroll ─────────────────────────────────────────────────────
+  // Reveal Logic
   const revealEls = document.querySelectorAll('.reveal');
-  
+  console.log("Found " + revealEls.length + " reveal elements.");
+
   if ('IntersectionObserver' in window) {
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(el => {
@@ -43,14 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }, { threshold: 0.1 });
-    
     revealEls.forEach(el => revealObserver.observe(el));
   } else {
-    // Fallback for older browsers: show all immediately
     revealEls.forEach(el => el.classList.add('visible'));
   }
 
-  // ── PROSPECTUS FORM FLOW ──────────────────────────────────────────────────
+  // Fallback: If nothing is visible after 2 seconds, force show everything
+  setTimeout(() => {
+    const firstReveal = document.querySelector('.reveal:not(.visible)');
+    if (firstReveal) {
+      console.warn("Reveal fallback triggered.");
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+  }, 2000);
+
+  // Form Logic
   const step1 = document.getElementById('form-step1');
   const step2 = document.getElementById('form-step2');
   const success = document.getElementById('form-success');
@@ -69,47 +77,42 @@ document.addEventListener('DOMContentLoaded', () => {
   if (step1) {
     step1.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const name  = document.getElementById('input-name').value.trim();
+      const name = document.getElementById('input-name').value.trim();
       const email = document.getElementById('input-email').value.trim();
-      const org   = document.getElementById('input-org').value.trim();
+      const org = document.getElementById('input-org').value.trim();
 
       if (!name || !isValidEmail(email)) {
-        formError.textContent = "Please enter a valid name and corporate email.";
+        formError.textContent = "Valid name and corporate email required.";
         formError.classList.remove('hidden');
         return;
       }
 
       if (!supabase) {
-        formError.textContent = "Database connection error. Please check Supabase setup.";
+        formError.textContent = "Database error. Please refresh.";
         formError.classList.remove('hidden');
         return;
       }
 
       formError.classList.add('hidden');
       btnSendCode.disabled = true;
-      btnSendCode.querySelector('.btn-label').textContent = "Sending Code...";
+      btnSendCode.querySelector('.btn-label').textContent = "Sending...";
 
       try {
         const { error } = await supabase.auth.signInWithOtp({
           email: email,
           options: { shouldCreateUser: true }
         });
-
         if (error) throw error;
 
         submittedEmail = email;
         submittedName = name;
         submittedOrg = org;
-
         otpEmailDisplay.textContent = email;
         step1.classList.add('hidden');
         step2.classList.remove('hidden');
         if (otpDigits[0]) otpDigits[0].focus();
-
-      } catch (error) {
-        console.error('Error sending OTP:', error.message);
-        formError.textContent = `Error: ${error.message}`;
+      } catch (err) {
+        formError.textContent = "Error: " + err.message;
         formError.classList.remove('hidden');
       } finally {
         btnSendCode.disabled = false;
@@ -118,18 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // OTP digit auto-advance
   otpDigits.forEach((digit, i) => {
     digit.addEventListener('input', () => {
       digit.value = digit.value.replace(/\D/g, '');
-      if (digit.value && i < otpDigits.length - 1) {
-        otpDigits[i + 1].focus();
-      }
+      if (digit.value && i < otpDigits.length - 1) otpDigits[i + 1].focus();
     });
     digit.addEventListener('keydown', (e) => {
-      if (e.key === 'Backspace' && !digit.value && i > 0) {
-        otpDigits[i - 1].focus();
-      }
+      if (e.key === 'Backspace' && !digit.value && i > 0) otpDigits[i - 1].focus();
     });
   });
 
@@ -137,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
     step2.addEventListener('submit', async (e) => {
       e.preventDefault();
       const token = [...otpDigits].map(d => d.value).join('');
-      
       if (token.length < 6) return;
 
       otpError.classList.add('hidden');
@@ -150,32 +147,19 @@ document.addEventListener('DOMContentLoaded', () => {
           token: token,
           type: 'signup'
         });
-
         if (authError) throw authError;
 
-        const { error: dbError } = await supabase
-          .from('leads')
-          .insert([
-            { 
-              full_name: submittedName, 
-              email: submittedEmail, 
-              organisation: submittedOrg,
-              created_at: new Date().toISOString()
-            }
-          ]);
-
-        if (dbError) throw dbError;
+        await supabase.from('leads').insert([{
+          full_name: submittedName,
+          email: submittedEmail,
+          organisation: submittedOrg
+        }]);
 
         step2.classList.add('hidden');
         success.classList.remove('hidden');
-
-      } catch (error) {
-        console.error('Verification failed:', error.message);
-        otpError.textContent = `Verification failed: ${error.message}`;
+      } catch (err) {
+        otpError.textContent = "Failed: " + err.message;
         otpError.classList.remove('hidden');
-        otpDigits.forEach(d => { d.value = ''; d.style.borderColor = 'rgba(224,112,112,.6)'; });
-        if (otpDigits[0]) otpDigits[0].focus();
-        setTimeout(() => otpDigits.forEach(d => d.style.borderColor = ''), 1800);
       } finally {
         btnVerify.disabled = false;
         btnVerify.querySelector('.btn-label').textContent = "Verify & Send Prospectus";
@@ -187,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBack.addEventListener('click', () => {
       step2.classList.add('hidden');
       step1.classList.remove('hidden');
-      otpDigits.forEach(d => d.value = '');
     });
   }
 });
