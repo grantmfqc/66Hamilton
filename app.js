@@ -4,7 +4,8 @@ const SUPABASE_KEY = 'sb_publishable_Cw5imAxvIhxnKZC4ThK41Q_kcWhpsKE';
 
 let supabase = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+// Initialization Function
+function init() {
   console.log("App initializing...");
 
   // Initialize Supabase
@@ -48,15 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     revealEls.forEach(el => el.classList.add('visible'));
   }
-
-  // Fallback: If nothing is visible after 2 seconds, force show everything
-  setTimeout(() => {
-    const firstReveal = document.querySelector('.reveal:not(.visible)');
-    if (firstReveal) {
-      console.warn("Reveal fallback triggered.");
-      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-    }
-  }, 2000);
 
   // Form Logic
   const step1 = document.getElementById('form-step1');
@@ -173,7 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
       step1.classList.remove('hidden');
     });
   }
-});
+}
+
+// Ensure the script runs even if DOM is already loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
