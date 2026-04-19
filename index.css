@@ -156,7 +156,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 .footer-copy{font-size:.72rem;color:rgba(138,138,146,.4)}
 
 /* ── REVEAL ANIMATION ── */
-.reveal{opacity:0;transform:translateY(32px);transition:opacity .9s ease,transform .9s ease}
+.reveal{opacity:1;transform:translateY(0);transition:opacity .9s ease,transform .9s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
 /* ── UTILITIES ── */
