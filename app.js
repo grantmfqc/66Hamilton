@@ -1,3 +1,10 @@
+// ── SUPABASE CONFIGURATION ──────────────────────────────────────────────────
+// Replace these with your actual Supabase project details
+const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
+const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
 // ── NAVBAR scroll effect ──────────────────────────────────────────────────
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
@@ -24,7 +31,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 revealEls.forEach(el => revealObserver.observe(el));
 
-// ── OTP FORM FLOW ─────────────────────────────────────────────────────────
+// ── PROSPECTUS FORM FLOW (Supabase Integrated) ──────────────────────────────
 const step1 = document.getElementById('form-step1');
 const step2 = document.getElementById('form-step2');
 const success = document.getElementById('form-success');
@@ -33,33 +40,66 @@ const otpError = document.getElementById('otp-error');
 const otpEmailDisplay = document.getElementById('otp-email-display');
 const btnBack = document.getElementById('btn-back');
 const otpDigits = document.querySelectorAll('.otp-digit');
+const btnSendCode = document.getElementById('btn-send-code');
+const btnVerify = document.getElementById('btn-verify');
 
-let storedOtp = '';
 let submittedEmail = '';
+let submittedName = '';
+let submittedOrg = '';
 
-// Step 1 → send OTP
+// Step 1 → Send OTP via Supabase
 step1.addEventListener('submit', async (e) => {
   e.preventDefault();
+  
   const name  = document.getElementById('input-name').value.trim();
   const email = document.getElementById('input-email').value.trim();
+  const org   = document.getElementById('input-org').value.trim();
+
   if (!name || !isValidEmail(email)) {
+    formError.textContent = "Please enter a valid name and corporate email.";
     formError.classList.remove('hidden');
     return;
   }
+
+  if (!supabase) {
+    formError.textContent = "Database connection error. Please check Supabase setup.";
+    formError.classList.remove('hidden');
+    return;
+  }
+
   formError.classList.add('hidden');
-  submittedEmail = email;
+  btnSendCode.disabled = true;
+  btnSendCode.querySelector('.btn-label').textContent = "Sending Code...";
 
-  // Generate a 6-digit OTP (demo — in production this happens server-side)
-  storedOtp = String(Math.floor(100000 + Math.random() * 900000));
-  console.log(`[DEV] OTP for ${email}: ${storedOtp}`);
+  try {
+    // 1. Send OTP to user's email
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        shouldCreateUser: true
+      }
+    });
 
-  // TODO: Replace with your real API call e.g.:
-  // await fetch('/api/send-otp', { method:'POST', body: JSON.stringify({ name, email, otp: storedOtp }) });
+    if (error) throw error;
 
-  otpEmailDisplay.textContent = email;
-  step1.classList.add('hidden');
-  step2.classList.remove('hidden');
-  otpDigits[0].focus();
+    // Store data for next step
+    submittedEmail = email;
+    submittedName = name;
+    submittedOrg = org;
+
+    otpEmailDisplay.textContent = email;
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+    otpDigits[0].focus();
+
+  } catch (error) {
+    console.error('Error sending OTP:', error.message);
+    formError.textContent = `Error: ${error.message}`;
+    formError.classList.remove('hidden');
+  } finally {
+    btnSendCode.disabled = false;
+    btnSendCode.querySelector('.btn-label').textContent = "Send Verification Code";
+  }
 });
 
 // OTP digit auto-advance
@@ -89,24 +129,56 @@ otpDigits.forEach((digit, i) => {
   });
 });
 
-// Step 2 → verify OTP
-step2.addEventListener('submit', (e) => {
+// Step 2 → Verify OTP and Store Lead
+step2.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const entered = [...otpDigits].map(d => d.value).join('');
-  if (entered !== storedOtp) {
+  const token = [...otpDigits].map(d => d.value).join('');
+  
+  if (token.length < 6) return;
+
+  otpError.classList.add('hidden');
+  btnVerify.disabled = true;
+  btnVerify.querySelector('.btn-label').textContent = "Verifying...";
+
+  try {
+    // 2. Verify the OTP code
+    const { error: authError } = await supabase.auth.verifyOtp({
+      email: submittedEmail,
+      token: token,
+      type: 'signup'
+    });
+
+    if (authError) throw authError;
+
+    // 3. Verification success! Store the lead in the database table
+    const { error: dbError } = await supabase
+      .from('leads')
+      .insert([
+        { 
+          full_name: submittedName, 
+          email: submittedEmail, 
+          organisation: submittedOrg,
+          created_at: new Date().toISOString()
+        }
+      ]);
+
+    if (dbError) throw dbError;
+
+    // Success UI
+    step2.classList.add('hidden');
+    success.classList.remove('hidden');
+
+  } catch (error) {
+    console.error('Verification failed:', error.message);
+    otpError.textContent = `Verification failed: ${error.message}`;
     otpError.classList.remove('hidden');
     otpDigits.forEach(d => { d.value = ''; d.style.borderColor = 'rgba(224,112,112,.6)'; });
     otpDigits[0].focus();
     setTimeout(() => otpDigits.forEach(d => d.style.borderColor = ''), 1800);
-    return;
+  } finally {
+    btnVerify.disabled = false;
+    btnVerify.querySelector('.btn-label').textContent = "Verify & Send Prospectus";
   }
-  otpError.classList.add('hidden');
-
-  // TODO: Replace with your API call to send the PDF prospectus:
-  // await fetch('/api/send-prospectus', { method:'POST', body: JSON.stringify({ email: submittedEmail }) });
-
-  step2.classList.add('hidden');
-  success.classList.remove('hidden');
 });
 
 // Back button
@@ -116,7 +188,6 @@ btnBack.addEventListener('click', () => {
   otpDigits.forEach(d => d.value = '');
 });
 
-// Email validator
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
