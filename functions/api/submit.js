@@ -24,8 +24,11 @@ export async function onRequestPost(context) {
     }
 
     // 2. Send Email via Resend (if configured)
-    if (context.env.RESEND_API_KEY) {
-      const resendRes = await fetch('https://api.resend.com/emails', {
+    if (!context.env.RESEND_API_KEY) {
+      return new Response(JSON.stringify({ error: 'System Error: RESEND_API_KEY is missing in Cloudflare Dashboard.' }), { status: 500 });
+    }
+
+    const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
@@ -53,7 +56,6 @@ export async function onRequestPost(context) {
         // Continue to return success to the user even if email delivery fails,
         // or you could return an error here depending on preference.
       }
-    }
 
     // Return success
     return new Response(JSON.stringify({ success: true }), { status: 200 });
