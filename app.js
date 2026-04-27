@@ -209,4 +209,32 @@ function initCarousel() {
   thumbs.forEach((thumb, index) => {
     thumb.addEventListener('click', () => updateCarousel(index));
   });
+
+  // Fullscreen Logic
+  const fullscreenBtn = document.getElementById('toggle-fullscreen');
+  const fullscreenWrap = document.getElementById('gallery-fullscreen-wrap');
+  const expandIcon = document.querySelector('.icon-expand');
+  const shrinkIcon = document.querySelector('.icon-shrink');
+
+  if (fullscreenBtn && fullscreenWrap) {
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        fullscreenWrap.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        expandIcon?.classList.add('hidden');
+        shrinkIcon?.classList.remove('hidden');
+      } else {
+        expandIcon?.classList.remove('hidden');
+        shrinkIcon?.classList.add('hidden');
+      }
+    });
+  }
 }

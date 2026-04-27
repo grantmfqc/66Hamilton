@@ -64,6 +64,12 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 .carousel-arrow{width:50px;height:50px;border-radius:50%;background:rgba(11,11,13,.6);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;pointer-events:auto}
 .carousel-arrow:hover{background:var(--accent-gold);border-color:var(--accent-gold);color:var(--bg)}
 .carousel-arrow svg{width:24px;height:24px}
+.fullscreen-btn{position:absolute;top:1.5rem;right:1.5rem;z-index:10;width:44px;height:44px;border-radius:50%;background:rgba(11,11,13,.6);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;pointer-events:auto;backdrop-filter:blur(8px)}
+.fullscreen-btn:hover{background:var(--accent-gold);border-color:var(--accent-gold);color:var(--bg)}
+.fullscreen-btn svg{width:20px;height:20px}
+#gallery-fullscreen-wrap:fullscreen{width:100vw;height:100vh;border:none;border-radius:0}
+#gallery-fullscreen-wrap:fullscreen .carousel-slide img{object-fit:contain;background:#000}
+#gallery-fullscreen-wrap:fullscreen .fullscreen-btn{top:2rem;right:2rem}
 
 .carousel-thumbnails-wrap{margin-top:1.5rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none}
 .carousel-thumbnails-wrap::-webkit-scrollbar{display:none}
