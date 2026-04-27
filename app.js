@@ -8,13 +8,51 @@ function init() {
     if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 60);
   });
 
-  // Hero Parallax
+  // Hero Parallax & Video
   const heroBg = document.getElementById('hero-bg');
+  const heroVideo = document.getElementById('hero-video');
+  const playBtn = document.getElementById('play-video-btn');
+  const heroContent = document.getElementById('hero-content');
+
   window.addEventListener('scroll', () => {
-    if (heroBg) {
+    if (heroBg && heroBg.style.opacity !== '0') {
       heroBg.style.transform = `translateY(${window.scrollY * 0.35}px)`;
     }
   }, { passive: true });
+
+  if (playBtn && heroVideo) {
+    playBtn.addEventListener('click', () => {
+      // Fade out background and content
+      if (heroBg) heroBg.style.opacity = '0';
+      heroContent.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      heroContent.style.opacity = '0';
+      heroContent.style.transform = 'translateY(-20px)';
+      
+      // Start video
+      heroVideo.style.opacity = '1';
+      heroVideo.play();
+      
+      // Optional: Add a way to pause or exit
+      heroVideo.addEventListener('click', () => {
+        if (heroVideo.paused) {
+          heroVideo.play();
+        } else {
+          heroVideo.pause();
+          // Bring back content
+          if (heroBg) heroBg.style.opacity = '1';
+          heroContent.style.opacity = '1';
+          heroContent.style.transform = 'translateY(0)';
+        }
+      });
+
+      // When video ends, bring back the UI
+      heroVideo.addEventListener('ended', () => {
+        if (heroBg) heroBg.style.opacity = '1';
+        heroContent.style.opacity = '1';
+        heroContent.style.transform = 'translateY(0)';
+      });
+    });
+  }
 
   // Reveal Logic
   const revealEls = document.querySelectorAll('.reveal');

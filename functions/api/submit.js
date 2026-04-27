@@ -59,14 +59,17 @@ export async function onRequestPost(context) {
             </head>
             <body>
               <div class="container">
-                <img src="https://premiumservice.ai/assets/hero-platter.jpg" alt="The Hamilton Residence" class="hero" />
+                <img src="https://www.premiumservice.ai/assets/hero-platter.jpg" alt="The Hamilton Residence" class="hero" />
                 <div class="content">
                   <span class="gold-text">Private Corporate Lease</span>
                   <h1>The Hamilton Residence</h1>
                   <p>Dear ${name},</p>
                   <p>Thank you for your enquiry regarding Apartment 1, 66 Hamilton Road, Herne Bay.</p>
-                  <p>As requested, please find your exclusive digital prospectus attached to this email. It contains comprehensive details regarding the residence, including floor plans, inclusions, and lease terms.</p>
-                  <a href="${securePdfUrl}" class="btn">VIEW PROSPECTUS ONLINE</a>
+                  <p>As requested, please find the exclusive digital prospectus for the residence below. It contains comprehensive details regarding the residence, including floor plans, executive inclusions, and corporate lease terms.</p>
+                  <div style="margin: 30px 0;">
+                    <a href="${securePdfUrl}" class="btn">DOWNLOAD PDF PROSPECTUS</a>
+                  </div>
+                  <p style="font-size: 13px;">You can also <a href="https://www.premiumservice.ai/prospectus.html" style="color: #C9A96E;">view the enhanced digital version online</a>.</p>
                 </div>
                 <div class="footer">
                   This communication is intended for ${email}.<br/>
