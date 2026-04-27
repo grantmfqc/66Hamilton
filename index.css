@@ -11,7 +11,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;font-size:16px}
-body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;width:100%}
 
 /* ── NAVBAR ── */
 .navbar{position:fixed;top:0;left:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.6rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s,border-color .4s;border-bottom:1px solid transparent}
@@ -19,7 +19,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 .nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;letter-spacing:.08em}
 .nav-logo-num{color:var(--accent-gold);font-weight:600}
 .nav-logo-text{font-weight:300;color:var(--text-primary)}
-.nav-cta{font-family:'Outfit',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-primary);text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:.55rem 1.4rem;border-radius:50px;transition:all .3s}
+.nav-cta{font-family:'Outfit',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-primary);text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:.55rem 1.4rem;border-radius:50px;transition:all .3s;white-space:nowrap}
 .nav-cta:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
 
 /* ── HERO ── */
@@ -214,6 +214,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   .navbar{padding:1rem 1.5rem}
   .navbar.scrolled{padding:.8rem 1.5rem}
   .nav-logo{font-size:1.1rem}
+  .nav-cta{font-size:.7rem;padding:.4rem 1rem}
   .residence-section,.location-section{grid-template-columns:1fr}
   .residence-image-wrap{height:60vw}
   .residence-copy,.location-copy{padding:3.5rem 1.5rem}
