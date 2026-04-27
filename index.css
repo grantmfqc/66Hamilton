@@ -71,6 +71,22 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 #gallery-fullscreen-wrap:fullscreen .carousel-slide img{object-fit:contain;background:#000}
 #gallery-fullscreen-wrap:fullscreen .fullscreen-btn{top:2rem;right:2rem}
 
+/* Hero Fullscreen Fixes */
+#hero-video-wrap:fullscreen .hero-video {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+  object-fit: contain !important;
+}
+#hero-video-wrap:fullscreen::before,
+#hero-video-wrap:fullscreen::after {
+  display: none !important;
+}
+#hero-video-wrap:fullscreen .hero-fullscreen-btn {
+  bottom: 2rem !important;
+  right: 2rem !important;
+}
+
 .carousel-thumbnails-wrap{margin-top:1.5rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none}
 .carousel-thumbnails-wrap::-webkit-scrollbar{display:none}
 .carousel-thumbnails{display:flex;gap:.8rem}
