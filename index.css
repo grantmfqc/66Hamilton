@@ -246,8 +246,8 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   .hero-rotate-hint{position:absolute;bottom:32%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;color:rgba(255,255,255,.5);font-family:'Outfit',sans-serif;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;z-index:5}
   .hero-rotate-hint svg{width:20px;height:20px;animation:rotateHint 3s infinite}
   
-  .hero-fullscreen-btn{position:absolute;bottom:2rem;right:2rem;z-index:15;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  .hero-fullscreen-btn svg{width:20px;height:20px}
+  .hero-fullscreen-btn{position:absolute;bottom:calc(50% - 28vw + 10px);right:1rem;z-index:15;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .hero-fullscreen-btn svg{width:18px;height:18px}
   
   .hero-bg{background-size:contain;background-repeat:no-repeat}
   
