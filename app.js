@@ -5,7 +5,9 @@ function init() {
   // Navbar
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 60);
+    if (navbar && !navbar.classList.contains('hidden-fade')) {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    }
   });
 
   // Hero Parallax & Video
@@ -13,6 +15,7 @@ function init() {
   const heroVideo = document.getElementById('hero-video');
   const playBtn = document.getElementById('play-video-btn');
   const heroContent = document.getElementById('hero-content');
+  const scrollHint = document.querySelector('.hero-scroll-hint');
 
   window.addEventListener('scroll', () => {
     if (heroBg && heroBg.style.opacity !== '0') {
@@ -22,8 +25,11 @@ function init() {
 
   if (playBtn && heroVideo) {
     playBtn.addEventListener('click', () => {
-      // Fade out background and content
+      // Fade out EVERYTHING
       if (heroBg) heroBg.style.opacity = '0';
+      if (navbar) navbar.classList.add('hidden-fade');
+      if (scrollHint) scrollHint.style.opacity = '0';
+      
       heroContent.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
       heroContent.style.opacity = '0';
       heroContent.style.transform = 'translateY(-20px)';
@@ -32,27 +38,30 @@ function init() {
       heroVideo.style.opacity = '1';
       heroVideo.play();
       
-      // Optional: Add a way to pause or exit
+      // Interaction to pause/restore
       heroVideo.addEventListener('click', () => {
-        if (heroVideo.paused) {
-          heroVideo.play();
-        } else {
+        if (!heroVideo.paused) {
           heroVideo.pause();
-          // Bring back content
-          if (heroBg) heroBg.style.opacity = '1';
-          heroContent.style.opacity = '1';
-          heroContent.style.transform = 'translateY(0)';
+          restoreHeroUI();
+        } else {
+          heroVideo.play();
         }
       });
 
-      // When video ends, bring back the UI
-      heroVideo.addEventListener('ended', () => {
-        if (heroBg) heroBg.style.opacity = '1';
-        heroContent.style.opacity = '1';
-        heroContent.style.transform = 'translateY(0)';
-      });
+      heroVideo.addEventListener('ended', restoreHeroUI);
     });
   }
+
+  function restoreHeroUI() {
+    if (heroBg) heroBg.style.opacity = '1';
+    if (navbar) navbar.classList.remove('hidden-fade');
+    if (scrollHint) scrollHint.style.opacity = '1';
+    heroContent.style.opacity = '1';
+    heroContent.style.transform = 'translateY(0)';
+  }
+
+  // Carousel Logic
+  initCarousel();
 
   // Reveal Logic
   const revealEls = document.querySelectorAll('.reveal');
@@ -148,4 +157,41 @@ if (document.readyState === 'loading') {
 
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function initCarousel() {
+  const track = document.querySelector('.carousel-track');
+  const thumbs = document.querySelectorAll('.carousel-thumb');
+  const nextBtn = document.querySelector('.carousel-arrow--next');
+  const prevBtn = document.querySelector('.carousel-arrow--prev');
+  
+  if (!track || thumbs.length === 0) return;
+
+  let currentIndex = 0;
+
+  const updateCarousel = (index) => {
+    currentIndex = index;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    
+    // Update thumbnails
+    thumbs.forEach(t => t.classList.remove('active'));
+    thumbs[index].classList.add('active');
+    
+    // Scroll thumbnail into view
+    thumbs[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  };
+
+  nextBtn?.addEventListener('click', () => {
+    let nextIndex = (currentIndex + 1) % thumbs.length;
+    updateCarousel(nextIndex);
+  });
+
+  prevBtn?.addEventListener('click', () => {
+    let prevIndex = (currentIndex - 1 + thumbs.length) % thumbs.length;
+    updateCarousel(prevIndex);
+  });
+
+  thumbs.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => updateCarousel(index));
+  });
 }
