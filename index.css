@@ -211,10 +211,10 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  .navbar{padding:1rem 1.5rem}
-  .navbar.scrolled{padding:.8rem 1.5rem}
-  .nav-logo{font-size:1.1rem}
-  .nav-cta{font-size:.7rem;padding:.4rem 1rem}
+  .navbar{padding:.8rem 1rem}
+  .navbar.scrolled{padding:.6rem 1rem}
+  .nav-logo{font-size:1rem}
+  .nav-cta{font-size:.6rem;padding:.35rem .8rem;letter-spacing:.08em}
   .residence-section,.location-section{grid-template-columns:1fr}
   .residence-image-wrap{height:60vw}
   .residence-copy,.location-copy{padding:3.5rem 1.5rem}
