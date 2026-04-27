@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>66 Hamilton — Professional Prospectus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0B0D;
+            --bg-mid: #111115;
+            --bg-card: #16161A;
+            --text-primary: #F2EFE9;
+            --text-muted: #8A8A92;
+            --accent-gold: #C9A96E;
+            --border: rgba(201, 169, 110, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background: #222; /* Preview background */
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* --- PDF / Print Specifics --- */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg);
+            page-break-after: always;
+            margin: 0 auto;
+        }
+
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        /* --- Content Layout --- */
+        .content-wrap {
+            padding: 25mm;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Typography --- */
+        h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 300; color: var(--text-primary); }
+        .eyebrow {
+            font-family: 'Outfit', sans-serif;
+            font-size: 8pt;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 8mm;
+        }
+
+        /* --- Components --- */
+        .gold-line {
+            height: 1px;
+            background: var(--accent-gold);
+            width: 40mm;
+            margin: 10mm 0;
+            opacity: 0.6;
+        }
+
+        .section-title { font-size: 42pt; line-height: 1.1; margin-bottom: 8mm; }
+        .section-title em { font-style: italic; color: var(--accent-gold); }
+        .section-body { font-size: 11pt; color: var(--text-muted); font-weight: 300; margin-bottom: 6mm; max-width: 140mm; }
+
+        /* --- Grid Systems --- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15mm; }
+        .amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 10mm; }
+        
+        .amenity-item {
+            border-left: 1px solid var(--border);
+            padding-left: 5mm;
+        }
+        .amenity-item h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 8.5pt;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2mm;
+        }
+        .amenity-item p { font-size: 9.5pt; color: var(--text-primary); opacity: 0.7; font-weight: 300; }
+
+        /* --- Images --- */
+        .img-full {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+        .img-frame {
+            width: 100%;
+            height: 110mm;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(11,11,13,0.2) 0%, rgba(11,11,13,0.85) 100%);
+            z-index: 1;
+        }
+
+        /* --- Footer Info --- */
+        .page-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 6mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 7pt;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* --- Media Overrides --- */
+        @media screen {
+            body { padding: 40px 0; }
+            .page { margin-bottom: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page">
+        <img src="assets/Platter.jpg" class="img-full" alt="66 Hamilton Waterfront">
+        <div class="img-overlay"></div>
+        <div class="content-wrap" style="justify-content: flex-end; padding-bottom: 40mm;">
+            <p class="eyebrow">Private Executive Lease</p>
+            <h1 style="font-size: 64pt; line-height: 0.9; margin-bottom: 10mm;">66<br><span style="font-style: italic; color: var(--accent-gold);">Hamilton</span></h1>
+            <div class="gold-line"></div>
+            <p style="font-size: 14pt; font-weight: 300; letter-spacing: 0.05em;">Herne Bay, Auckland</p>
+            <p style="font-size: 9pt; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.2em; margin-top: 2mm;">Waterfront Residence Prospectus</p>
+        </div>
+    </div>
+
+    <!-- PAGE 2: INTRODUCTION -->
+    <div class="page">
+        <div class="content-wrap">
+            <p class="eyebrow">The Standard</p>
+            <h2 class="section-title">Where luxury is <em>uncompromising.</em></h2>
+            
+            <p class="section-body">66 Hamilton Road is more than a residence; it is a curated lifestyle designed for those who command the highest standards of professional and personal living.</p>
+            
+            <p class="section-body">Occupying the premier top-floor position of the iconic Westpoint complex, the residence offers a rare combination of absolute waterfront serenity and immediate proximity to Auckland’s commercial heart.</p>
+
+            <div class="grid-2" style="margin-top: 10mm;">
+                <div class="amenity-item">
+                    <h4>Suitcase-Ready</h4>
+                    <p>Designed for seamless transition, the residence is fully furnished with bespoke pieces and high-end Miele appliances. Arrive and focus immediately on your objectives.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Top Floor Privacy</h4>
+                    <p>Occupying the entire top floor, the residence ensures complete privacy with no overhead occupants and 360-degree exposure to natural light and harbour views.</p>
+                </div>
+            </div>
+
+            <div class="img-frame" style="background-image: url('assets/living_room.jpeg'); height: 130mm;"></div>
+            
+            <div class="page-footer">
+                <span>The Hamilton Residence</span>
+                <span>Confidential — Page 02</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: THE RESIDENCE -->
+    <div class="page">
+        <div class="content-wrap">
+            <p class="eyebrow">The Configuration</p>
+            <h2 class="section-title">Space for <em>Perspective.</em></h2>
+            
+            <div class="grid-2">
+                <div>
+                    <p class="section-body">Spanning 188m² of meticulously planned interior space, the residence balances open-plan social areas with private, quiet sanctuaries.</p>
+                    <p class="section-body">Floor-to-ceiling glazing connects the interior directly to the Waitematā Harbour, creating an immersive environment that evolves with the Auckland light.</p>
+                </div>
+                <div style="background: var(--bg-card); padding: 10mm; border: 1px solid var(--border);">
+                    <h4 style="font-family:'Outfit'; font-size: 8pt; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 5mm;">Key Statistics</h4>
+                    <ul style="list-style: none; font-size: 10pt; line-height: 2.2;">
+                        <li style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>Bedrooms</span> <span style="color: var(--accent-gold);">2 Suites</span></li>
+                        <li style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>Bathrooms</span> <span style="color: var(--accent-gold);">2.5</span></li>
+                        <li style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>Interior Area</span> <span style="color: var(--accent-gold);">188m²</span></li>
+                        <li style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>Parking</span> <span style="color: var(--accent-gold);">Secure Basement</span></li>
+                        <li style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;"><span>Views</span> <span style="color: var(--accent-gold);">Waterfront Direct</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-top: 10mm; height: 90mm;">
+                <div style="background: url('assets/kitchen.jpeg') center/cover; border: 1px solid var(--border);"></div>
+                <div style="background: url('assets/Master_Bedroom1.jpeg') center/cover; border: 1px solid var(--border);"></div>
+            </div>
+
+            <div class="page-footer">
+                <span>The Hamilton Residence</span>
+                <span>Confidential — Page 03</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: TECHNOLOGY & SERVICES -->
+    <div class="page">
+        <div class="content-wrap">
+            <p class="eyebrow">Executive Connectivity</p>
+            <h2 class="section-title">Technological <em>Excellence.</em></h2>
+            
+            <p class="section-body">Recognizing the needs of the modern executive, the residence is equipped with commercial-grade infrastructure and smart home integration.</p>
+
+            <div class="amenity-grid">
+                <div class="amenity-item">
+                    <h4>Designer Workstation</h4>
+                    <p>Dedicated desk with multi-monitor setup and single cable USB-C docking. Optimized for productivity.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Business-Grade Fibre</h4>
+                    <p>High-speed 1Gbps internet with redundant coverage and on-call technical support.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Sonos & Entertainment</h4>
+                    <p>Integrated Sonos sound system throughout. Smart TVs with Chromecast in living, master, and second bedrooms.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Advanced Security</h4>
+                    <p>Secure automated perimeter and entry with video intercom and 24/7 CCTV monitoring of complex grounds.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Wellness & Spa</h4>
+                    <p>Access to the complex heated swimming pool and Jacuzzi, plus a private spa bath in-residence.</p>
+                </div>
+                <div class="amenity-item">
+                    <h4>Executive Concierge</h4>
+                    <p>Weekly professional cleaning included. Optional laundry services and property management on-call.</p>
+                </div>
+            </div>
+
+            <div class="img-frame" style="background-image: url('assets/Kitchen-workstation2.jpeg'); height: 80mm; margin-top: auto;"></div>
+
+            <div class="page-footer">
+                <span>The Hamilton Residence</span>
+                <span>Confidential — Page 04</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 5: LOCATION -->
+    <div class="page">
+        <div class="content-wrap">
+            <p class="eyebrow">The Context</p>
+            <h2 class="section-title">Herne Bay: <em>The Enclave.</em></h2>
+            
+            <div class="grid-2">
+                <div>
+                    <p class="section-body">Herne Bay is Auckland's most prestigious inner-city suburb—a quiet, leafy sanctuary for the city's leaders. It offers absolute privacy while keeping the CBD within a 10-minute commute.</p>
+                </div>
+                <div style="font-size: 10pt;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 2mm; margin-bottom: 2mm;">
+                        <span style="color: var(--text-muted);">CBD & Viaduct</span> <span>10m Drive</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 2mm; margin-bottom: 2mm;">
+                        <span style="color: var(--text-muted);">Wynyard Tech Hub</span> <span>12m Drive</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 2mm; margin-bottom: 2mm;">
+                        <span style="color: var(--text-muted);">Ponsonby Dining</span> <span>20m Walk</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 2mm; margin-bottom: 2mm;">
+                        <span style="color: var(--text-muted);">Auckland Airport</span> <span>25m Drive</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="img-frame" style="background-image: url('assets/Ariel_view.jpg'); height: 140mm;"></div>
+
+            <div class="page-footer">
+                <span>The Hamilton Residence</span>
+                <span>Confidential — Page 05</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 6: BACK COVER -->
+    <div class="page" style="background: var(--bg-mid);">
+        <div class="content-wrap" style="text-align: center; justify-content: center;">
+            <div style="margin-bottom: 20mm;">
+                <h3 style="font-size: 28pt; margin-bottom: 4mm;">Direct Enquiries</h3>
+                <p style="font-family: 'Outfit'; font-size: 10pt; letter-spacing: 0.1em; color: var(--accent-gold);">EXCLUSIVELY MANAGED BY PREMIUM SERVICE</p>
+            </div>
+            
+            <div style="padding: 15mm; border: 1px solid var(--border); max-width: 140mm; margin: 0 auto;">
+                <p style="font-size: 11pt; font-weight: 300; margin-bottom: 6mm;">To arrange a private viewing or request executive lease terms, please contact our portfolio manager.</p>
+                <p style="font-family: 'Cormorant Garamond'; font-size: 20pt; color: var(--text-primary);">prospectus@contact.premiumservice.ai</p>
+            </div>
+
+            <div style="margin-top: 30mm;">
+                <p style="font-size: 8pt; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.25em;">The Hamilton Residence &middot; Herne Bay</p>
+                <p style="font-size: 7pt; color: var(--text-muted); opacity: 0.4; margin-top: 2mm;">© 2026. All rights reserved. Confidential Property Document.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
