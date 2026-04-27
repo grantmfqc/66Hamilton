@@ -36,7 +36,10 @@ function init() {
       
       // Start video
       heroVideo.style.opacity = '1';
-      heroVideo.play().catch(err => {
+      heroVideo.muted = true; // Essential for mobile playback reliability
+      heroVideo.play().then(() => {
+        console.log("Video playing successfully");
+      }).catch(err => {
         console.warn("Video play failed:", err);
         // Fallback: Show UI again if play is blocked
         restoreHeroUI();

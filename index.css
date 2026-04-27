@@ -222,23 +222,32 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 }
 @media(max-width:600px){
   /* Hero Mobile */
-  .hero{height:100vh;min-height:600px}
-  .hero-video{width:auto;height:100%;max-width:none} /* Allow video to fill height on mobile */
-  .hero-title{font-size:3.2rem}
-  .hero-sub{font-size:.85rem;margin-bottom:2rem}
-  .play-icon-wrap{width:70px;height:70px}
+  .hero{height:100vh;min-height:560px;display:flex;align-items:center;justify-content:center;padding-top:80px}
+  .hero-video-container{inset:0;background:#000}
+  .hero-video{width:100%;height:100%;object-fit:cover;opacity:0} /* Cover on mobile for impact */
+  .hero-video-container::before, .hero-video-container::after{display:none} /* Hide bars on mobile for more space */
+  
+  .hero-content{padding:0 1.5rem;margin-top:-2rem}
+  .hero-eyebrow{font-size:.65rem;margin-bottom:1rem;letter-spacing:.15em}
+  .hero-title{font-size:2.8rem;margin-bottom:1.2rem}
+  .hero-sub{font-size:.82rem;margin-bottom:2.2rem;line-height:1.6}
+  
+  .play-icon-wrap{width:65px;height:65px}
+  .hero-scroll-hint{bottom:1.5rem}
   
   /* Carousel Mobile - Taller for 'Full Size' feel */
-  .carousel-main-wrap{aspect-ratio:4/5;min-height:450px}
-  .carousel-caption{font-size:.65rem;padding:.5rem 1rem;bottom:1.2rem;width:max-content;max-width:90%}
-  .carousel-arrow{width:40px;height:40px}
-  .carousel-thumb{flex:0 0 90px}
+  .carousel-main-wrap{aspect-ratio:1/1.2;min-height:400px}
+  .carousel-caption{font-size:.65rem;padding:.5rem 1rem;bottom:1rem;width:max-content;max-width:90%}
+  .carousel-arrow{width:38px;height:38px}
+  .carousel-thumb{flex:0 0 80px}
   
   .gallery-grid{grid-template-columns:1fr}
-  .stats-strip{flex-direction:column;gap:1.5rem}
-  .stat-divider{width:50px;height:1px}
-  .otp-digit{width:40px;height:52px;font-size:1.5rem}
+  .stats-strip{flex-direction:column;gap:1.5rem;padding:2.5rem 1.5rem}
+  .stat-divider{width:40px;height:1px}
+  .stat-num{font-size:1.8rem}
+  .otp-digit{width:38px;height:48px;font-size:1.4rem}
   .aerial-title{font-size:1.6rem}
+  .aerial-caption{padding:1.5rem;bottom:1rem}
 }
 
 /* ── AERIAL SECTION ── */
