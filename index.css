@@ -57,6 +57,9 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 .carousel-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
 .carousel-slide img{width:100%;height:100%;object-fit:cover;transition:opacity .5s ease}
 .carousel-caption{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(11,11,13,.7);backdrop-filter:blur(10px);color:var(--accent-gold);font-family:'Outfit',sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;padding:.6rem 1.4rem;border-radius:4px;border:1px solid var(--border);z-index:3;pointer-events:none}
+.rotate-hint{display:none;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1rem;color:var(--text-muted);font-family:'Outfit',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase}
+.rotate-hint svg{width:16px;height:16px;opacity:0.6;animation:rotateHint 3s infinite}
+@keyframes rotateHint{0%,100%{transform:rotate(0deg)} 50%{transform:rotate(90deg)}}
 .carousel-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 1.5rem;z-index:5;pointer-events:none}
 .carousel-arrow{width:50px;height:50px;border-radius:50%;background:rgba(11,11,13,.6);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;pointer-events:auto}
 .carousel-arrow:hover{background:var(--accent-gold);border-color:var(--accent-gold);color:var(--bg)}
@@ -258,13 +261,12 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   .hero-scroll-hint span{font-size:.6rem}
   .scroll-line{height:40px}
   
-  /* Carousel Mobile */
-  .carousel-main-wrap{aspect-ratio:1/1.2}
-  .carousel-caption{font-size:.6rem;padding:.4rem .8rem;bottom:.8rem}
-  
-  .stats-strip{padding:2rem 1.5rem}
-  .stat-num{font-size:1.6rem}
-  .aerial-caption{padding:1.2rem}
+  /* Carousel Mobile - Revert to Landscape */
+  .carousel-main-wrap{aspect-ratio:16/9;min-height:auto}
+  .rotate-hint{display:flex}
+  .carousel-caption{font-size:.55rem;padding:.3rem .7rem;bottom:.6rem}
+  .carousel-arrow{width:34px;height:34px}
+  .carousel-thumb{flex:0 0 70px}
 }
 
 /* ── AERIAL SECTION ── */
