@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
                   <span class="gold-text">Private Corporate Lease</span>
                   <h1>The Hamilton Residence</h1>
                   <p>Dear ${name},</p>
-                  <p>Thank you for your enquiry regarding Apartment 1, 66 Hamilton Road, Herne Bay.</p>
+                  <p>Thank you for your enquiry regarding 66 Hamilton Road, Herne Bay.</p>
                   <p>As requested, please find the exclusive digital prospectus for the residence below. It contains comprehensive details regarding the residence, including floor plans, executive inclusions, and corporate lease terms.</p>
                   <div style="margin: 30px 0;">
                     <a href="${securePdfUrl}" class="btn">DOWNLOAD PDF PROSPECTUS</a>
