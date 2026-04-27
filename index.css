@@ -263,8 +263,8 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   }
   
   .hero-content{
-    display:flex;flex-direction:column;justify-content:flex-start;
-    height:100%;padding:75px 1.2rem 0;margin:0;
+    display:flex;flex-direction:column;justify-content:flex-start !important;
+    height:100% !important;padding:60px 1.2rem 0 !important;margin:0 !important;
   }
   
   .hero-eyebrow{
