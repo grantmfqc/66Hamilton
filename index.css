@@ -238,7 +238,10 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   .stat-item{padding:0 1rem}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
   .gallery-section{padding:4rem 1rem}
-  .amenities-section{padding:4rem 1.5rem}
+  .amenities-section{padding:4rem 1.2rem}
+  .amenities-grid{grid-template-columns:1fr;gap:1.2rem}
+  .amenity-item{padding:1.2rem;gap:1rem}
+  .amenity-icon{width:32px;height:32px}
   .terms-section{padding:4rem 1.5rem}
   .pform-row{grid-template-columns:1fr}
   .location-map-wrap{height:300px}
