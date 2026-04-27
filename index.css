@@ -10,8 +10,8 @@
   --border-gold: rgba(201,169,110,0.25);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
-body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;width:100%}
+html,body{scroll-behavior:smooth;font-size:16px;width:100%;overflow-x:hidden;position:relative}
+body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;width:100%;max-width:100vw}
 
 /* ── NAVBAR ── */
 .navbar{position:fixed;top:0;left:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.6rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s,border-color .4s;border-bottom:1px solid transparent}
@@ -231,6 +231,13 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   .calendar-iframe{height:500px}
 }
 @media(max-width:600px){
+  /* Global viewport lock */
+  body, .navbar, .hero, .carousel-section, .stats-strip, .residence-section, .view-section, .aerial-section, .amenities-section, .location-section, .terms-section, .prospectus-section, .footer {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   /* Hero Mobile Overhaul */
   .hero{height:100dvh;min-height:500px;padding-top:0}
   .hero-video-container{inset:0;background:#000}
