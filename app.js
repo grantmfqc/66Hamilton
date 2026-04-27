@@ -24,7 +24,7 @@ function init() {
   }, { passive: true });
 
   if (playBtn && heroVideo) {
-    playBtn.addEventListener('click', () => {
+    const handlePlay = () => {
       // Fade out EVERYTHING
       if (heroBg) heroBg.style.opacity = '0';
       if (navbar) navbar.classList.add('hidden-fade');
@@ -36,20 +36,32 @@ function init() {
       
       // Start video
       heroVideo.style.opacity = '1';
-      heroVideo.play();
+      heroVideo.play().catch(err => {
+        console.warn("Video play failed:", err);
+        // Fallback: Show UI again if play is blocked
+        restoreHeroUI();
+      });
       
       // Interaction to pause/restore
-      heroVideo.addEventListener('click', () => {
+      const togglePlay = () => {
         if (!heroVideo.paused) {
           heroVideo.pause();
           restoreHeroUI();
         } else {
           heroVideo.play();
         }
-      });
+      };
 
+      heroVideo.addEventListener('click', togglePlay);
+      heroVideo.addEventListener('touchstart', togglePlay, { passive: true });
       heroVideo.addEventListener('ended', restoreHeroUI);
-    });
+    };
+
+    playBtn.addEventListener('click', handlePlay);
+    playBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handlePlay();
+    }, { passive: false });
   }
 
   function restoreHeroUI() {
