@@ -29,10 +29,22 @@
 
   <!-- ═══════════════════════════════ HERO ════════════════════════════════ -->
   <section class="hero" id="hero">
-    <div class="hero-video-container">
+    <div class="hero-video-container" id="hero-video-wrap">
       <video id="hero-video" class="hero-video" poster="assets/Platter.jpg" preload="none" playsinline>
         <source src="https://grantmfqc.github.io/66Hamilton/assets/66-hamilton-hero.mp4" type="video/mp4">
       </video>
+      <button class="hero-fullscreen-btn" id="hero-fullscreen" aria-label="Fullscreen Video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </button>
+    </div>
+    <div class="hero-rotate-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+        <line x1="12" y1="18" x2="12.01" y2="18" />
+      </svg>
+      <span>Rotate for cinematic view</span>
     </div>
     <div class="hero-bg" id="hero-bg" style="background-image: url('assets/Platter.jpg');"></div>
     <div class="hero-overlay"></div>

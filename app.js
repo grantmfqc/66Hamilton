@@ -24,11 +24,16 @@ function init() {
   }, { passive: true });
 
   if (playBtn && heroVideo) {
+    const heroFullscreenBtn = document.getElementById('hero-fullscreen');
+    const heroVideoWrap = document.getElementById('hero-video-wrap');
+    const heroRotateHint = document.querySelector('.hero-rotate-hint');
+
     const handlePlay = () => {
       // Fade out EVERYTHING
       if (heroBg) heroBg.style.opacity = '0';
       if (navbar) navbar.classList.add('hidden-fade');
       if (scrollHint) scrollHint.style.opacity = '0';
+      if (heroRotateHint) heroRotateHint.style.opacity = '0';
       
       heroContent.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
       heroContent.style.opacity = '0';
@@ -52,6 +57,7 @@ function init() {
           restoreHeroUI();
         } else {
           heroVideo.play();
+          if (heroRotateHint) heroRotateHint.style.opacity = '0';
         }
       };
 
@@ -65,6 +71,25 @@ function init() {
       e.preventDefault();
       handlePlay();
     }, { passive: false });
+
+    // Hero Fullscreen
+    if (heroFullscreenBtn && heroVideoWrap) {
+      const toggleHeroFS = (e) => {
+        e.stopPropagation();
+        if (!document.fullscreenElement) {
+          heroVideoWrap.requestFullscreen().catch(err => {
+            console.error(`Error: ${err.message}`);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      };
+      heroFullscreenBtn.addEventListener('click', toggleHeroFS);
+      heroFullscreenBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        toggleHeroFS(e);
+      }, { passive: false });
+    }
   }
 
   function restoreHeroUI() {
