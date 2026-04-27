@@ -264,14 +264,14 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   
   .hero-content{
     display:flex;flex-direction:column;justify-content:flex-start;
-    height:100%;padding:100px 1.2rem 0;margin:0;
+    height:100%;padding:75px 1.2rem 0;margin:0;
   }
   
   .hero-eyebrow{
     display: none;
   }
   
-  .hero-title{font-size:2.4rem;margin-bottom:1.5rem;margin-top:20px}
+  .hero-title{font-size:2.2rem;margin-bottom:1.5rem;margin-top:0}
   .hero-sub{display:none !important; visibility: hidden !important; height: 0; margin: 0; padding: 0;}
   
   .hero-play-btn{margin-top:1rem;position:relative;z-index:10}
