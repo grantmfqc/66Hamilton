@@ -252,9 +252,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   }
   
   .hero-eyebrow{
-    position:absolute;top:100px;left:0;right:0;
-    font-size:.65rem;margin:0;letter-spacing:.2em;
-    padding:0.8rem 0;background:rgba(0,0,0,0.4);
+    display: none;
   }
   
   .hero-title{font-size:2.4rem;margin-bottom:1.5rem;margin-top:20px}
