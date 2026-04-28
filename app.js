@@ -76,12 +76,20 @@ function init() {
     if (heroFullscreenBtn && heroVideoWrap) {
       const toggleHeroFS = (e) => {
         e.stopPropagation();
-        if (!document.fullscreenElement) {
-          heroVideoWrap.requestFullscreen().catch(err => {
-            console.error(`Error: ${err.message}`);
-          });
-        } else {
-          document.exitFullscreen();
+        if (heroVideoWrap.requestFullscreen) {
+          if (!document.fullscreenElement) {
+            heroVideoWrap.requestFullscreen().catch(err => console.error(err));
+          } else {
+            document.exitFullscreen();
+          }
+        } else if (heroVideoWrap.webkitRequestFullscreen) { /* Safari Desktop/iPad */
+          if (!document.webkitFullscreenElement) {
+            heroVideoWrap.webkitRequestFullscreen();
+          } else {
+            document.webkitExitFullscreen();
+          }
+        } else if (heroVideo.webkitEnterFullscreen) { /* iOS iPhone Safari */
+          heroVideo.webkitEnterFullscreen();
         }
       };
       heroFullscreenBtn.addEventListener('click', toggleHeroFS);
