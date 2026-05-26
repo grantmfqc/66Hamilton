@@ -1,7 +1,3 @@
 name = "66hamiltonrd"
 compatibility_date = "2026-05-03"
 pages_build_output_dir = "."
-
-[[kv_namespaces]]
-binding = "APPLICATIONS_KV"
-id = "00000000000000000000000000000000"
