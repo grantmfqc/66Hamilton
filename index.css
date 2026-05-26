@@ -16,11 +16,12 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 /* ── NAVBAR ── */
 .navbar{position:fixed;top:0;left:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.6rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s,border-color .4s;border-bottom:1px solid transparent}
 .navbar.scrolled{background:rgba(11,11,13,.85);backdrop-filter:blur(16px);padding:1rem 4rem;border-color:var(--border)}
+.nav-actions{display:flex;align-items:center;gap:.8rem}
 .nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;letter-spacing:.08em;text-decoration:none;display:inline-block}
 .nav-logo-num{color:var(--accent-gold);font-weight:600}
 .nav-logo-text{font-weight:300;color:var(--text-primary)}
-.nav-cta{font-family:'Outfit',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-primary);text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:.55rem 1.4rem;border-radius:50px;transition:all .3s;white-space:nowrap}
-.nav-cta:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
+.nav-cta{font-family:'Outfit',sans-serif;font-size:.84rem;letter-spacing:.12em;text-transform:uppercase;color:var(--bg);text-decoration:none;border:1px solid var(--accent-gold);background:var(--accent-gold);padding:.62rem 1.55rem;border-radius:50px;transition:all .3s;white-space:nowrap}
+.nav-cta:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:var(--bg);box-shadow:0 0 14px rgba(201,169,110,.35)}
 
 /* ── HERO ── */
 .hero{position:relative;height:100vh;min-height:700px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:#000}
@@ -229,8 +230,10 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 @media(max-width:900px){
   .navbar{padding:.7rem 1rem}
   .navbar.scrolled{padding:.5rem 1rem}
+  .nav-actions{gap:.45rem}
   .nav-logo{font-size:.95rem}
-  .nav-cta{font-size:.55rem;padding:.3rem .7rem;letter-spacing:.08em}
+  .nav-cta{font-size:.6rem;padding:.36rem .82rem;letter-spacing:.08em}
+  .nav-login-btn{font-size:.55rem;padding:.3rem .7rem;letter-spacing:.08em}
   .residence-section,.location-section{grid-template-columns:1fr}
   .residence-image-wrap{height:60vw}
   .residence-copy,.location-copy{padding:3.5rem 1.5rem}
@@ -475,19 +478,19 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
   letter-spacing: 1.5px;
   text-transform: uppercase;
   text-decoration: none;
-  border: 1px solid rgba(201, 169, 110, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   padding: 8px 16px;
-  border-radius: 4px;
-  background: rgba(201, 169, 110, 0.02);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.02);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-right: 15px;
   display: inline-block;
+  white-space: nowrap;
 }
 .nav-login-btn:hover {
-  color: var(--accent-gold, #c9a96e);
-  border-color: var(--accent-gold, #c9a96e);
-  background: rgba(201, 169, 110, 0.08);
-  box-shadow: 0 0 15px rgba(201, 169, 110, 0.15);
+  color: var(--text-primary, #f2efe9);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
 }
 
