@@ -3,16 +3,38 @@ export async function onRequestPost(context) {
     const data = await context.request.json();
     const { passcode, rent, startDate, linenService } = data;
 
-    // 1. Verify admin passcode
-    const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
-    if (passcode !== expectedPasscode) {
-      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid admin passcode' }), { status: 401 });
-    }
-
-    // 2. Check KV binding
     const kv = context.env.APPLICATIONS_KV;
     if (!kv) {
       return new Response(JSON.stringify({ error: 'System Error: APPLICATIONS_KV binding is missing in Cloudflare.' }), { status: 500 });
+    }
+
+    // 1. Verify admin authorization
+    let isAuthorized = false;
+    
+    // Check session token
+    const authHeader = context.request.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const sessionToken = authHeader.substring(7);
+      const sessionStr = await kv.get(`session:${sessionToken}`);
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
+        if (session.role === 'admin' && session.userAgent === userAgent) {
+          isAuthorized = true;
+        }
+      }
+    }
+
+    // Fallback to legacy passcode
+    if (!isAuthorized && passcode) {
+      const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
+      if (passcode === expectedPasscode) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid admin credentials' }), { status: 401 });
     }
 
     // 3. Generate unique application ID

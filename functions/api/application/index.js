@@ -1,22 +1,51 @@
 export async function onRequestGet(context) {
   try {
     const url = new URL(context.request.url);
-    const token = url.searchParams.get('token');
-    const passcode = url.searchParams.get('passcode'); // for admin overview
-
-    // 1. Verify access
-    if (!token && !passcode) {
-      return new Response(JSON.stringify({ error: 'Missing access credentials' }), { status: 400 });
-    }
+    let token = url.searchParams.get('token');
+    let passcode = url.searchParams.get('passcode'); // legacy backward compatibility
 
     const kv = context.env.APPLICATIONS_KV;
     if (!kv) {
       return new Response(JSON.stringify({ error: 'System Error: APPLICATIONS_KV binding is missing in Cloudflare.' }), { status: 500 });
     }
 
+    // Check secure session authorization
+    let isAdmin = false;
+    let isTenant = false;
+    const authHeader = context.request.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const sessionToken = authHeader.substring(7);
+      const sessionStr = await kv.get(`session:${sessionToken}`);
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        // Verify User-Agent matches session to prevent hijacking
+        const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
+        if (session.userAgent === userAgent) {
+          if (session.role === 'admin') {
+            isAdmin = true;
+          } else if (session.role === 'tenant') {
+            isTenant = true;
+            token = session.tokenId;
+          }
+        }
+      }
+    }
+
+    // Legacy Passcode Authorization (if not already authenticated as admin via session)
+    if (!isAdmin && passcode) {
+      const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
+      if (passcode === expectedPasscode) {
+        isAdmin = true;
+      }
+    }
+
+    // 1. Verify access
+    if (!token && !isAdmin) {
+      return new Response(JSON.stringify({ error: 'Missing or expired access credentials' }), { status: 401 });
+    }
+
     // Admin Mode: Load all applications or a specific one
-    const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
-    if (passcode === expectedPasscode) {
+    if (isAdmin) {
       if (token) {
         // Fetch specific application for admin review
         const data = await kv.get(`application:${token}`);

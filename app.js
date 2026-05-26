@@ -108,6 +108,33 @@ function init() {
     heroContent.style.transform = 'translateY(0)';
   }
 
+  // Portal Login UI Bindings
+  const loginBtn = document.getElementById('portal-login-btn');
+  const closeBtn = document.getElementById('login-close-btn');
+  const changeEmailBtn = document.getElementById('login-change-email-btn');
+  const step1Form = document.getElementById('login-step1-form');
+  const step2Form = document.getElementById('login-step2-form');
+  const loginModal = document.getElementById('login-modal');
+
+  loginBtn?.addEventListener('click', openLoginModal);
+  closeBtn?.addEventListener('click', closeLoginModal);
+  changeEmailBtn?.addEventListener('click', backToStep1);
+  step1Form?.addEventListener('submit', handleRequestOTP);
+  step2Form?.addEventListener('submit', handleVerifyOTP);
+
+  // Close modal if click is on the overlay backdrop
+  loginModal?.addEventListener('click', (e) => {
+    if (e.target === loginModal) {
+      closeLoginModal();
+    }
+  });
+
+  // Auto-trigger login modal if login=1 query parameter is present (e.g. redirected from session timeout)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('login')) {
+    setTimeout(() => { openLoginModal(); }, 300);
+  }
+
   // Carousel Logic
   initCarousel();
 
@@ -157,12 +184,13 @@ function init() {
       const org = document.getElementById('input-org').value.trim();
       const phone = document.getElementById('input-phone').value.trim();
       const pref = document.getElementById('input-pref').value;
+      const country = document.getElementById('input-country').value.trim();
       
       const formData = new FormData(e.target);
       const turnstileToken = formData.get('cf-turnstile-response');
 
-      if (!name || !isValidEmail(email) || !phone || !turnstileToken) {
-        formError.textContent = "Please fill in all fields and verify you are human.";
+      if (!name || !isValidEmail(email) || !phone || !country || !turnstileToken) {
+        formError.textContent = "Please fill in all fields (including country of residence) and verify you are human.";
         formError.classList.remove('hidden');
         return;
       }
@@ -175,7 +203,7 @@ function init() {
         const response = await fetch('/api/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, org, phone, pref, token: turnstileToken })
+          body: JSON.stringify({ name, email, org, phone, pref, token: turnstileToken, country })
         });
         
         const result = await response.json();
@@ -210,6 +238,7 @@ function init() {
       const phone = document.getElementById('input-phone').value.trim();
       const pref = document.getElementById('input-pref').value;
       const code = document.getElementById('input-code').value.trim();
+      const country = document.getElementById('input-country').value.trim();
 
       if (!code || code.length !== 6) {
         verifyError.textContent = "Please enter the 6-digit verification code.";
@@ -225,7 +254,7 @@ function init() {
         const response = await fetch('/api/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, org, phone, pref, code })
+          body: JSON.stringify({ name, email, org, phone, pref, code, country })
         });
         
         const result = await response.json();
@@ -328,4 +357,181 @@ function initCarousel() {
       }
     });
   }
+}
+
+// ═══════════════════════════════ RESIDENT PORTAL LOGIN SCRIPT ═══════════════════════════════
+let resendCooldownInterval = null;
+
+function openLoginModal(e) {
+  if (e) e.preventDefault();
+  const modal = document.getElementById('login-modal');
+  if (!modal) return;
+  
+  // Clear any existing states
+  document.getElementById('login-error-banner').style.display = 'none';
+  document.getElementById('login-success-banner').style.display = 'none';
+  document.getElementById('login-step1-form').style.display = 'block';
+  document.getElementById('login-step2-form').style.display = 'none';
+  
+  // Restore email from memory
+  const savedEmail = localStorage.getItem('login_email') || '';
+  document.getElementById('login-email-input').value = savedEmail;
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // Lock background scroll
+}
+
+function closeLoginModal(e) {
+  if (e) e.preventDefault();
+  const modal = document.getElementById('login-modal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  document.body.style.overflow = 'auto'; // Restore background scroll
+  
+  if (resendCooldownInterval) {
+    clearInterval(resendCooldownInterval);
+  }
+}
+
+function backToStep1(e) {
+  if (e) e.preventDefault();
+  document.getElementById('login-step1-form').style.display = 'block';
+  document.getElementById('login-step2-form').style.display = 'none';
+  document.getElementById('login-error-banner').style.display = 'none';
+  document.getElementById('login-success-banner').style.display = 'none';
+}
+
+async function handleRequestOTP(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById('login-email-input');
+  const email = emailInput.value.trim();
+  const errorBanner = document.getElementById('login-error-banner');
+  const successBanner = document.getElementById('login-success-banner');
+  const reqBtn = document.getElementById('login-request-btn');
+  
+  if (!email || !isValidEmail(email)) {
+    showLoginError("Please enter a valid email address.");
+    return;
+  }
+
+  errorBanner.style.display = 'none';
+  successBanner.style.display = 'none';
+  reqBtn.disabled = true;
+  reqBtn.textContent = "Dispatched Request...";
+
+  try {
+    const res = await fetch('/api/auth/request-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error');
+
+    // Save email in memory
+    localStorage.setItem('login_email', email);
+
+    // Transition to Step 2
+    document.getElementById('sent-email-placeholder').textContent = email;
+    document.getElementById('login-step1-form').style.display = 'none';
+    document.getElementById('login-step2-form').style.display = 'block';
+    
+    // Clear code input field
+    document.getElementById('login-otp-input').value = '';
+
+    // Start 60s cooldown timer
+    startResendCooldown();
+  } catch (err) {
+    showLoginError(err.message);
+  } finally {
+    reqBtn.disabled = false;
+    reqBtn.textContent = "Request Access Code";
+  }
+}
+
+async function handleVerifyOTP(e) {
+  if (e) e.preventDefault();
+  const email = document.getElementById('login-email-input').value.trim();
+  const otp = document.getElementById('login-otp-input').value.trim();
+  const errorBanner = document.getElementById('login-error-banner');
+  const successBanner = document.getElementById('login-success-banner');
+  const verifyBtn = document.getElementById('login-verify-btn');
+
+  if (!otp || otp.length !== 6) {
+    showLoginError("Please enter the 6-digit verification code.");
+    return;
+  }
+
+  errorBanner.style.display = 'none';
+  successBanner.style.display = 'none';
+  verifyBtn.disabled = true;
+  verifyBtn.textContent = "Verifying Environment...";
+
+  try {
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Verification failed');
+
+    // Authentication Success! Save session
+    localStorage.setItem('session_token', data.token);
+    localStorage.setItem('session_role', data.role);
+    localStorage.setItem('session_email', email);
+
+    successBanner.textContent = "Identity Verified! Redirecting to Resident Dashboard...";
+    successBanner.style.display = 'block';
+
+    setTimeout(() => {
+      closeLoginModal();
+      if (data.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = `apply.html?token=${data.tokenId}`;
+      }
+    }, 1500);
+
+  } catch (err) {
+    showLoginError(err.message);
+  } finally {
+    verifyBtn.disabled = false;
+    verifyBtn.textContent = "Verify & Sign In";
+  }
+}
+
+function startResendCooldown() {
+  const cooldownText = document.getElementById('login-cooldown-text');
+  const resendLink = document.getElementById('login-resend-link');
+  
+  resendLink.style.display = 'none';
+  cooldownText.style.display = 'inline';
+  
+  let timeLeft = 60;
+  
+  if (resendCooldownInterval) {
+    clearInterval(resendCooldownInterval);
+  }
+  
+  const updateTimer = () => {
+    cooldownText.textContent = `Resend code in ${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(resendCooldownInterval);
+      cooldownText.style.display = 'none';
+      resendLink.style.display = 'inline';
+    }
+    timeLeft--;
+  };
+  
+  updateTimer();
+  resendCooldownInterval = setInterval(updateTimer, 1000);
+}
+
+function showLoginError(msg) {
+  const banner = document.getElementById('login-error-banner');
+  banner.textContent = msg;
+  banner.style.display = 'block';
 }

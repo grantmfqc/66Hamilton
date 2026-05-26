@@ -18,13 +18,35 @@ export async function onRequestPost(context) {
     let activeToken = token;
     let isAdmin = false;
 
-    if (passcode === expectedPasscode) {
-      isAdmin = true;
-      activeToken = token || payload.token;
+    // Check secure session authorization
+    const authHeader = context.request.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const sessionToken = authHeader.substring(7);
+      const sessionStr = await kv.get(`session:${sessionToken}`);
+      if (sessionStr) {
+        const session = JSON.parse(sessionStr);
+        const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
+        if (session.userAgent === userAgent) {
+          if (session.role === 'admin') {
+            isAdmin = true;
+            activeToken = token || payload.token;
+          } else if (session.role === 'tenant') {
+            activeToken = session.tokenId;
+          }
+        }
+      }
+    }
+
+    // Legacy passcode check (fallback)
+    if (!isAdmin && passcode) {
+      if (passcode === expectedPasscode) {
+        isAdmin = true;
+        activeToken = token || payload.token;
+      }
     }
 
     if (!activeToken) {
-      return new Response(JSON.stringify({ error: 'Missing application token' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Missing application token or expired session' }), { status: 401 });
     }
 
     // 2. Fetch application

@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { name, email, org, phone, pref, token, code } = data;
+    const { name, email, org, phone, pref, token, code, country } = data;
 
     const kv = context.env.APPLICATIONS_KV;
     if (!kv) {
@@ -95,6 +95,7 @@ export async function onRequestPost(context) {
                   <tr><th style="text-align: left;">Email</th><td>${email}</td></tr>
                   <tr><th style="text-align: left;">Phone</th><td>${phone}</td></tr>
                   <tr><th style="text-align: left;">Organisation</th><td>${org || 'N/A'}</td></tr>
+                  <tr><th style="text-align: left;">Country of Residence</th><td>${country || 'N/A'}</td></tr>
                   <tr><th style="text-align: left;">Prefers</th><td>${pref}</td></tr>
                 </table>
               </div>

@@ -21,9 +21,12 @@
 
   <!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
   <nav class="navbar" id="navbar">
-    <a href="#" class="nav-logo">
-      <span class="nav-logo-num">66</span><span class="nav-logo-text"> Hamilton.</span>
-    </a>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="#" class="nav-login-btn" id="portal-login-btn">Portal Login</a>
+      <a href="#" class="nav-logo">
+        <span class="nav-logo-num">66</span><span class="nav-logo-text"> Hamilton.</span>
+      </a>
+    </div>
     <a href="#prospectus" class="nav-cta" id="nav-cta-btn">Contact</a>
   </nav>
 
@@ -671,9 +674,15 @@
           </div>
         </div>
 
-        <div class="pform-group pform-group--full">
-          <label for="input-org">Organisation <span class="optional">(optional)</span></label>
-          <input type="text" id="input-org" name="org" placeholder="e.g. Deloitte NZ, Screen Auckland, MBIE…" autocomplete="organization" />
+        <div class="pform-row">
+          <div class="pform-group">
+            <label for="input-country">Country of Residence</label>
+            <input type="text" id="input-country" name="country" placeholder="e.g. New Zealand, United Kingdom" required />
+          </div>
+          <div class="pform-group">
+            <label for="input-org">Organisation <span class="optional">(optional)</span></label>
+            <input type="text" id="input-org" name="org" placeholder="e.g. Deloitte NZ, Screen Auckland, MBIE…" autocomplete="organization" />
+          </div>
         </div>
         <div class="pform-group pform-group--full"
           style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
@@ -728,6 +737,51 @@
       <p class="footer-copy">&copy; 2026 The Hamilton Residence. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- ═══════════════════════════════ PORTAL LOGIN MODAL ═══════════════════════════════ -->
+  <div class="login-modal-overlay" id="login-modal" style="display: none;">
+    <div class="login-modal-card">
+      <button class="login-modal-close" id="login-close-btn">&times;</button>
+      
+      <div style="text-align: center; margin-bottom: 25px;">
+        <h2 class="login-modal-title">RESIDENT PORTAL</h2>
+        <p class="login-modal-subtitle">Secure Access Control System</p>
+      </div>
+
+      <!-- Step 1: Request OTP -->
+      <form id="login-step1-form">
+        <div class="login-form-group">
+          <label for="login-email-input">Registered Email Address</label>
+          <input type="email" id="login-email-input" placeholder="e.g. resident@domain.com" required />
+        </div>
+        <button type="submit" class="login-modal-btn" id="login-request-btn">Request Access Code</button>
+      </form>
+
+      <!-- Step 2: Verify OTP -->
+      <form id="login-step2-form" style="display: none;">
+        <div style="margin-bottom: 20px; text-align: center;">
+          <p style="font-size: 0.88rem; color: #a0a0a5; margin-bottom: 10px; line-height: 1.4;">
+            A one-time verification code has been sent to:<br/>
+            <strong id="sent-email-placeholder" style="color: #ffffff;"></strong>
+          </p>
+          <a href="#" id="login-change-email-btn" style="font-size: 0.8rem; color: var(--accent-gold); text-decoration: underline;">Change Email Address</a>
+        </div>
+        <div class="login-form-group">
+          <label for="login-otp-input">6-Digit Verification Code</label>
+          <input type="text" id="login-otp-input" placeholder="••••••" maxlength="6" pattern="\d{6}" required style="text-align: center; font-size: 1.6rem; letter-spacing: 8px; font-family: monospace;" />
+        </div>
+        <button type="submit" class="login-modal-btn" id="login-verify-btn">Verify & Sign In</button>
+        
+        <div style="text-align: center; margin-top: 15px;">
+          <span id="login-cooldown-text" style="font-size: 0.8rem; color: #888;"></span>
+          <a href="#" id="login-resend-link" style="display: none; font-size: 0.8rem; color: var(--accent-gold); text-decoration: none; font-weight: bold;">Resend Code</a>
+        </div>
+      </form>
+      
+      <div id="login-error-banner" class="login-error-banner" style="display: none;"></div>
+      <div id="login-success-banner" class="login-success-banner" style="display: none;"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
