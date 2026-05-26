@@ -1087,6 +1087,7 @@
         }
 
         function goToStage(stageNum) {
+            window.scrollTo(0, 0);
             document.querySelectorAll('.step').forEach(step => step.classList.remove('active', 'completed'));
             document.getElementById('stage-onboarding').style.display = 'none';
             document.getElementById('stage-contract').style.display = 'none';
