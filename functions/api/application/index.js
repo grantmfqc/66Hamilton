@@ -15,7 +15,7 @@ export async function onRequestGet(context) {
     }
 
     // Admin Mode: Load all applications or a specific one
-    const expectedPasscode = context.env.ADMIN_PASSCODE || 'Hamilton66';
+    const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
     if (passcode === expectedPasscode) {
       if (token) {
         // Fetch specific application for admin review

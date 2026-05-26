@@ -4,7 +4,7 @@ export async function onRequestPost(context) {
     const { passcode, rent, startDate, linenService } = data;
 
     // 1. Verify admin passcode
-    const expectedPasscode = context.env.ADMIN_PASSCODE || 'Hamilton66';
+    const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
     if (passcode !== expectedPasscode) {
       return new Response(JSON.stringify({ error: 'Unauthorized: Invalid admin passcode' }), { status: 401 });
     }

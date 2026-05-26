@@ -12,7 +12,7 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: 'System Error: APPLICATIONS_KV binding is missing in Cloudflare.' }), { status: 500 });
     }
 
-    const expectedPasscode = context.env.ADMIN_PASSCODE || 'Hamilton66';
+    const expectedPasscode = context.env.ADMIN_PASSCODE || 'HouseNow!6969';
 
     // 1. Authorize action
     let activeToken = token;
