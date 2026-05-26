@@ -4,4 +4,4 @@ pages_build_output_dir = "."
 
 [[kv_namespaces]]
 binding = "APPLICATIONS_KV"
-id = "local-dev-kv"
+id = "00000000000000000000000000000000"
