@@ -521,7 +521,7 @@
                     <input type="text" id="tenant-name" required />
                 </div>
                 <div class="form-group">
-                    <label for="tenant-address">Current Permanent Address (Outside NZ)</label>
+                    <label for="tenant-address">Current Permanent Address</label>
                     <input type="text" id="tenant-address" required />
                 </div>
                 <div class="form-row">
@@ -570,7 +570,7 @@
 
                 <div class="form-section-title">3. Identity Verification & Travel Logistics</div>
                 <div class="form-group">
-                    <label>Passport Upload (Clear scan or photo of ID page)</label>
+                    <label>Passport/Drivers License Upload (Clear scan or photo of ID)</label>
                     <div class="file-upload-wrapper">
                         <span class="file-upload-text" id="upload-label">Drag & drop or click to upload Passport</span>
                         <input type="file" id="tenant-passport" accept="image/*,application/pdf" onchange="handlePassportUpload(event)" required />
@@ -583,16 +583,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="flight-number">Arrival Airline & Flight Number</label>
-                        <input type="text" id="flight-number" placeholder="e.g. NZ80" />
+                        <label for="expected-arrival-date">Expected Arrival Date</label>
+                        <input type="date" id="expected-arrival-date" required />
                     </div>
                     <div class="form-group">
-                        <label for="landing-time">Scheduled Landing Time (Auckland Airport)</label>
-                        <input type="time" id="landing-time" />
+                        <label for="expected-arrival-time">Expected Arrival Time</label>
+                        <input type="time" id="expected-arrival-time" required />
                     </div>
                 </div>
 
-                <div class="form-section-title">4. International Emergency Contact</div>
+                <div class="form-section-title">4. Emergency Contact</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="emergency-name">Full Name</label>
@@ -1117,8 +1117,8 @@
             document.getElementById('tenant-address').value = td.address || '';
             document.getElementById('tenant-phone').value = td.phone || '';
             document.getElementById('tenant-email').value = td.email || '';
-            document.getElementById('flight-number').value = td.flightNumber || '';
-            document.getElementById('landing-time').value = td.landingTime || '';
+            document.getElementById('expected-arrival-date').value = td.expectedArrivalDate || '';
+            document.getElementById('expected-arrival-time').value = td.expectedArrivalTime || '';
             document.getElementById('emergency-name').value = td.emergencyName || '';
             document.getElementById('emergency-relationship').value = td.emergencyRelationship || '';
             document.getElementById('emergency-phone').value = td.emergencyPhone || '';
@@ -1194,8 +1194,8 @@
                 email: document.getElementById('tenant-email').value.trim(),
                 occupants,
                 passportData,
-                flightNumber: document.getElementById('flight-number').value.trim(),
-                landingTime: document.getElementById('landing-time').value,
+                expectedArrivalDate: document.getElementById('expected-arrival-date').value,
+                expectedArrivalTime: document.getElementById('expected-arrival-time').value,
                 emergencyName: document.getElementById('emergency-name').value.trim(),
                 emergencyRelationship: document.getElementById('emergency-relationship').value.trim(),
                 emergencyPhone: document.getElementById('emergency-phone').value.trim(),
