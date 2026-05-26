@@ -793,7 +793,22 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+            <!-- Custom success card for submitted contract pending approval -->
+            <div id="pending-approval-banner" style="display: none; margin-top: 25px; padding: 30px 20px; background: rgba(201, 169, 110, 0.05); border: 1px solid var(--accent-gold); border-radius: 8px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
+                <div style="font-size: 2.8rem; margin-bottom: 15px; color: var(--accent-gold); line-height: 1;">✓</div>
+                <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--text-light); margin-bottom: 12px; letter-spacing: 0.5px;">Agreement Sent for Approval</h3>
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; max-width: 550px; margin: 0 auto 12px;">
+                    Your signed Licence to Occupy contract has been successfully submitted and sent to the owner for final approval.
+                </p>
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; max-width: 550px; margin: 0 auto 20px;">
+                    Shortly, you will receive a copy of the fully countersigned contract in your email, along with your official login credentials for the Apartment Manual and portal.
+                </p>
+                <p style="font-size: 0.85rem; color: var(--accent-gold); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">
+                    You may now safely close this window.
+                </p>
+            </div>
+
+            <div id="sig-action-buttons" style="display: flex; justify-content: space-between; margin-top: 30px;">
                 <button class="btn btn-outline" onclick="goToStage(1)">Back</button>
                 <button class="btn" id="btn-submit-signature" onclick="submitSignature()">Sign & Complete Agreement</button>
             </div>
@@ -1065,6 +1080,11 @@
         }
 
         function routePortalState() {
+            // Reset default visibilities
+            if (document.getElementById('sig-action-buttons')) document.getElementById('sig-action-buttons').style.display = 'flex';
+            if (document.getElementById('pending-approval-banner')) document.getElementById('pending-approval-banner').style.display = 'none';
+            if (document.getElementById('sig-pad-section')) document.getElementById('sig-pad-section').style.display = 'block';
+
             if (applicationData.status === 'pending_tenant') {
                 goToStage(1);
             } else if (applicationData.status === 'pending_tenant_signature') {
@@ -1076,8 +1096,12 @@
                 document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
                 document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString();
                 document.getElementById('sig-pad-section').style.display = 'none';
-                document.getElementById('btn-submit-signature').disabled = true;
-                document.getElementById('btn-submit-signature').textContent = "Pending Owner Counter-Signature";
+                if (document.getElementById('sig-action-buttons')) {
+                    document.getElementById('sig-action-buttons').style.display = 'none';
+                }
+                if (document.getElementById('pending-approval-banner')) {
+                    document.getElementById('pending-approval-banner').style.display = 'block';
+                }
                 goToStage(2);
             } else if (applicationData.status === 'completed') {
                 // Fully finalized portal! Unlocks House manual, wifi, and feedback logs
