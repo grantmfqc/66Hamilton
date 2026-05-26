@@ -140,11 +140,16 @@ function init() {
 
   // Form Logic
   const step1 = document.getElementById('form-step1');
+  const step2 = document.getElementById('form-step2');
   const success = document.getElementById('form-success');
   const formError = document.getElementById('form-error');
+  const verifyError = document.getElementById('verify-error');
   const btnSendCode = document.getElementById('btn-send-code');
+  const btnVerifyCode = document.getElementById('btn-verify-code');
+  const btnBackCode = document.getElementById('btn-back-code');
 
-  if (step1) {
+  if (step1 && step2) {
+    // Step 1 Submit Handler (Request validation code)
     step1.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('input-name').value.trim();
@@ -164,7 +169,7 @@ function init() {
 
       formError.classList.add('hidden');
       btnSendCode.disabled = true;
-      btnSendCode.querySelector('.btn-label').textContent = "Requesting...";
+      btnSendCode.querySelector('.btn-label').textContent = "Sending Code...";
 
       try {
         const response = await fetch('/api/submit', {
@@ -179,8 +184,10 @@ function init() {
           throw new Error(result.error || 'Server error');
         }
 
+        // Move to Step 2 Verification code screen
+        document.getElementById('verification-target-email').textContent = email;
         step1.classList.add('hidden');
-        success.classList.remove('hidden');
+        step2.classList.remove('hidden');
       } catch (err) {
         formError.textContent = "Error: " + err.message;
         formError.classList.remove('hidden');
@@ -192,6 +199,57 @@ function init() {
           window.turnstile.reset();
         }
       }
+    });
+
+    // Step 2 Submit Handler (Verify validation code)
+    step2.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('input-name').value.trim();
+      const email = document.getElementById('input-email').value.trim();
+      const org = document.getElementById('input-org').value.trim();
+      const phone = document.getElementById('input-phone').value.trim();
+      const pref = document.getElementById('input-pref').value;
+      const code = document.getElementById('input-code').value.trim();
+
+      if (!code || code.length !== 6) {
+        verifyError.textContent = "Please enter the 6-digit verification code.";
+        verifyError.classList.remove('hidden');
+        return;
+      }
+
+      verifyError.classList.add('hidden');
+      btnVerifyCode.disabled = true;
+      btnVerifyCode.querySelector('.btn-label').textContent = "Verifying...";
+
+      try {
+        const response = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, org, phone, pref, code })
+        });
+        
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Server error');
+        }
+
+        // Show Success
+        step2.classList.add('hidden');
+        success.classList.remove('hidden');
+      } catch (err) {
+        verifyError.textContent = err.message;
+        verifyError.classList.remove('hidden');
+      } finally {
+        btnVerifyCode.disabled = false;
+        btnVerifyCode.querySelector('.btn-label').textContent = "Confirm Verification";
+      }
+    });
+
+    // Step 2 Back Button Handler
+    btnBackCode?.addEventListener('click', () => {
+      step2.classList.add('hidden');
+      step1.classList.remove('hidden');
     });
   }
 }

@@ -16,7 +16,7 @@ body{background:var(--bg);color:var(--text-primary);font-family:'Inter',sans-ser
 /* ── NAVBAR ── */
 .navbar{position:fixed;top:0;left:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.6rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s,border-color .4s;border-bottom:1px solid transparent}
 .navbar.scrolled{background:rgba(11,11,13,.85);backdrop-filter:blur(16px);padding:1rem 4rem;border-color:var(--border)}
-.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;letter-spacing:.08em}
+.nav-logo{font-family:'Outfit',sans-serif;font-size:1.3rem;letter-spacing:.08em;text-decoration:none;display:inline-block}
 .nav-logo-num{color:var(--accent-gold);font-weight:600}
 .nav-logo-text{font-weight:300;color:var(--text-primary)}
 .nav-cta{font-family:'Outfit',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-primary);text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:.55rem 1.4rem;border-radius:50px;transition:all .3s;white-space:nowrap}

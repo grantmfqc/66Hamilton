@@ -21,9 +21,9 @@
 
   <!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
   <nav class="navbar" id="navbar">
-    <div class="nav-logo">
+    <a href="#" class="nav-logo">
       <span class="nav-logo-num">66</span><span class="nav-logo-text"> Hamilton.</span>
-    </div>
+    </a>
     <a href="#prospectus" class="nav-cta" id="nav-cta-btn">Contact</a>
   </nav>
 
@@ -651,7 +651,7 @@
             <input type="text" id="input-name" name="name" placeholder="e.g. Sarah Mitchell" autocomplete="name" required />
           </div>
           <div class="pform-group">
-            <label for="input-email">Corporate Email</label>
+            <label for="input-email">Email Address</label>
             <input type="email" id="input-email" name="email" placeholder="e.g. sarah@company.com" autocomplete="email" required />
           </div>
         </div>
@@ -685,6 +685,27 @@
           <span class="btn-label">Request Prospectus</span>
           <span class="btn-arrow">→</span>
         </button>
+      </form>
+
+      <!-- Step 2: Verification Code Input -->
+      <form id="form-step2" class="pform hidden" novalidate>
+        <div class="pform-group pform-group--full" style="max-width: 400px; margin: 0 auto 1.5rem; text-align: center;">
+          <label for="input-code" style="display: block; margin-bottom: 8px;">Enter Verification Code</label>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px; margin-bottom: 15px; line-height: 1.5;">
+            We have sent a 6-digit verification code to <strong id="verification-target-email" style="color: var(--accent-gold);">your email</strong>. Please enter the code below to complete your request.
+          </p>
+          <input type="text" id="input-code" name="code" placeholder="• • • • • •" pattern="[0-9]*" inputmode="numeric" maxlength="6" style="text-align: center; letter-spacing: 6px; font-size: 1.4rem; font-weight: bold; padding: 12px; max-width: 250px; margin: 0 auto; background: rgba(255,255,255,0.03); border: 1px solid var(--accent-gold); color: var(--text-primary); border-radius: 4px;" required />
+        </div>
+        <div id="verify-error" class="form-error hidden" style="margin-bottom: 1.5rem;">Invalid or expired verification code.</div>
+        <div style="display: flex; gap: 15px; max-width: 400px; margin: 0 auto;">
+          <button type="button" class="pform-submit" id="btn-back-code" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--text-primary); padding: 12px 20px; font-size: 0.9rem; flex: 1; border-radius: 4px; cursor: pointer;">
+            Back
+          </button>
+          <button type="submit" class="pform-submit" id="btn-verify-code" style="padding: 12px 20px; font-size: 0.9rem; flex: 2; border-radius: 4px;">
+            <span class="btn-label">Confirm Verification</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
       </form>
 
       <!-- Step 3: Success -->

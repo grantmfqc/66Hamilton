@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>66 Hamilton — Owner Administration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0B0D;
+            --bg-card: #121214;
+            --accent-gold: #C9A96E;
+            --text-primary: #F2EFE9;
+            --text-muted: rgba(242, 239, 233, 0.6);
+            --border: rgba(201, 169, 110, 0.2);
+            --border-hover: rgba(201, 169, 110, 0.4);
+            --success: #81c784;
+            --error: #e57373;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--accent-gold);
+        }
+
+        .subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-gold);
+        }
+
+        /* --- Passcode Dialog --- */
+        #auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .auth-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: #fff;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .auth-card button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .auth-card button:hover {
+            background: #b5945b;
+        }
+
+        .auth-error {
+            color: var(--error);
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+
+        /* --- Forms & Inputs --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent-gold);
+            outline: none;
+        }
+
+        button.btn-primary {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 600;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        button.btn-primary:hover {
+            background: #b5945b;
+        }
+
+        /* --- App List --- */
+        .app-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 0;
+        }
+
+        .app-item:last-child {
+            border-bottom: none;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .app-name {
+            font-weight: 600;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending_tenant { background: rgba(255, 152, 0, 0.15); color: #ffb74d; }
+        .status-badge.pending_tenant_signature { background: rgba(255, 152, 0, 0.25); color: #ffa726; }
+        .status-badge.pending_owner { background: rgba(33, 150, 243, 0.15); color: #64b5f6; }
+        .status-badge.completed { background: rgba(76, 175, 80, 0.15); color: #81c784; }
+
+        .app-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .app-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-link {
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Link Generator Response --- */
+        #generated-link-box {
+            background: rgba(201, 169, 110, 0.05);
+            border: 1px dashed var(--accent-gold);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        #generated-link-box p {
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .copy-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .copy-input-group input {
+            flex: 1;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            color: var(--accent-gold);
+            font-family: monospace;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .copy-input-group button {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* --- Tabs in Main Content --- */
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 35px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-gold);
+            border-bottom-color: var(--accent-gold);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- Logs & Feedbacks --- */
+        .log-item {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+
+        .log-tag {
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .log-date {
+            color: var(--text-muted);
+        }
+
+        .log-desc {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        .log-tenant {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            border-top: 1px dashed rgba(255,255,255,0.05);
+            padding-top: 8px;
+        }
+
+        /* --- Notifications Toast --- */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-gold);
+            color: var(--text-primary);
+            padding: 15px 30px;
+            border-radius: 4px;
+            display: none;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        @media (min-width: 900px) {
+            .maintenance-dashboard-layout {
+                grid-template-columns: 380px 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Passcode Protection screen -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2>66 Hamilton</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Owner Dashboard Access</p>
+            <input type="password" id="passcode-input" placeholder="Enter Admin Passcode" />
+            <button onclick="attemptLogin()">Access Panel</button>
+            <div id="auth-error" class="auth-error"></div>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div class="container">
+        <header>
+            <h1>66 Hamilton <em>Administration.</em></h1>
+            <p class="subtitle">Property Licence & Onboarding portal</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Left Side: Controls -->
+            <div class="sidebar">
+                <!-- Create Application link -->
+                <div class="card">
+                    <h2>Generate Private Link</h2>
+                    <form id="create-app-form" onsubmit="generateLink(event)">
+                        <div class="form-group">
+                            <label for="rent-input">Weekly Licence Fee (NZD)</label>
+                            <input type="number" id="rent-input" value="2400" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="date-input">Commencement Date</label>
+                            <input type="date" id="date-input" required />
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="linen-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
+                            <label for="linen-checkbox" style="margin-bottom: 0;">Linen service ($45/wk)</label>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Create Invite</button>
+                    </form>
+
+                    <div id="generated-link-box">
+                        <p>Share this secure link with the applicant:</p>
+                        <div class="copy-input-group">
+                            <input type="text" id="invite-url-input" readonly />
+                            <button onclick="copyInviteUrl()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Details & Tabs -->
+            <div class="main-panel">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab('applications')">Applications</button>
+                    <button class="tab-btn" onclick="switchTab('manual')">House Manual</button>
+                    <button class="tab-btn" onclick="switchTab('maintenance')">Maintenance</button>
+                    <button class="tab-btn" onclick="switchTab('reviews')">Reviews</button>
+                </div>
+
+                <!-- TAB: Applications -->
+                <div id="tab-applications" class="tab-content active">
+                    <div class="card">
+                        <h2>Active Agreements</h2>
+                        <div id="app-list">
+                            <p style="color: var(--text-muted);">Loading applications...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: House Manual Editor -->
+                <div id="tab-manual" class="tab-content">
+                    <div class="card">
+                        <h2>Edit House Manual</h2>
+                        <form id="manual-form" onsubmit="saveManual(event)">
+                            <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label for="wifi-ssid">WiFi 2.4GHz Network Name (SSID)</label>
+                                    <input type="text" id="wifi-ssid" required />
+                                </div>
+                                <div>
+                                    <label for="wifi-password">WiFi 2.4GHz Password</label>
+                                    <input type="text" id="wifi-password" required />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label for="wifi-ssid5">WiFi 5GHz Network Name (SSID)</label>
+                                    <input type="text" id="wifi-ssid5" required />
+                                </div>
+                                <div>
+                                    <label for="wifi-password5">WiFi 5GHz Password</label>
+                                    <input type="text" id="wifi-password5" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="manual-address">Property Address</label>
+                                <input type="text" id="manual-address" required />
+                            </div>
+                            <div class="form-group" style="border: 1px solid var(--border); border-radius: 6px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 25px;">
+                                <label style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">Access Codes</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label for="access-pedestrian" style="font-size: 0.75rem;">Pedestrian Gate</label>
+                                        <input type="text" id="access-pedestrian" required />
+                                    </div>
+                                    <div>
+                                        <label for="access-driveway" style="font-size: 0.75rem;">Driveway Gate</label>
+                                        <input type="text" id="access-driveway" required />
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <label for="access-street-glass" style="font-size: 0.75rem;">Street Level Glass Doors</label>
+                                        <input type="text" id="access-street-glass" required />
+                                    </div>
+                                    <div>
+                                        <label for="access-basement-glass" style="font-size: 0.75rem;">Basement Glass Doors</label>
+                                        <input type="text" id="access-basement-glass" required />
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <label for="access-apartment" style="font-size: 0.75rem;">Apartment Door</label>
+                                        <input type="text" id="access-apartment" required />
+                                    </div>
+                                    <div>
+                                        <label for="access-garage" style="font-size: 0.75rem;">Garage</label>
+                                        <input type="text" id="access-garage" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="border: 1px solid var(--border); border-radius: 6px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 25px;" id="block-checkin-details">
+                                <label for="checkin-details" style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">Check-in / Key Retrieval Instructions</label>
+                                <textarea id="checkin-details" rows="5" required style="margin-bottom: 15px;"></textarea>
+                                <label style="font-size: 0.75rem;">Check-in Image (Optional)</label>
+                                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                                    <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'checkin-details-image-data', 'checkin-details-preview', 'checkin-details-preview-container')" style="width: auto; max-width: 250px; font-size: 0.8rem; padding: 6px 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2);" />
+                                    <input type="hidden" id="checkin-details-image-data" value="" />
+                                    <div id="checkin-details-preview-container" style="display: none; position: relative; width: 80px; height: 80px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                        <img id="checkin-details-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <button type="button" onclick="removeStandardSectionImage('checkin-details-image-data', 'checkin-details-preview', 'checkin-details-preview-container')" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 18px; height: 18px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; padding: 0;">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="border: 1px solid var(--border); border-radius: 6px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 25px;" id="block-rubbish-details">
+                                <label for="rubbish-details" style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">Rubbish & Recycling Guidelines</label>
+                                <textarea id="rubbish-details" rows="4" required style="margin-bottom: 15px;"></textarea>
+                                <label style="font-size: 0.75rem;">Rubbish / Waste Image (Optional)</label>
+                                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                                    <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'rubbish-details-image-data', 'rubbish-details-preview', 'rubbish-details-preview-container')" style="width: auto; max-width: 250px; font-size: 0.8rem; padding: 6px 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2);" />
+                                    <input type="hidden" id="rubbish-details-image-data" value="" />
+                                    <div id="rubbish-details-preview-container" style="display: none; position: relative; width: 80px; height: 80px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                        <img id="rubbish-details-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <button type="button" onclick="removeStandardSectionImage('rubbish-details-image-data', 'rubbish-details-preview', 'rubbish-details-preview-container')" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 18px; height: 18px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; padding: 0;">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="border: 1px solid var(--border); border-radius: 6px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 25px;" id="block-additional-details">
+                                <label for="additional-details" style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">House Guidelines & Pool Rules</label>
+                                <textarea id="additional-details" rows="4" required style="margin-bottom: 15px;"></textarea>
+                                <label style="font-size: 0.75rem;">Guidelines Image (Optional)</label>
+                                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                                    <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'additional-details-image-data', 'additional-details-preview', 'additional-details-preview-container')" style="width: auto; max-width: 250px; font-size: 0.8rem; padding: 6px 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2);" />
+                                    <input type="hidden" id="additional-details-image-data" value="" />
+                                    <div id="additional-details-preview-container" style="display: none; position: relative; width: 80px; height: 80px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                        <img id="additional-details-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <button type="button" onclick="removeStandardSectionImage('additional-details-image-data', 'additional-details-preview', 'additional-details-preview-container')" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 18px; height: 18px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; padding: 0;">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 30px;">
+                                <label style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Custom Sections</span>
+                                    <button type="button" class="btn-primary" onclick="addCustomSectionUI()" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 4px;">+ Add Section</button>
+                                </label>
+                                <div id="custom-sections-container"></div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="margin-top: 15px;">Save House Manual</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TAB: Maintenance Logs -->
+                <div id="tab-maintenance" class="tab-content">
+                    <button type="button" class="btn-primary" onclick="toggleAdminInitiateForm()" style="margin-bottom: 25px; width: auto; display: inline-flex; align-items: center; gap: 8px;">
+                        <span id="initiate-toggle-icon">＋</span> Initiate Maintenance / Access Request
+                    </button>
+
+                    <!-- Initiate Ticket Card (Hidden by default, expandable) -->
+                    <div id="admin-maint-form-container" style="display: none; margin-bottom: 30px;">
+                        <div class="card" style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border);">
+                            <h2 style="color: var(--accent-gold);">Initiate Maintenance / Access Request</h2>
+                            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.85rem;">Create a maintenance ticket, log repairs, or request building access from a tenant.</p>
+                            
+                            <form id="admin-maint-form" onsubmit="submitAdminMaintenance(event)">
+                                <div class="form-group">
+                                    <label for="admin-maint-tenant">Target Apartment / Tenant</label>
+                                    <select id="admin-maint-tenant" required style="width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text-primary); border-radius: 4px;">
+                                        <option value="">-- Select Completed Tenant --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div>
+                                            <label for="admin-maint-date">Requested Access Date</label>
+                                            <input type="date" id="admin-maint-date" required />
+                                        </div>
+                                        <div>
+                                            <label for="admin-maint-time">Requested Access Time</label>
+                                            <input type="time" id="admin-maint-time" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-maint-category">Issue Category</label>
+                                    <select id="admin-maint-category" required style="width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: var(--text-primary); border-radius: 4px;">
+                                        <option value="Plumbing">Plumbing / Hot Water</option>
+                                        <option value="Electrical">Electrical / Lighting</option>
+                                        <option value="Appliances">Kitchen Appliances</option>
+                                        <option value="WiFi">Broadband / TV</option>
+                                        <option value="Other">Other / Structural</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-maint-desc">Details of Work / Request</label>
+                                    <textarea id="admin-maint-desc" rows="4" placeholder="Describe the maintenance scheduled or details of access required..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" style="width: 100%;">Create Access Request</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Requests Logs Card -->
+                    <div class="card" style="width: 100%;">
+                        <h2>Active & Past Requests History</h2>
+                        <div id="maintenance-list">
+                            <p style="color: var(--text-muted);">No active maintenance requests.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Reviews -->
+                <div id="tab-reviews" class="tab-content">
+                    <div class="card">
+                        <h2>Tenant Feedback & Reviews</h2>
+                        <div id="reviews-list">
+                            <p style="color: var(--text-muted);">No reviews submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast">Copied to clipboard.</div>
+
+    <script>
+        // Set default commencement date to today
+        document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
+
+        let adminPasscode = localStorage.getItem('admin_passcode') || '';
+
+        if (adminPasscode) {
+            // Check auth on load
+            verifyPasscode(adminPasscode);
+        }
+
+        function attemptLogin() {
+            const pass = document.getElementById('passcode-input').value.trim();
+            if (!pass) return;
+            verifyPasscode(pass);
+        }
+
+        async function verifyPasscode(passcode) {
+            try {
+                const res = await fetch(`/api/application?passcode=${encodeURIComponent(passcode)}`);
+                if (res.ok) {
+                    adminPasscode = passcode;
+                    localStorage.setItem('admin_passcode', adminPasscode);
+                    document.getElementById('auth-overlay').style.display = 'none';
+                    loadDashboardData();
+                } else {
+                    document.getElementById('auth-error').textContent = 'Invalid Admin Passcode. Please try again.';
+                    localStorage.removeItem('admin_passcode');
+                }
+            } catch (err) {
+                document.getElementById('auth-error').textContent = 'Server connection error: ' + err.message;
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Set active button
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        async function loadDashboardData() {
+            try {
+                const res = await fetch(`/api/application?passcode=${encodeURIComponent(adminPasscode)}`);
+                if (!res.ok) throw new Error('Unauthorized');
+                const data = await res.json();
+
+                renderApplications(data.applications);
+                populateManualForm(data.manual);
+                renderMaintenanceAndFeedback(data.applications);
+                populateAdminTenantSelect(data.applications);
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to load dashboard data.');
+            }
+        }
+
+        function renderApplications(apps) {
+            const listEl = document.getElementById('app-list');
+            if (!apps || apps.length === 0) {
+                listEl.innerHTML = '<p style="color: var(--text-muted); font-size: 0.95rem;">No active lease agreements found.</p>';
+                return;
+            }
+
+            listEl.innerHTML = apps.map(app => `
+                <div class="app-item">
+                    <div class="app-header">
+                        <span class="app-name">${escapeHTML(app.tenantName)}</span>
+                        <span class="status-badge ${app.status}">${app.status.replace('_', ' ')}</span>
+                    </div>
+                    <div class="app-meta">
+                        <span>Rent: $${app.rent.toLocaleString()}/wk</span>
+                        <span>Starts: ${app.startDate}</span>
+                    </div>
+                    <div class="app-actions">
+                        <a href="/apply.html?token=${app.id}" target="_blank" class="btn-link">Onboarding Page</a>
+                        ${app.status === 'pending_owner' ? `<a href="/sign-owner.html?token=${app.id}" class="btn-link" style="color: var(--accent-gold); font-weight: bold;">Sign Contract</a>` : ''}
+                        ${app.status === 'completed' ? `<a href="#" onclick="downloadSignedPDFAdmin('${app.id}'); return false;" class="btn-link" style="color: var(--success); font-weight: bold;">Download PDF</a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function downloadSignedPDFAdmin(appId) {
+            try {
+                showToast('Retrieving signed contract...');
+                const res = await fetch(`/api/application?token=${appId}&passcode=${encodeURIComponent(adminPasscode)}`);
+                if (!res.ok) throw new Error('Could not retrieve agreement');
+                const app = await res.json();
+                
+                if (!app.signedPdfData) {
+                    throw new Error('Finalized PDF contract is missing in database.');
+                }
+                
+                const link = document.createElement('a');
+                link.href = app.signedPdfData;
+                link.download = `${(app.tenantDetails.name || 'Tenant').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Tenancy_Agreement.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Signed contract downloaded.');
+            } catch (err) {
+                alert('Download failed: ' + err.message);
+            }
+        }
+
+        function populateManualForm(manual) {
+            if (!manual) return;
+            document.getElementById('wifi-ssid').value = manual.wifiSSID || '';
+            document.getElementById('wifi-password').value = manual.wifiPassword || '';
+            document.getElementById('wifi-ssid5').value = manual.wifiSSID5 || '';
+            document.getElementById('wifi-password5').value = manual.wifiPassword5 || '';
+            document.getElementById('manual-address').value = manual.address || '';
+            
+            // Populate Access Codes (falling back to checkinCode if needed)
+            document.getElementById('access-pedestrian').value = manual.accessPedestrian || manual.checkinCode || '';
+            document.getElementById('access-driveway').value = manual.accessDriveway || manual.checkinCode || '';
+            document.getElementById('access-street-glass').value = manual.accessStreetGlass || manual.checkinCode || '';
+            document.getElementById('access-basement-glass').value = manual.accessBasementGlass || manual.checkinCode || '';
+            document.getElementById('access-apartment').value = manual.accessApartment || manual.checkinCode || '';
+            document.getElementById('access-garage').value = manual.accessGarage || manual.checkinCode || '';
+            
+            document.getElementById('checkin-details').value = manual.checkinDetails || '';
+            document.getElementById('rubbish-details').value = manual.rubbishDetails || '';
+            document.getElementById('additional-details').value = manual.additionalDetails || '';
+
+            // Populate standard section images
+            const checkinImg = manual.checkinDetailsImage || '';
+            document.getElementById('checkin-details-image-data').value = checkinImg;
+            if (checkinImg) {
+                document.getElementById('checkin-details-preview').src = checkinImg;
+                document.getElementById('checkin-details-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('checkin-details-preview').src = '';
+                document.getElementById('checkin-details-preview-container').style.display = 'none';
+            }
+
+            const rubbishImg = manual.rubbishDetailsImage || '';
+            document.getElementById('rubbish-details-image-data').value = rubbishImg;
+            if (rubbishImg) {
+                document.getElementById('rubbish-details-preview').src = rubbishImg;
+                document.getElementById('rubbish-details-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('rubbish-details-preview').src = '';
+                document.getElementById('rubbish-details-preview-container').style.display = 'none';
+            }
+
+            const additionalImg = manual.additionalDetailsImage || '';
+            document.getElementById('additional-details-image-data').value = additionalImg;
+            if (additionalImg) {
+                document.getElementById('additional-details-preview').src = additionalImg;
+                document.getElementById('additional-details-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('additional-details-preview').src = '';
+                document.getElementById('additional-details-preview-container').style.display = 'none';
+            }
+
+            // Populate Custom Sections
+            const container = document.getElementById('custom-sections-container');
+            container.innerHTML = '';
+            if (manual.customSections && Array.isArray(manual.customSections)) {
+                manual.customSections.forEach(section => {
+                    addCustomSectionUI(section);
+                });
+            }
+        }
+
+        function renderMaintenanceAndFeedback(apps) {
+            const maintenanceList = [];
+            const reviewsList = [];
+
+            apps.forEach(app => {
+                // Fetch the full details to read maintenance / feedback logs
+                fetch(`/api/application?token=${app.id}&passcode=${encodeURIComponent(adminPasscode)}`)
+                    .then(res => res.json())
+                    .then(fullApp => {
+                        if (fullApp.maintenance && fullApp.maintenance.length > 0) {
+                            fullApp.maintenance.forEach(m => {
+                                maintenanceList.push({
+                                    id: m.id || m.timestamp,
+                                    token: fullApp.id,
+                                    tenantName: fullApp.tenantDetails.name,
+                                    date: m.timestamp,
+                                    category: m.category,
+                                    description: m.description,
+                                    imageUrl: m.imageUrl || '',
+                                    resolved: m.resolved === true || m.resolved === 'true',
+                                    ownerFeedback: m.ownerFeedback || '',
+                                    updates: m.updates || [],
+                                    initiator: m.initiator || 'tenant',
+                                    accessDate: m.accessDate || '',
+                                    accessTime: m.accessTime || ''
+                                });
+                            });
+                            renderMaintenanceItems(maintenanceList);
+                        }
+
+                        if (fullApp.feedback && fullApp.feedback.length > 0) {
+                            fullApp.feedback.forEach(f => {
+                                reviewsList.push({
+                                    tenantName: fullApp.tenantDetails.name,
+                                    date: f.timestamp,
+                                    rating: f.rating,
+                                    text: f.text
+                                });
+                            });
+                            renderReviewItems(reviewsList);
+                        }
+                    }).catch(console.error);
+            });
+        }
+
+        function populateAdminTenantSelect(apps) {
+            const select = document.getElementById('admin-maint-tenant');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Select Completed Tenant --</option>';
+            apps.forEach(app => {
+                if (app.status === 'completed') {
+                    const name = app.tenantName || 'Unknown Tenant';
+                    const rent = app.rent || '';
+                    const option = document.createElement('option');
+                    option.value = app.id;
+                    option.textContent = `${name} (Rent: $${rent}/wk)`;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function toggleAdminInitiateForm() {
+            const container = document.getElementById('admin-maint-form-container');
+            const icon = document.getElementById('initiate-toggle-icon');
+            if (container.style.display === 'none' || !container.style.display) {
+                container.style.display = 'block';
+                icon.textContent = '－';
+            } else {
+                container.style.display = 'none';
+                icon.textContent = '＋';
+            }
+        }
+
+        async function submitAdminMaintenance(e) {
+            e.preventDefault();
+            const targetToken = document.getElementById('admin-maint-tenant').value;
+            const category = document.getElementById('admin-maint-category').value;
+            const description = document.getElementById('admin-maint-desc').value.trim();
+            const accessDate = document.getElementById('admin-maint-date').value;
+            const accessTime = document.getElementById('admin-maint-time').value;
+
+            if (!targetToken) {
+                alert('Please select a target tenant first.');
+                return;
+            }
+
+            try {
+                showToast('Initiating request...');
+                const res = await fetch('/api/application/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: targetToken,
+                        type: 'maintenance',
+                        payload: {
+                            category,
+                            description,
+                            imageUrl: '',
+                            accessDate,
+                            accessTime,
+                            initiator: 'landlord'
+                        }
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Server error');
+                }
+
+                showToast('Maintenance request initiated successfully.');
+                document.getElementById('admin-maint-desc').value = '';
+                document.getElementById('admin-maint-date').value = '';
+                document.getElementById('admin-maint-time').value = '';
+                loadDashboardData();
+            } catch (err) {
+                alert('Failed to initiate request: ' + err.message);
+            }
+        }
+
+        function renderMaintenanceItems(items) {
+            const listEl = document.getElementById('maintenance-list');
+            if (items.length === 0) {
+                listEl.innerHTML = '<p style="color: var(--text-muted);">No active maintenance requests.</p>';
+                return;
+            }
+            items.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            listEl.innerHTML = items.map((item, idx) => {
+                const id = item.id;
+                const isResolved = item.resolved === true;
+                
+                let imgHtml = '';
+                if (item.imageUrl) {
+                    imgHtml = `
+                        <div style="margin-top: 15px; max-width: 150px; cursor: pointer;" onclick="expandMaintenanceImageAdmin('${item.imageUrl}')">
+                            <img src="${item.imageUrl}" style="width: 100%; border-radius: 4px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.2);" alt="Tenant attached Photo" />
+                            <div style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 4px;">Click to zoom</div>
+                        </div>
+                    `;
+                }
+
+                let updatesHtml = '';
+                if (item.updates && item.updates.length > 0) {
+                    updatesHtml = `
+                        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 0.5px; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 4px;">Updates & Comments Log</div>
+                            ${item.updates.map(up => {
+                                const isOwner = up.sender === 'landlord';
+                                return `
+                                    <div style="border-left: 2px solid ${isOwner ? 'var(--accent-gold)' : 'var(--text-muted)'}; padding-left: 10px; margin-bottom: 5px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
+                                            <span style="font-weight: bold; color: ${isOwner ? 'var(--accent-gold)' : 'var(--text-primary)'};">${isOwner ? 'Your Update' : 'Tenant Note'}</span>
+                                            <span style="color: var(--text-muted); font-size: 0.7rem;">${new Date(up.timestamp).toLocaleString()}</span>
+                                        </div>
+                                        <div style="font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">${escapeHTML(up.text)}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="log-item" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 25px 0;">
+                        <div class="log-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                            <div>
+                                <span class="log-tag" style="background: rgba(201, 169, 110, 0.1); border: 1px solid rgba(201, 169, 110, 0.2); color: var(--accent-gold); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHTML(item.category)}</span>
+                                ${item.initiator === 'landlord' ? `
+                                    <span style="background: rgba(201, 169, 110, 0.15); border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 8px;">Landlord Scheduled</span>
+                                ` : ''}
+                                <span class="log-date" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 10px;">${new Date(item.date).toLocaleString()}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Tenant: <strong style="color: var(--text-primary);">${escapeHTML(item.tenantName)}</strong></div>
+                        </div>
+                        
+                        ${item.accessDate ? `
+                            <div style="font-size: 0.85rem; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 6px; background: rgba(201, 169, 110, 0.05); padding: 8px 12px; border-radius: 4px; border: 1px solid rgba(201,169,110,0.1); width: fit-content;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <span>Requested Access: ${item.accessDate} at ${item.accessTime}</span>
+                            </div>
+                        ` : ''}
+
+                        <p class="log-desc" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); margin: 0; white-space: pre-line;">${escapeHTML(item.description)}</p>
+                        ${imgHtml}
+                        ${updatesHtml}
+                        
+                        <!-- Landlord Administration Block -->
+                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 6px; padding: 15px; margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                                <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 0.5px; font-weight: bold;">Landlord Status & Feedback</div>
+                                
+                                <!-- Resolution Control -->
+                                <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px;">
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold;">Resolved?</span>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <label style="display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: ${isResolved ? 'var(--success)' : 'var(--text-muted)'}; cursor: pointer; margin: 0;">
+                                            <input type="radio" name="admin-resolved-${id}" value="yes" ${isResolved ? 'checked' : ''} onchange="updateAdminMaintenanceStatus('${item.token}', '${id}', true)" style="cursor: pointer; margin: 0;" /> Yes
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: ${!isResolved ? 'var(--error)' : 'var(--text-muted)'}; cursor: pointer; margin: 0;">
+                                            <input type="radio" name="admin-resolved-${id}" value="no" ${!isResolved ? 'checked' : ''} onchange="updateAdminMaintenanceStatus('${item.token}', '${id}', false)" style="cursor: pointer; margin: 0;" /> No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Primary Feedback Input -->
+                            <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-end;">
+                                <div style="flex: 1;">
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Primary Feedback / Resolution Details</label>
+                                    <input type="text" id="admin-feedback-${id}" value="${escapeHTML(item.ownerFeedback)}" placeholder="Provide landlord feedback/resolution details here..." style="font-size: 0.85rem; padding: 10px 14px;" />
+                                </div>
+                                <button type="button" class="btn-primary" onclick="saveAdminFeedback('${item.token}', '${id}')" style="padding: 10px 18px; font-size: 0.8rem; flex-shrink: 0; width: auto; border-radius: 4px;">Save Feedback</button>
+                            </div>
+
+                            <!-- Add Timeline Note Section -->
+                            <div style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; align-items: flex-end;">
+                                <div style="flex: 1;">
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 5px;">Add New Progress Update Note (Appends to Timeline)</label>
+                                    <input type="text" id="admin-comment-input-${id}" placeholder="Type here to add more information or progress updates to this request..." style="font-size: 0.85rem; padding: 10px 14px;" />
+                                </div>
+                                <button type="button" class="btn-primary" onclick="addAdminMaintenanceComment('${item.token}', '${id}')" style="padding: 10px 18px; font-size: 0.8rem; flex-shrink: 0; width: auto; border-radius: 4px; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold);">Add Note</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function updateAdminMaintenanceStatus(token, id, resolved) {
+            try {
+                showToast('Updating resolution status...');
+                const res = await fetch('/api/application/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        passcode: adminPasscode,
+                        token: token,
+                        type: 'update-maintenance',
+                        payload: { id, resolved }
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Server error');
+                }
+
+                showToast('Resolution status updated.');
+                loadDashboardData();
+            } catch (err) {
+                alert('Failed to update status: ' + err.message);
+            }
+        }
+
+        async function saveAdminFeedback(token, id) {
+            const feedbackText = document.getElementById(`admin-feedback-${id}`).value.trim();
+            try {
+                showToast('Saving landlord feedback...');
+                const res = await fetch('/api/application/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        passcode: adminPasscode,
+                        token: token,
+                        type: 'update-maintenance',
+                        payload: {
+                            id: id,
+                            ownerFeedback: feedbackText
+                        }
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Server error');
+                }
+
+                showToast('Feedback saved successfully.');
+                loadDashboardData();
+            } catch (err) {
+                alert('Failed to save feedback: ' + err.message);
+            }
+        }
+
+        async function addAdminMaintenanceComment(token, id) {
+            const input = document.getElementById(`admin-comment-input-${id}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                showToast('Adding update note...');
+                const res = await fetch('/api/application/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        passcode: adminPasscode,
+                        token: token,
+                        type: 'update-maintenance',
+                        payload: {
+                            id: id,
+                            newComment: text
+                        }
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Server error');
+                }
+
+                showToast('Note added to timeline.');
+                input.value = '';
+                loadDashboardData();
+            } catch (err) {
+                alert('Failed to add note: ' + err.message);
+            }
+        }
+
+        function expandMaintenanceImageAdmin(url) {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.background = 'rgba(0,0,0,0.9)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '999999';
+            overlay.style.cursor = 'zoom-out';
+            overlay.onclick = () => overlay.remove();
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxWidth = '90%';
+            img.style.maxHeight = '90%';
+            img.style.borderRadius = '8px';
+            img.style.border = '2px solid var(--border)';
+            img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+            overlay.appendChild(img);
+
+            document.body.appendChild(overlay);
+        }
+
+        function renderReviewItems(items) {
+            const listEl = document.getElementById('reviews-list');
+            if (items.length === 0) return;
+            items.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            listEl.innerHTML = items.map(item => `
+                <div class="log-item">
+                    <div class="log-header">
+                        <span class="log-tag">Rating: ${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</span>
+                        <span class="log-date">${new Date(item.date).toLocaleString()}</span>
+                    </div>
+                    <p class="log-desc">${escapeHTML(item.text)}</p>
+                    <div class="log-tenant">From: ${escapeHTML(item.tenantName)}</div>
+                </div>
+            `).join('');
+        }
+
+        async function generateLink(e) {
+            e.preventDefault();
+            const rent = parseInt(document.getElementById('rent-input').value);
+            const startDate = document.getElementById('date-input').value;
+            const linenService = document.getElementById('linen-checkbox').checked;
+
+            try {
+                const res = await fetch('/api/application/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passcode: adminPasscode, rent, startDate, linenService })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                document.getElementById('invite-url-input').value = data.inviteUrl;
+                document.getElementById('generated-link-box').style.display = 'block';
+                showToast('Invite link generated successfully.');
+                loadDashboardData();
+            } catch (err) {
+                alert('Error creating invite: ' + err.message);
+            }
+        }
+
+        async function saveManual(e) {
+            e.preventDefault();
+            
+            // Gather Custom Sections
+            const customSections = [];
+            document.querySelectorAll('.custom-section-block').forEach(block => {
+                const heading = block.querySelector('.custom-heading').value.trim();
+                const content = block.querySelector('.custom-content').value.trim();
+                const imageUrl = block.querySelector('.custom-image-data').value || '';
+                if (heading || content) {
+                    customSections.push({ heading, content, imageUrl });
+                }
+            });
+
+            const manual = {
+                wifiSSID: document.getElementById('wifi-ssid').value.trim(),
+                wifiPassword: document.getElementById('wifi-password').value.trim(),
+                wifiSSID5: document.getElementById('wifi-ssid5').value.trim(),
+                wifiPassword5: document.getElementById('wifi-password5').value.trim(),
+                address: document.getElementById('manual-address').value.trim(),
+                
+                // Save access codes
+                accessPedestrian: document.getElementById('access-pedestrian').value.trim(),
+                accessDriveway: document.getElementById('access-driveway').value.trim(),
+                accessStreetGlass: document.getElementById('access-street-glass').value.trim(),
+                accessBasementGlass: document.getElementById('access-basement-glass').value.trim(),
+                accessApartment: document.getElementById('access-apartment').value.trim(),
+                accessGarage: document.getElementById('access-garage').value.trim(),
+                
+                checkinDetails: document.getElementById('checkin-details').value.trim(),
+                checkinDetailsImage: document.getElementById('checkin-details-image-data').value || '',
+                rubbishDetails: document.getElementById('rubbish-details').value.trim(),
+                rubbishDetailsImage: document.getElementById('rubbish-details-image-data').value || '',
+                additionalDetails: document.getElementById('additional-details').value.trim(),
+                additionalDetailsImage: document.getElementById('additional-details-image-data').value || '',
+                customSections: customSections
+            };
+
+            try {
+                const res = await fetch('/api/application/edit-manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passcode: adminPasscode, manual })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                showToast('House Manual saved successfully.');
+            } catch (err) {
+                alert('Error saving house manual: ' + err.message);
+            }
+        }
+
+        function removeStandardSectionImage(dataId, imgId, containerId) {
+            document.getElementById(dataId).value = '';
+            document.getElementById(imgId).src = '';
+            document.getElementById(containerId).style.display = 'none';
+            const container = document.getElementById(containerId).parentElement;
+            if (container) {
+                const fileInput = container.querySelector('input[type="file"]');
+                if (fileInput) fileInput.value = '';
+            }
+        }
+
+        function handleStandardSectionImage(event, dataId, imgId, containerId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    document.getElementById(dataId).value = dataUrl;
+                    document.getElementById(imgId).src = dataUrl;
+                    document.getElementById(containerId).style.display = 'block';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addCustomSectionUI(data = null) {
+            const container = document.getElementById('custom-sections-container');
+            const blockId = 'custom-section-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            
+            const heading = data ? data.heading : '';
+            const content = data ? data.content : '';
+            const imageUrl = data ? data.imageUrl : '';
+
+            const block = document.createElement('div');
+            block.className = 'custom-section-block';
+            block.id = blockId;
+            block.style.border = '1px solid var(--border)';
+            block.style.borderRadius = '6px';
+            block.style.padding = '20px';
+            block.style.background = 'rgba(255, 255, 255, 0.01)';
+            block.style.marginBottom = '20px';
+            block.style.position = 'relative';
+
+            block.innerHTML = `
+                <button type="button" class="btn-link" onclick="document.getElementById('${blockId}').remove()" style="position: absolute; top: 15px; right: 15px; color: var(--error); padding: 0; font-size: 0.8rem; border: none; background: transparent; cursor: pointer;">Remove Section</button>
+                <div class="form-group" style="margin-bottom: 15px; padding-right: 120px;">
+                    <label style="font-size: 0.75rem;">Section Heading (Will be Gold)</label>
+                    <input type="text" class="custom-heading" value="${escapeHTML(heading)}" placeholder="e.g. Swimming Pool & Spa Guidelines" required />
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 0.75rem;">Section Content / Details</label>
+                    <textarea class="custom-content" rows="4" placeholder="Enter instructions or guidelines for this manual section..." required>${escapeHTML(content)}</textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 0.75rem;">Section Image (Optional, displays adjacent to text)</label>
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <input type="file" accept="image/*" onchange="handleCustomSectionImage(event, '${blockId}')" style="width: auto; max-width: 250px; font-size: 0.8rem; padding: 6px 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2);" />
+                        <input type="hidden" class="custom-image-data" value="${imageUrl}" />
+                        <div class="custom-image-preview-container" style="display: ${imageUrl ? 'block' : 'none'}; position: relative; width: 80px; height: 80px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                            <img class="custom-image-preview" src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" />
+                            <button type="button" onclick="removeSectionImage('${blockId}')" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 18px; height: 18px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; padding: 0;">×</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(block);
+        }
+
+        function removeSectionImage(blockId) {
+            const block = document.getElementById(blockId);
+            if (block) {
+                block.querySelector('.custom-image-data').value = '';
+                block.querySelector('.custom-image-preview-container').style.display = 'none';
+                block.querySelector('.custom-image-preview').src = '';
+                block.querySelector('input[type="file"]').value = '';
+            }
+        }
+
+        function handleCustomSectionImage(event, blockId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG with 0.7 quality to keep size under ~80KB
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const block = document.getElementById(blockId);
+                    if (block) {
+                        block.querySelector('.custom-image-data').value = dataUrl;
+                        block.querySelector('.custom-image-preview').src = dataUrl;
+                        block.querySelector('.custom-image-preview-container').style.display = 'block';
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function copyInviteUrl() {
+            const input = document.getElementById('invite-url-input');
+            input.select();
+            document.execCommand('copy');
+            showToast('Invite link copied to clipboard.');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>

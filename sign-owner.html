@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>66 Hamilton — Owner Counter-Signature</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg: #0B0B0D;
+            --bg-card: #121214;
+            --accent-gold: #C9A96E;
+            --text-primary: #F2EFE9;
+            --text-muted: rgba(242, 239, 233, 0.6);
+            --border: rgba(201, 169, 110, 0.2);
+            --border-hover: rgba(201, 169, 110, 0.4);
+            --success: #81c784;
+            --error: #e57373;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--accent-gold);
+        }
+
+        .subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-gold);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+
+        /* --- Tenant Info Summary Grid --- */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .summary-table th {
+            color: var(--text-muted);
+            font-weight: normal;
+            width: 35%;
+        }
+
+        .summary-table td {
+            font-weight: 500;
+        }
+
+        /* --- Passport Image Overlay --- */
+        .passport-btn {
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #passport-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        #passport-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 2px solid var(--accent-gold);
+            border-radius: 4px;
+        }
+
+        /* --- Digital Contract Screen --- */
+        .contract-box {
+            background: #fff;
+            color: #000;
+            padding: 40px;
+            max-height: 400px;
+            overflow-y: scroll;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        .contract-box > *:first-child {
+            margin-top: 0 !important;
+        }
+
+        .contract-box h1, .contract-box h2, .contract-box h3, .contract-box h4 {
+            font-family: inherit;
+            color: #000;
+            margin: 15px 0 10px 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .contract-box h1 { font-size: 14pt; font-weight: bold; margin-bottom: 20px; }
+        .contract-box h2 { font-size: 12pt; font-weight: bold; }
+        .contract-box p { margin-bottom: 12px; text-indent: 20px; }
+        .contract-box p.no-indent { text-indent: 0; }
+        .contract-box ol { margin: 10px 0 15px 25px; }
+        .contract-box li { margin-bottom: 8px; }
+
+        /* --- Signature Pad --- */
+        .sig-container {
+            border: 1px solid var(--border);
+            background: #1a1a1c;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .sig-canvas {
+            display: block;
+            width: 100%;
+            height: 150px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .sig-clear {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 600;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #b5945b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>66 Hamilton <em>Counter-Signature.</em></h1>
+            <p class="subtitle">Licensor Agreement Execution</p>
+        </header>
+
+        <!-- Section: Verification Info -->
+        <div class="card" id="tenant-summary-card">
+            <h2>Applicant Details</h2>
+            <table class="summary-table">
+                <tr><th>Full Legal Name</th><td id="summary-name"></td></tr>
+                <tr><th>Permanent Address</th><td id="summary-address"></td></tr>
+                <tr><th>Contact Details</th><td id="summary-contact"></td></tr>
+                <tr><th>Identity Documents</th><td><button class="passport-btn" onclick="openPassportModal()">View Uploaded Passport</button></td></tr>
+                <tr><th>Travel Logistics</th><td id="summary-travel"></td></tr>
+                <tr><th>Booking Securement</th><td id="summary-booking"></td></tr>
+                <tr><th>Payment Details</th><td id="summary-payment"></td></tr>
+            </table>
+        </div>
+
+        <!-- Section: Contract Review & Signature -->
+        <div class="card" id="signing-card">
+            <h2>Contract Execution</h2>
+            
+            <div class="contract-box" id="verbatim-contract-box">
+                <h1>Licence to Occupy for Serviced Accommodation</h1>
+                <p class="no-indent"><strong>THIS AGREEMENT</strong> is made on the date of final electronic execution by both parties.</p>
+                
+                <h3 style="text-align: left; font-size: 11pt;">Parties:</h3>
+                <ol>
+                    <li><strong>GRANT DENNIS</strong> (the "Licensor")</li>
+                    <li><strong><span class="fill-tenant-name">_____</span></strong>, identified as the Primary Licensee in Section 1 of the attached Onboarding Portal (the "Licensee")</li>
+                </ol>
+
+                <h3 style="text-align: left; font-size: 11pt;">Background:</h3>
+                <p class="no-indent">A. The Licensor is the master lease holder of the residential property located at Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand (the "Premises"), and possesses all necessary commercial and legal authority to grant non-exclusive temporary licenses to occupy the property.</p>
+                <p class="no-indent">B. The Licensor operates the property as premium, short-term commercial serviced accommodation.</p>
+                <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly ninety (90) days, subject to the active delivery of commercial services by the Licensor.</p>
+                <p class="no-indent">D. The parties explicitly agree that this arrangement is not a residential tenancy and is expressly excluded from the operations of the New Zealand Residential Tenancies Act 1986 pursuant to Section 5 of that Act (relating to temporary, transient, and serviced accommodation).</p>
+
+                <h3 style="text-align: left; font-size: 11pt;">Operative Terms:</h3>
+                <p class="no-indent"><strong>1. Grant of Licence</strong></p>
+                <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly ninety (90) days, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
+                <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
+
+                <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
+                <p class="no-indent">2.1 The term of this Licence shall be for exactly 90 Days, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+                <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+
+                <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Surcharges</strong></p>
+                <p class="no-indent">3.1 The total bundled weekly cost for the serviced accommodation is NZD $2,400.00 inclusive of GST.</p>
+                <p class="no-indent">3.2 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until either:</p>
+                <p class="no-indent" style="margin-left: 20px;">(a) 100% of the total 90-day Licence Fee has been paid and fully cleared into the Licensor's account; or</p>
+                <p class="no-indent" style="margin-left: 20px;">(b) A non-refundable securement fee of NZD $1,000.00 (the "Booking Deposit") has been paid and fully cleared into the Licensor's account.</p>
+                <p class="no-indent">3.3 Market Withdrawal: Upon verified receipt and bank clearance of either option in clause 3.2, the Licensor shall immediately withdraw the Premises from TradeMe and all other advertising channels, securing the dates exclusively for the Licensee.</p>
+                <p class="no-indent">3.4 Balance Due Condition Precedent: If the Licensee elects to secure the property via the Booking Deposit, the remaining balance of the total 90-day Licence Fee must clear into the Licensor's nominated New Zealand bank account no later than seven (7) days prior to the Commencement Date. The Booking Deposit will be credited in full against the total balance due.</p>
+                <p class="no-indent">3.5 Processing Fees: If payments are executed via credit card or online payment gateways (e.g., Stripe, Wise link), a non-refundable 2.5% transaction surcharge will be added to the invoice and borne entirely by the Licensee.</p>
+                <p class="no-indent">3.6 Forfeiture and Cancellation: If the remaining balance has not fully cleared into the Licensor's account by the strict 7-day pre-arrival deadline, this agreement shall automatically terminate. The $1,000.00 Booking Deposit shall be strictly non-refundable and forfeited in full to the Licensor as pre-estimated liquidated damages for removing the asset from the commercial market. The Licensor will immediately re-list the property for public booking, and physical access/fobs to the Premises will be withheld.</p>
+
+                <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
+                <p class="no-indent">4.1 The weekly Licence Fee includes the active provision of the following commercial services by the Licensor:</p>
+                <ul style="margin-left: 40px; list-style-type: square; margin-bottom: 10px;">
+                    <li>Full provisioning and baseline usage allocation of residential utilities (electricity, gas, water, and unlimited high-speed broadband internet).</li>
+                    <li>A mandatory, professional housekeeping and interior cleaning service conducted once per calendar week.</li>
+                </ul>
+                <p class="no-indent">4.2 Erosion of Quiet Enjoyment: Because this is a commercial serviced accommodation contract, the Licensor, their property managers, and contracted housekeeping staff retain an absolute, non-negotiable, and unhindered weekly right of entry to perform the mandatory cleaning services, verify chattel safety, and inspect the status of the asset. The Licensee cannot refuse, delay, or restrict this entry.</p>
+
+                <p class="no-indent"><strong>5. 24-Hour Inventory Reconciliation Window</strong></p>
+                <p class="no-indent">5.1 A complete inventory log of high-end furniture, electronics, and household chattels will be provided to the Licensee upon arrival.</p>
+                <p class="no-indent">5.2 The Licensee has exactly 24 hours from physical check-in to inspect the Premises and notify the Licensor via email or WhatsApp of any missing inventory or pre-existing damage.</p>
+                <p class="no-indent">5.3 If no discrepancy notice is received within this 24-hour window, the Premises and all listed chattels shall be legally deemed to have been delivered in immaculate condition. The Licensee shall be held fully liable for any defects, damages, or missing items recorded at the final checkout inspection.</p>
+
+                <p class="no-indent"><strong>6. Winter Utility Fair Use Cap Clause</strong></p>
+                <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $600.00 (inclusive of GST) per calendar month.</p>
+                <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $600.00 NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
+                <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 15% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
+
+                <p class="no-indent"><strong>7. Optional Linen & Bed Sheet Service</strong></p>
+                <p class="no-indent">7.1 The mandatory weekly cleaning service does not include bed sheet laundering and linen replacement.</p>
+                <p class="no-indent">7.2 If requested in writing by the Licensee, the Licensor can provide a complete premium linen and bed sheet replacement service at an additional cost of NZD $45.00 + GST ($51.75 incl. GST) per bed, per week. This service will be invoiced separately and must be paid in advance alongside the main Licence Fee block.</p>
+
+                <p class="no-indent"><strong>8. Conduct, House Rules & Liability Penalties</strong></p>
+                <p class="no-indent">8.1 Occupancy Restrictions: Only the specific individuals declared in Section 2 of the attached Onboarding Portal are permitted to reside in the Premises. Sub-licensing rooms or hosting additional permanent overnight guests is strictly prohibited.</p>
+                <p class="no-indent">8.2 Quiet Hours & Social Gatherings: The Premises is located in a strict residential building. Quiet hours must be observed between 10:00 PM and 7:00 AM daily. No parties or large social gatherings are permitted. If building management or noise control protocols require a security guard call-out due to loud behavior from the occupants, a mandatory NZD $250.00 enforcement fee will be billed instantly to the Licensee, alongside serving as immediate grounds for Licence revocation.</p>
+                <p class="no-indent">8.3 Fire Alarm False Call-Outs: Smoking and vaping are strictly prohibited inside the Premises or on the balconies. If the occupants trigger a false fire alarm via cooking negligence, smoking, or tampering with sensors that results in a Fire and Emergency New Zealand (FENZ) call-out, the Licensee is strictly liable for the full penalty fine levied by emergency services (historically $1,000.00+ GST), plus a 15% administrative fee.</p>
+                <p class="no-indent">8.4 Supervision of Minors: In strict accordance with New Zealand child safety laws, no children under the age of 14 years may be left unattended or without adult supervision anywhere within the Premises or common property of the building complex at any time.</p>
+
+                <p class="no-indent"><strong>9. Option to Request Extension</strong></p>
+                <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of between 1 and 90 additional days) by providing written notice to the Licensor no later than thirty (30) days prior to the Expiry Date.</p>
+                <p class="no-indent">9.2 The Licensor retains absolute discretion to accept or deny an extension request based on apartment availability, master lease parameters, or past conduct.</p>
+                <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the extension fee block in cleared funds at least ten (10) days prior to the original Expiry Date. All commercial services and weekly cleaning entry mandates will continue throughout any extension.</p>
+
+                <p class="no-indent"><strong>10. Immediate Revocation & Eviction</strong></p>
+                <p class="no-indent">10.1 If the Licensee commits a material breach of this agreement, fails to clear utility overage invoices, or violates structural building rules, the Licensor reserves the right to revoke this Licence immediately upon written notice.</p>
+                <p class="no-indent">10.2 Upon revocation, the Licensee's personal permission to occupy the space terminates instantly. They must vacate the premises and remove all personal belongings within twenty-four (24) hours without recourse to the New Zealand Tenancy Tribunal.</p>
+
+                <p class="no-indent"><strong>11. Jurisdiction</strong></p>
+                <p class="no-indent">11.1 This agreement is governed exclusively by the laws of New Zealand. Any contractual disputes that cannot be settled by mutual agreement shall be directed to the courts of New Zealand.</p>
+
+                <h2 style="margin-top: 30px; font-size: 12pt;">Execution Schedule</h2>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 10pt; color: #000;" border="1" cellpadding="8">
+                    <tr><th style="width: 40%;">Licensor</th><td>Grant Dennis</td></tr>
+                    <tr><th>Licensee</th><td><span class="fill-tenant-name">_____</span></td></tr>
+                    <tr><th>Premises</th><td>Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand</td></tr>
+                    <tr><th>Commencement Date</th><td><span class="fill-commence-date">_____</span></td></tr>
+                    <tr><th>Expiry Date</th><td><span class="fill-expiry-date">_____</span></td></tr>
+                    <tr><th>Total Base Licence Fee Due<br/><small>(90 Days / 12.85 Weeks)</small></th><td><span class="fill-rent">_____</span></td></tr>
+                    <tr><th>Optional Linen Service Selected</th><td><span class="fill-linen-service">_____</span></td></tr>
+                </table>
+
+                <h2 style="margin-top: 40px; font-size: 12pt;">Digital Signatures</h2>
+                <p class="no-indent">By signing below, both parties acknowledge they have read, understood, and agreed to be legally bound by the terms of this commercial Licence to Occupy.</p>
+                
+                <table style="width: 100%; margin-top: 30px; border-collapse: collapse;" border="0" cellpadding="10">
+                    <tr>
+                        <td style="width: 50%; vertical-align: bottom;">
+                            <strong>Licensor Digital Signature:</strong><br/>
+                            <div id="render-owner-sig" style="height: 60px; border-bottom: 1px solid #000; margin-top: 10px;">
+                                <span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.9rem; color: #000;"><strong>Licensor:</strong> Grant Dennis</div>
+                            <div style="margin-top: 5px;">Date: <span id="render-owner-date">__________</span></div>
+                        </td>
+                        <td style="width: 50%; vertical-align: bottom;">
+                            <strong>Licensee Digital Signature:</strong><br/>
+                            <div id="render-tenant-sig" style="height: 60px; border-bottom: 1px solid #000; margin-top: 10px;">
+                                <span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Tenant Signature</span>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.9rem; color: #000;"><strong>Licensee:</strong> <span class="fill-tenant-name">_____</span></div>
+                            <div style="margin-top: 5px;">Date: <span id="render-tenant-date">__________</span></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Signature Pad UI -->
+            <label style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px;">Please Sign using your Mouse or Touchscreen</label>
+            <div class="sig-container">
+                <canvas class="sig-canvas" id="canvas-signature"></canvas>
+                <button class="sig-clear" onclick="clearSignatureCanvas()">Clear Pad</button>
+            </div>
+
+            <div style="text-align: right; margin-top: 30px;">
+                <button class="btn" onclick="submitOwnerSignature()">Counter-Sign & Finalize</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passport Image Modal -->
+    <div id="passport-modal" onclick="closePassportModal()">
+        <img id="passport-modal-img" />
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        let applicationData = null;
+
+        const canvas = document.getElementById('canvas-signature');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        if (!token) {
+            alert("Error: Secure application token is missing.");
+            document.body.innerHTML = "<div class='container' style='text-align:center; padding: 100px 0;'><h2 style='color: var(--accent-gold); font-family: Cormorant Garamond; font-size: 2.2rem;'>Invalid Secure URL</h2></div>";
+        } else {
+            loadApplicationDetails();
+        }
+
+        async function loadApplicationDetails() {
+            try {
+                const res = await fetch(`/api/application?token=${token}`);
+                if (!res.ok) throw new Error('Failed to load application');
+                applicationData = await res.json();
+
+                if (applicationData.status !== 'pending_owner') {
+                    alert(`Application is currently in status: ${applicationData.status.replace('_', ' ')}. No action required.`);
+                    window.location.href = '/admin.html';
+                    return;
+                }
+
+                populateTenantSummary();
+                populateContractPreview();
+                setupSignaturePad();
+                resizeCanvas();
+            } catch (err) {
+                alert("Error loading details: " + err.message);
+            }
+        }
+
+        function populateTenantSummary() {
+            const td = applicationData.tenantDetails;
+            document.getElementById('summary-name').textContent = td.name || '';
+            document.getElementById('summary-address').textContent = td.address || '';
+            document.getElementById('summary-contact').innerHTML = `Email: ${td.email}<br/>Phone: ${td.phone}`;
+            document.getElementById('summary-travel').innerHTML = `Flight: ${td.flightNumber || 'N/A'}<br/>Landing: ${td.landingTime || 'N/A'}`;
+            document.getElementById('summary-booking').innerHTML = `Option ${td.bookingOption}<br/>${td.bookingOption === 'A' ? 'Full Upfront Wire' : '1,000 Booking Deposit'}`;
+            document.getElementById('summary-payment').innerHTML = `Method: ${td.transferMethod === 'wire' ? 'Bank SWIFT Wire' : 'Digital Portal'}<br/>Payment Date: ${td.paymentDate}`;
+        }
+
+        function populateContractPreview() {
+            const td = applicationData.tenantDetails;
+            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = td.name);
+            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = applicationData.startDate);
+            
+            const commenceDate = new Date(applicationData.startDate);
+            const expiryDate = new Date(commenceDate.getTime() + 90 * 24 * 60 * 60 * 1000);
+            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = expiryDate.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+
+            const baseRent = applicationData.rent * (90/7);
+            document.querySelectorAll('.fill-rent').forEach(el => el.textContent = `$${baseRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`);
+            document.querySelectorAll('.fill-linen-service').forEach(el => el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No');
+
+            // Render tenant signature and date
+            document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
+            document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString();
+        }
+
+        function openPassportModal() {
+            const modal = document.getElementById('passport-modal');
+            const img = document.getElementById('passport-modal-img');
+            img.src = applicationData.tenantDetails.passportData;
+            modal.style.display = 'flex';
+        }
+
+        function closePassportModal() {
+            document.getElementById('passport-modal').style.display = 'none';
+        }
+
+        // --- Signature Pad Canvas Logic ---
+        function setupSignaturePad() {
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            canvas.addEventListener('touchstart', startDrawingTouch, { passive: false });
+            canvas.addEventListener('touchmove', drawTouch, { passive: false });
+            canvas.addEventListener('touchend', stopDrawingTouch);
+        }
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            ctx.scale(ratio, ratio);
+            clearSignatureCanvas();
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#fff';
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function startDrawingTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
+
+        function drawTouch(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#fff';
+            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function stopDrawingTouch() {
+            isDrawing = false;
+        }
+
+        function clearSignatureCanvas() {
+            ctx.fillStyle = '#1a1a1c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        async function submitOwnerSignature() {
+            const dataUrl = canvas.toDataURL();
+            
+            if (confirm("Are you sure you want to execute and finalize this Licence to Occupy agreement?")) {
+                try {
+                    // Show a loading indicator
+                    const btn = document.querySelector('#signing-card button.btn');
+                    btn.disabled = true;
+                    btn.textContent = "Finalizing Agreement...";
+
+                    // 1. Render owner signature locally on the contract view
+                    document.getElementById('render-owner-sig').innerHTML = `<img src="${dataUrl}" style="max-height: 50px;" />`;
+                    document.getElementById('render-owner-date').textContent = new Date().toLocaleDateString('en-NZ');
+
+                    // 2. Fetch and append Body Corporate Rules to the verbatim contract block
+                    const rulesRes = await fetch('/body-corporate-rules.html');
+                    if (!rulesRes.ok) throw new Error("Could not load Body Corporate Rules");
+                    const rulesHtml = await rulesRes.text();
+                    
+                    const parser = new DOMParser();
+                    const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
+                    const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
+
+                    const verbatimBox = document.getElementById('verbatim-contract-box');
+
+                    // Create dynamic rules section for the PDF
+                    const rulesSection = document.createElement('div');
+                    rulesSection.style.pageBreakBefore = 'always';
+                    rulesSection.style.marginTop = '0px';
+                    rulesSection.innerHTML = `
+                        <h2 style="text-align: center; text-transform: uppercase; margin-top: 0px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
+                        <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; text-align: justify; color: #000;">
+                            ${rulesContent}
+                        </div>
+                    `;
+                    verbatimBox.appendChild(rulesSection);
+
+                    // 3. Temporarily update styling of contract container for clean PDF output
+                    const originalMaxHeight = verbatimBox.style.maxHeight;
+                    const originalOverflowY = verbatimBox.style.overflowY;
+                    const originalBorder = verbatimBox.style.border;
+                    
+                    verbatimBox.style.maxHeight = 'none';
+                    verbatimBox.style.overflowY = 'visible';
+                    verbatimBox.style.border = 'none';
+
+                    const opt = {
+                        margin:       15,
+                        filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, logging: false },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    // Generate raw base64 string from html2pdf
+                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
+
+                    // Restore original container styling and remove appended rules from UI
+                    verbatimBox.style.maxHeight = originalMaxHeight;
+                    verbatimBox.style.overflowY = originalOverflowY;
+                    verbatimBox.style.border = originalBorder;
+                    verbatimBox.removeChild(rulesSection);
+
+                    // 4. Submit everything to backend api
+                    const res = await fetch('/api/application/sign-owner', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            token, 
+                            ownerSignature: dataUrl,
+                            pdfData: pdfData
+                        })
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error);
+
+                    alert("Agreement successfully executed and finalized! Redirecting to admin panel.");
+                    window.location.href = '/admin.html';
+                } catch (err) {
+                    alert('Error saving counter-signature: ' + err.message);
+                    // Reset button
+                    const btn = document.querySelector('#signing-card button.btn');
+                    btn.disabled = false;
+                    btn.textContent = "Counter-Sign & Finalize";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

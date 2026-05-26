@@ -3,3 +3,6 @@ node_modules
 .gemini
 .antigravity
 *.log
+.env
+.wrangler/
+scratch/
