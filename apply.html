@@ -343,8 +343,8 @@
 
         /* --- Signature Pad --- */
         .sig-container {
-            border: 1px solid var(--border);
-            background: #1a1a1c;
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            background: #ffffff;
             border-radius: 4px;
             margin-bottom: 20px;
             position: relative;
@@ -670,6 +670,22 @@
             
             <!-- Verbatim lease text box -->
             <div class="contract-box" id="verbatim-contract-box">
+                <!-- PDF-Only Premium Header -->
+                <div class="pdf-only-header" style="display: none; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 25px;">
+                    <table style="width: 100%; border: none; margin: 0; padding: 0; border-collapse: collapse;">
+                        <tr style="border: none;">
+                            <td style="border: none; padding: 0; text-align: left; font-family: 'Times New Roman', serif; font-size: 9pt; color: #444; line-height: 1.4;">
+                                <strong>66 HAMILTON ROAD</strong><br/>
+                                Herne Bay, Auckland, New Zealand
+                            </td>
+                            <td style="border: none; padding: 0; text-align: right; font-family: 'Times New Roman', serif; font-size: 9pt; color: #444; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <strong>Licence to Occupy Agreement</strong><br/>
+                                Confidential Serviced Accommodation
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
                 <h1>Licence to Occupy for Serviced Accommodation</h1>
                 <p class="no-indent"><strong>THIS AGREEMENT</strong> is made on the date of final electronic execution by both parties.</p>
                 
@@ -778,6 +794,20 @@
                         </td>
                     </tr>
                 </table>
+
+                <!-- PDF-Only Premium Footer -->
+                <div class="pdf-only-footer" style="display: none; border-top: 1px solid #ccc; padding-top: 12px; margin-top: 40px;">
+                    <table style="width: 100%; border: none; margin: 0; padding: 0; border-collapse: collapse;">
+                        <tr style="border: none;">
+                            <td style="border: none; padding: 0; text-align: left; font-family: 'Times New Roman', serif; font-size: 8pt; color: #666;">
+                                Licence to Occupy for Serviced Accommodation • 66 Hamilton Road
+                            </td>
+                            <td style="border: none; padding: 0; text-align: right; font-family: 'Times New Roman', serif; font-size: 8pt; color: #666;">
+                                Auckland, New Zealand
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <!-- Signature Pad UI -->
@@ -1298,7 +1328,7 @@
             if (!isDrawing) return;
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
-            ctx.strokeStyle = '#fff';
+            ctx.strokeStyle = '#000';
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
         }
@@ -1323,7 +1353,7 @@
             const rect = canvas.getBoundingClientRect();
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
-            ctx.strokeStyle = '#fff';
+            ctx.strokeStyle = '#000';
             ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
             ctx.stroke();
         }
@@ -1333,7 +1363,7 @@
         }
 
         function clearSignatureCanvas() {
-            ctx.fillStyle = '#1a1a1c';
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
@@ -1911,10 +1941,17 @@
             const originalMaxHeight = element.style.maxHeight;
             const originalOverflowY = element.style.overflowY;
             const originalBorder = element.style.border;
+            const originalPadding = element.style.padding;
             
             element.style.maxHeight = 'none';
             element.style.overflowY = 'visible';
             element.style.border = 'none';
+            element.style.padding = '0px';
+
+            const pdfHeader = element.querySelector('.pdf-only-header');
+            const pdfFooter = element.querySelector('.pdf-only-footer');
+            if (pdfHeader) pdfHeader.style.display = 'block';
+            if (pdfFooter) pdfFooter.style.display = 'block';
 
             const opt = {
                 margin:       15,
@@ -1930,6 +1967,9 @@
                 element.style.maxHeight = originalMaxHeight;
                 element.style.overflowY = originalOverflowY;
                 element.style.border = originalBorder;
+                element.style.padding = originalPadding;
+                if (pdfHeader) pdfHeader.style.display = 'none';
+                if (pdfFooter) pdfFooter.style.display = 'none';
             });
         }
 
