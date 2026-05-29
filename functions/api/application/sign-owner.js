@@ -67,7 +67,7 @@ export async function onRequestPost(context) {
         },
         body: JSON.stringify({
           from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
-          to: app.tenantDetails.email,
+          to: app.tenantDetails.primaryOccupantEmail || app.tenantDetails.email,
           subject: 'Executed Tenancy Agreement & Portal Access - 66 Hamilton Road',
           attachments: emailAttachments,
           html: `
@@ -81,7 +81,7 @@ export async function onRequestPost(context) {
               <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">We are pleased to inform you that your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties.</p>
               <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">A copy of your fully executed agreement has been attached to this email as a PDF.</p>
               
-              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">To access your Resident Portal, please click the link below to visit the login page. You must log in using your registered email address: <strong style="color: #c9a96e;">${app.tenantDetails.email}</strong>. Once submitted, a secure 6-digit verification code will be sent to your email. Enter that code on the login page to authenticate and access the portal.</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">To access your Resident Portal, please click the link below to visit the login page. You must log in using your registered email address: <strong style="color: #c9a96e;">${app.tenantDetails.primaryOccupantEmail || app.tenantDetails.email}</strong>. Once submitted, a secure 6-digit verification code will be sent to your email. Enter that code on the login page to authenticate and access the portal.</p>
               
               <div style="text-align: center; margin: 35px 0;">
                 <a href="${loginUrl}" style="background-color: #c9a96e; color: #000000; font-weight: bold; padding: 14px 28px; text-decoration: none; border-radius: 4px; display: inline-block; letter-spacing: 1px;">LOG IN TO RESIDENT PORTAL</a>

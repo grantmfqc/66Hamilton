@@ -38,16 +38,20 @@ export async function onRequestPost(context) {
     if (email === expectedAdminEmail) {
       role = 'admin';
     } else {
-      // Scan all applications to find matching tenant email
+      // Scan all applications to find matching tenant email (billing email or primary occupant email)
       const list = await kv.list({ prefix: 'application:' });
       for (const key of list.keys) {
         const val = await kv.get(key.name);
         if (val) {
           const app = JSON.parse(val);
-          if (app.tenantDetails && app.tenantDetails.email && app.tenantDetails.email.trim().toLowerCase() === email) {
-            role = 'tenant';
-            tokenId = app.id;
-            break;
+          if (app.tenantDetails) {
+            const billingEmail = app.tenantDetails.email?.trim().toLowerCase();
+            const primaryOccupantEmail = app.tenantDetails.primaryOccupantEmail?.trim().toLowerCase();
+            if ((billingEmail && billingEmail === email) || (primaryOccupantEmail && primaryOccupantEmail === email)) {
+              role = 'tenant';
+              tokenId = app.id;
+              break;
+            }
           }
         }
       }
