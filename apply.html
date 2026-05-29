@@ -897,6 +897,7 @@
                     <tr><th>Expiry Date</th><td><span class="fill-expiry-date">_____</span></td></tr>
                     <tr><th>Total Base Licence Fee Due<br/><small>(90 Days / 12.85 Weeks)</small></th><td><span class="fill-rent">_____</span></td></tr>
                     <tr><th>Optional Linen Service Selected</th><td><span class="fill-linen-service">_____</span></td></tr>
+                    <tr id="execution-schedule-payment-row" style="display: none;"><th>Payment Schedule<br/><small>(Monthly Option Structured)</small></th><td id="execution-payment-schedule-container" style="padding: 0;"></td></tr>
                 </table>
 
                 <h2 style="margin-top: 40px; font-size: 12pt;">Digital Signatures</h2>
@@ -1677,6 +1678,108 @@
             }
         }
 
+        function getPaymentSchedule(checkinDateStr, totalDays, dailyRateValue) {
+            const dailyRateInclGst = dailyRateValue * 1.15;
+            const checkinDate = new Date(checkinDateStr);
+            
+            let remainingDays = totalDays;
+            const schedule = [];
+            
+            // Payment 1
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                schedule.push({
+                    paymentNumber: 1,
+                    label: "Payment 1 (Upfront Booking Securement)",
+                    dueDate: "Prior to Check-in",
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days 1 to ${daysCovered}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 2
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = checkinDate + 14 days
+                const dueDate = new Date(checkinDate);
+                dueDate.setDate(dueDate.getDate() + 14);
+                
+                const startDayIndex = 31;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 2,
+                    label: "Payment 2 (Installment 1)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 3
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = Payment 2 Due Date + 30 days
+                const prevDueDate = schedule[1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = 61;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 3,
+                    label: "Payment 3 (Installment 2)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 4 and onwards
+            let paymentIdx = 4;
+            while (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = previous payment due date + 30 days
+                const prevDueDate = schedule[schedule.length - 1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = (paymentIdx - 1) * 30 + 1;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: paymentIdx,
+                    label: `Payment ${paymentIdx} (${daysCovered < 30 ? 'Final Part Installment' : `Installment ${paymentIdx - 1}`})`,
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                
+                remainingDays -= daysCovered;
+                paymentIdx++;
+            }
+            
+            return schedule;
+        }
+
         function populateContractPreview() {
             const td = applicationData.tenantDetails;
             const isCompany = td.licenseeType === 'company';
@@ -1746,20 +1849,57 @@
                     `}
                     <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                 `;
+                
+                // Hide payment row in execution schedule
+                const execRow = document.getElementById('execution-schedule-payment-row');
+                if (execRow) execRow.style.display = 'none';
             } else {
                 // Monthly Installments
-                const upfrontAmount = (dailyRate * 30) * 1.15; // 1 month upfront
-                const balanceAmount = totalVal - upfrontAmount;
-                const monthlyInst = (dailyRate * 30) * 1.15; // monthly installment
+                const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate);
+                
+                let scheduleRowsHtml = '';
+                schedule.forEach(p => {
+                    scheduleRowsHtml += `
+                        <tr style="border: 1px solid #000;">
+                            <td style="text-align: center; border: 1px solid #000; padding: 6px;">${p.paymentNumber}</td>
+                            <td style="border: 1px solid #000; padding: 6px;">${p.label}<br/><small style="color: #555; font-size: 0.85em;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small></td>
+                            <td style="text-align: center; border: 1px solid #000; padding: 6px; font-weight: bold;">${p.dueDate}</td>
+                            <td style="text-align: right; border: 1px solid #000; padding: 6px; font-weight: bold;">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                        </tr>
+                    `;
+                });
+                
+                const scheduleTableHtml = `
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 9.5pt; font-family: 'Times New Roman', Times, serif; color: #000; border: 1px solid #000;" border="1" cellpadding="6">
+                        <thead>
+                            <tr style="background-color: #f2f2f2; border: 1px solid #000;">
+                                <th style="width: 12%; text-align: center; border: 1px solid #000; padding: 6px;">Payment</th>
+                                <th style="width: 38%; text-align: left; border: 1px solid #000; padding: 6px;">Coverage / Description</th>
+                                <th style="width: 25%; text-align: center; border: 1px solid #000; padding: 6px;">Due Date</th>
+                                <th style="width: 25%; text-align: right; border: 1px solid #000; padding: 6px;">Amount (incl. GST)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scheduleRowsHtml}
+                        </tbody>
+                    </table>
+                `;
 
                 paymentClauseHtml = `
                     <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
                     <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
-                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong></p>
-                    <p class="no-indent" style="margin-left: 20px;">(a) <strong>Upfront Payment:</strong> The Licensee must pay the first month's payment block in full (<strong>$${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>, inclusive of GST) upon booking as a condition precedent to secure the booking.</p>
-                    <p class="no-indent" style="margin-left: 20px;">(b) <strong>Balance in Installments:</strong> The remaining balance of $${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD shall be paid in consecutive monthly installments of <strong>$${monthlyInst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> (or the final remaining balance block), with the first installment commencing exactly 14 days after the Commencement Date.</p>
-                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront payment ($${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period:</p>
+                    ${scheduleTableHtml}
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront securement payment remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                 `;
+                
+                // Show and populate payment row in execution schedule
+                const execRow = document.getElementById('execution-schedule-payment-row');
+                const execContainer = document.getElementById('execution-payment-schedule-container');
+                if (execRow && execContainer) {
+                    execContainer.innerHTML = scheduleTableHtml;
+                    execRow.style.display = 'table-row';
+                }
             }
 
             const clause3El = document.getElementById('contract-clause-3');
