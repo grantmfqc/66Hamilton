@@ -834,10 +834,19 @@
                     </div>
                     <div class="app-actions">
                         <a href="/apply.html?token=${app.id}" target="_blank" class="btn-link">Onboarding Page</a>
-                        ${app.status === 'pending_owner' ? `<a href="/sign-owner.html?token=${app.id}" class="btn-link" style="color: var(--accent-gold); font-weight: bold;">Sign Contract</a>` : ''}
-                        ${app.status === 'completed' ? `<a href="#" onclick="downloadSignedPDFAdmin('${app.id}'); return false;" class="btn-link" style="color: var(--success); font-weight: bold;">Download PDF</a>` : ''}
+                        <a href="#" onclick="toggleContractDetails('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Contract Details</a>
+                        ${app.status === 'pending_owner' ? `<a href="/sign-owner.html?token=${app.id}" class="btn-link" style="color: var(--accent-gold); font-weight: bold; margin-left: 10px;">Sign Contract</a>` : ''}
+                        ${app.status === 'completed' ? `<a href="#" onclick="downloadSignedPDFAdmin('${app.id}'); return false;" class="btn-link" style="color: var(--success); font-weight: bold; margin-left: 10px;">Download PDF</a>` : ''}
                         <a href="#" onclick="toggleAppSettings('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Settings</a>
                         <a href="#" onclick="deleteApplication('${app.id}', '${escapeHTML(app.tenantName)}'); return false;" class="btn-link" style="color: #ff6b6b; margin-left: auto;">Delete</a>
+                    </div>
+                    
+                    <!-- Expandable Contract Details Panel -->
+                    <div id="details-panel-${app.id}" style="display: none; margin-top: 15px; padding: 18px; border: 1px solid rgba(201, 169, 110, 0.3); border-radius: 6px; background: rgba(0,0,0,0.25); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+                        <div id="details-loading-${app.id}" style="text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.9rem;">
+                            <span style="display: inline-block; margin-right: 8px;">⏳</span> Loading applicant details...
+                        </div>
+                        <div id="details-content-${app.id}" style="display: none;"></div>
                     </div>
                     
                     <!-- Expandable Retrospective Settings Panel -->
@@ -899,6 +908,187 @@
                 </div>
                 `;
             }).join('');
+        }
+
+        async function toggleContractDetails(id) {
+            const panel = document.getElementById(`details-panel-${id}`);
+            if (!panel) return;
+            
+            // Toggle visibility
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                return;
+            }
+            
+            panel.style.display = 'block';
+            
+            const loadingEl = document.getElementById(`details-loading-${id}`);
+            const contentEl = document.getElementById(`details-content-${id}`);
+            
+            // If already loaded once, don't fetch again
+            if (contentEl.innerHTML !== '') {
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+                return;
+            }
+            
+            try {
+                // Fetch full application detail
+                const res = await fetchAdmin(`/api/application?token=${id}&passcode=${encodeURIComponent(adminPasscode)}`);
+                if (!res.ok) throw new Error('Failed to load application details');
+                const app = await res.json();
+                const td = app.tenantDetails || {};
+                
+                // Construct HTML details
+                let html = '';
+                
+                // Style variables
+                const sectionHeaderStyle = `font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;`;
+                const labelStyle = `color: var(--text-muted); font-size: 0.82rem; font-weight: 500;`;
+                const valStyle = `color: #fff; font-size: 0.85rem; word-break: break-word;`;
+                const gridStyle = `display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 20px; margin-bottom: 15px;`;
+                
+                // Formulate Details HTML
+                html += `<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #fff; margin: 0;">Completed Application Details</h3>
+                            <button onclick="toggleContractDetails('${id}')" style="background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 4px;">&times;</button>
+                         </div>`;
+                
+                // 1. Licensee Section
+                html += `<div style="${sectionHeaderStyle}">1. Primary Licensee Details</div>`;
+                html += `<div style="${gridStyle}">`;
+                html += `  <div><span style="${labelStyle}">Licensee Type:</span><br/><span style="${valStyle}">${td.licenseeType === 'company' ? '🏢 Company Entity' : '👤 Individual Person'}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Full Legal Name / Entity Name:</span><br/><span style="${valStyle}"><strong>${escapeHTML(td.name || 'N/A')}</strong></span></div>`;
+                if (td.licenseeType === 'company') {
+                    html += `  <div><span style="${labelStyle}">Company Registration / NZBN:</span><br/><span style="${valStyle}">${escapeHTML(td.companyReg || 'N/A')}</span></div>`;
+                    html += `  <div><span style="${labelStyle}">Authorized Representative:</span><br/><span style="${valStyle}">${escapeHTML(td.companyRep || 'N/A')}</span></div>`;
+                }
+                html += `  <div style="grid-column: 1 / -1;"><span style="${labelStyle}">Permanent Residential / Registered Address:</span><br/><span style="${valStyle}">${escapeHTML(td.address || 'N/A')}</span></div>`;
+                html += `</div>`;
+                
+                // 2. Contact Details & Occupants Section
+                html += `<div style="${sectionHeaderStyle}">2. Contact & Occupants Details</div>`;
+                html += `<div style="${gridStyle}">`;
+                html += `  <div><span style="${labelStyle}">Primary Email:</span><br/><span style="${valStyle}">${escapeHTML(td.email || 'N/A')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Primary Mobile / WhatsApp:</span><br/><span style="${valStyle}">${escapeHTML(td.phone || 'N/A')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Primary Occupant Name:</span><br/><span style="${valStyle}">${escapeHTML(td.primaryOccupantName || 'Same as licensee')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Primary Occupant DOB:</span><br/><span style="${valStyle}">${escapeHTML(td.primaryOccupantDob || 'N/A')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Primary Occupant Phone:</span><br/><span style="${valStyle}">${escapeHTML(td.primaryOccupantPhone || 'N/A')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Primary Occupant Email:</span><br/><span style="${valStyle}">${escapeHTML(td.primaryOccupantEmail || 'N/A')}</span></div>`;
+                html += `</div>`;
+                
+                if (td.occupants && td.occupants.length > 0) {
+                    html += `<div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px; margin-top: -6px;">Additional Co-Occupants:</div>`;
+                    html += `<div style="${gridStyle}">`;
+                    td.occupants.forEach((occ, index) => {
+                        html += `  <div><span style="${labelStyle}">Occupant ${index + 2}:</span><br/><span style="${valStyle}">${escapeHTML(occ.name)} (DOB: ${escapeHTML(occ.dob)})</span></div>`;
+                    });
+                    html += `</div>`;
+                }
+                
+                // 3. Contract Term & Pricing
+                const totalVal = app.rateValue || app.rent || 2400;
+                const rateType = app.rateType || 'weekly';
+                const rateLabel = rateType === 'daily' ? 'Daily' : (rateType === 'monthly' ? 'Monthly' : 'Weekly');
+                
+                html += `<div style="${sectionHeaderStyle}">3. Booking & Contract Terms</div>`;
+                html += `<div style="${gridStyle}">`;
+                html += `  <div><span style="${labelStyle}">Arrival Date & Time:</span><br/><span style="${valStyle}">${escapeHTML(td.arrivalDate || 'N/A')} at ${escapeHTML(td.arrivalTime || 'N/A')}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Departure Date & Time:</span><br/><span style="${valStyle}">${escapeHTML(td.departureDate || 'N/A')} at ${escapeHTML(td.departureTime || 'N/A')}</span></div>`;
+                
+                // Calculate days if available
+                if (td.arrivalDate && td.departureDate) {
+                    const startD = new Date(td.arrivalDate);
+                    const endD = new Date(td.departureDate);
+                    startD.setHours(0,0,0,0);
+                    endD.setHours(0,0,0,0);
+                    const diffDays = Math.ceil(Math.abs(endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+                    html += `  <div><span style="${labelStyle}">Total Contract Days:</span><br/><span style="${valStyle}"><strong>${diffDays} Days</strong> (inclusive)</span></div>`;
+                }
+                
+                html += `  <div><span style="${labelStyle}">Contract Base Rate:</span><br/><span style="${valStyle}">$${totalVal.toLocaleString()}/${rateType === 'daily' ? 'day' : (rateType === 'monthly' ? 'month' : 'wk')} (${rateLabel})</span></div>`;
+                
+                // Renders billing calculations if checkin details populated
+                if (app.rentCalculation) {
+                    const rc = app.rentCalculation;
+                    html += `  <div><span style="${labelStyle}">Price Subtotal (excl. GST):</span><br/><span style="${valStyle}">$${rc.subtotal ? rc.subtotal.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</span></div>`;
+                    html += `  <div><span style="${labelStyle}">GST (15%):</span><br/><span style="${valStyle}">$${rc.gst ? rc.gst.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</span></div>`;
+                    html += `  <div><span style="${labelStyle}">Total Price (incl. GST):</span><br/><span style="${valStyle}"><strong>$${rc.total ? rc.total.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</strong></span></div>`;
+                }
+                
+                const termsChoice = app.paymentTermsChoice || 'full';
+                html += `  <div><span style="${labelStyle}">Payment Terms Option:</span><br/><span style="${valStyle}"><strong>${termsChoice === 'monthly' ? 'Option 2: Monthly Installments' : 'Option 1: Full Payment Plan'}</strong></span></div>`;
+                if (termsChoice === 'full') {
+                    html += `  <div><span style="${labelStyle}">Payment Option Selection:</span><br/><span style="${valStyle}">${td.bookingOption === 'A' ? 'Plan A: Pay Full Upfront' : 'Plan B: 1-Month Deposit + Balance 14 Days Prior'}</span></div>`;
+                }
+                html += `  <div><span style="${labelStyle}">Payment Confirmation Status:</span><br/><span style="${valStyle}">${td.transferMethod ? '✅ Bank transfer initiated (Wise/SWIFT)' : '❌ Not initiated'}</span></div>`;
+                html += `</div>`;
+                
+                // 4. Identity & Legal Signatures
+                html += `<div style="${sectionHeaderStyle}">4. Identity & Signatures</div>`;
+                html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 5px;">`;
+                
+                // Passport thumbnail / modal display in admin
+                if (td.passportData) {
+                    html += `  <div>
+                                 <span style="${labelStyle}">Uploaded Identity Document:</span><br/>
+                                 <div style="margin-top: 8px;">
+                                     <img src="${td.passportData}" style="max-height: 80px; max-width: 150px; border-radius: 4px; border: 1px solid var(--accent-gold); cursor: pointer; transition: all 0.2s;" onclick="openAdminPassportView('${id}', '${td.passportData}')" title="Click to view full image and download" />
+                                     <br/><a href="${td.passportData}" download="Tenant_Passport_${id}.png" style="font-size: 0.72rem; color: var(--accent-gold); text-decoration: underline; margin-top: 5px; display: inline-block;">Download File</a>
+                                 </div>
+                               </div>`;
+                } else {
+                    html += `  <div><span style="${labelStyle}">Uploaded Identity Document:</span><br/><span style="${valStyle}"><em>No document uploaded</em></span></div>`;
+                }
+                
+                // Signatures
+                if (app.tenantSignature) {
+                    html += `  <div>
+                                 <span style="${labelStyle}">Tenant Signature:</span><br/>
+                                 <div style="background: #fff; padding: 6px; display: inline-block; border-radius: 4px; margin-top: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                                     <img src="${app.tenantSignature}" style="max-height: 40px; display: block;" />
+                                 </div>
+                                 <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px;">Signed at: ${new Date(app.tenantSignedAt).toLocaleString('en-NZ')}</div>
+                               </div>`;
+                } else {
+                    html += `  <div><span style="${labelStyle}">Tenant Signature:</span><br/><span style="${valStyle}"><em>Not signed yet</em></span></div>`;
+                }
+                
+                html += `</div>`;
+                
+                contentEl.innerHTML = html;
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+                
+            } catch (err) {
+                loadingEl.innerHTML = `<span style="color: #ff6b6b;">❌ Error loading details: ${err.message}</span>`;
+            }
+        }
+
+        function openAdminPassportView(id, dataUrl) {
+            let modal = document.getElementById('admin-passport-modal');
+            if (!modal) {
+                // Dynamically create modal if not exists
+                modal = document.createElement('div');
+                modal.id = 'admin-passport-modal';
+                modal.onclick = () => { modal.style.display = 'none'; };
+                modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; display: none;';
+                modal.innerHTML = `
+                    <button style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 2.5rem; cursor: pointer; line-height: 1;" onclick="document.getElementById('admin-passport-modal').style.display = 'none'">&times;</button>
+                    <div style="position: relative; max-width: 90%; max-height: 80%; display: flex; flex-direction: column; align-items: center; gap: 20px;" onclick="event.stopPropagation()">
+                        <img id="admin-passport-modal-img" style="max-width: 100%; max-height: 70vh; border: 2px solid var(--accent-gold); border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+                        <a id="admin-passport-download-link" download="Tenant_Passport_${id}.png" href="#" class="btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 0.85rem; text-decoration: none; background: var(--accent-gold); color: #000; font-weight: 600; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(201, 169, 110, 0.3); font-family: 'Outfit', sans-serif;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download Document
+                        </a>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('admin-passport-modal-img').src = dataUrl;
+            document.getElementById('admin-passport-download-link').href = dataUrl;
+            modal.style.display = 'flex';
         }
 
         function toggleAppSettings(id) {
