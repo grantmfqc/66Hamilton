@@ -515,13 +515,43 @@
             <h2>Licensee Onboarding & Verification Questionnaire</h2>
             <form id="onboarding-form" onsubmit="submitOnboarding(event)">
                 
+                
                 <div class="form-section-title">1. Primary Licensee Details (Responsible Party)</div>
                 <div class="form-group">
-                    <label for="tenant-name">Full Legal Name (As it appears on your passport)</label>
+                    <label>Licensee Entity Type</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" id="licensee-individual" name="licensee-type" value="individual" checked onchange="toggleLicenseeType()" style="accent-color: var(--accent-gold); width: auto;" />
+                            <label for="licensee-individual" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Individual</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" id="licensee-company" name="licensee-type" value="company" onchange="toggleLicenseeType()" style="accent-color: var(--accent-gold); width: auto;" />
+                            <label for="licensee-company" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Company / Corporate Entity</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tenant-name" id="label-tenant-name">Full Legal Name</label>
                     <input type="text" id="tenant-name" required />
                 </div>
+                
+                <!-- Company Details block (shown only if Company is selected) -->
+                <div id="company-details-block" style="display: none; margin-bottom: 20px; border-left: 2px solid var(--accent-gold); padding-left: 15px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="company-reg">Company Registration / NZBN (Optional)</label>
+                            <input type="text" id="company-reg" />
+                        </div>
+                        <div class="form-group">
+                            <label for="company-rep">Authorized Representative Name</label>
+                            <input type="text" id="company-rep" />
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="tenant-address">Current Permanent Address</label>
+                    <label for="tenant-address">Contact Address</label>
                     <input type="text" id="tenant-address" required />
                 </div>
                 <div class="form-row">
@@ -530,21 +560,48 @@
                         <input type="tel" id="tenant-phone" required />
                     </div>
                     <div class="form-group">
-                        <label for="tenant-email">Primary Email Address</label>
+                        <label for="tenant-email">Primary Billing Email Address</label>
                         <input type="email" id="tenant-email" required />
                     </div>
                 </div>
 
                 <div class="form-section-title">2. Additional Occupants</div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Only named occupants are licensed to enter and stay at the property.</p>
+                
+                <!-- Primary Occupant (Required) -->
+                <div style="border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 20px;">
+                    <label style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; display: block;">Primary Occupant Details</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prim-occ-name">Full Name</label>
+                            <input type="text" id="prim-occ-name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="prim-occ-dob">Date of Birth</label>
+                            <input type="date" id="prim-occ-dob" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prim-occ-phone">Mobile / WhatsApp Number</label>
+                            <input type="tel" id="prim-occ-phone" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="prim-occ-email">Email Address</label>
+                            <input type="email" id="prim-occ-email" required />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Occupants 2, 3, 4 (Optional) -->
                 <div class="form-row" style="margin-bottom: 10px;">
                     <div class="form-group">
                         <label>Occupant 2 Name</label>
                         <input type="text" class="occ-name" />
                     </div>
                     <div class="form-group">
-                        <label>Occupant 2 Age</label>
-                        <input type="number" class="occ-age" />
+                        <label>Occupant 2 Date of Birth</label>
+                        <input type="date" class="occ-dob" />
                     </div>
                 </div>
                 <div class="form-row" style="margin-bottom: 10px;">
@@ -553,8 +610,8 @@
                         <input type="text" class="occ-name" />
                     </div>
                     <div class="form-group">
-                        <label>Occupant 3 Age</label>
-                        <input type="number" class="occ-age" />
+                        <label>Occupant 3 Date of Birth</label>
+                        <input type="date" class="occ-dob" />
                     </div>
                 </div>
                 <div class="form-row" style="margin-bottom: 10px;">
@@ -563,14 +620,14 @@
                         <input type="text" class="occ-name" />
                     </div>
                     <div class="form-group">
-                        <label>Occupant 4 Age</label>
-                        <input type="number" class="occ-age" />
+                        <label>Occupant 4 Date of Birth</label>
+                        <input type="date" class="occ-dob" />
                     </div>
                 </div>
 
-                <div class="form-section-title">3. Identity Verification & Travel Logistics</div>
+                <div class="form-section-title">3. Identity Verification</div>
                 <div class="form-group">
-                    <label>Passport/Drivers License Upload (Clear scan or photo of ID)</label>
+                    <label>Primary Occupant Passport/Drivers License Upload (Clear scan or photo of ID)</label>
                     <div class="file-upload-wrapper">
                         <span class="file-upload-text" id="upload-label">Drag & drop or click to upload Passport</span>
                         <input type="file" id="tenant-passport" accept="image/*,application/pdf" onchange="handlePassportUpload(event)" required />
@@ -579,16 +636,6 @@
                     <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         <span><strong>Privacy & Security Guarantee:</strong> Your passport scan is immediately encrypted and securely processed using industry-standard AES-256 protocols. It is stored exclusively within a highly restricted, access-controlled Cloudflare database strictly for verification purposes and is permanently deleted upon lease finalization. We never expose your personal documents.</span>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="expected-arrival-date">Expected Arrival Date</label>
-                        <input type="date" id="expected-arrival-date" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="expected-arrival-time">Expected Arrival Time</label>
-                        <input type="time" id="expected-arrival-time" required />
                     </div>
                 </div>
 
@@ -614,49 +661,139 @@
                     </div>
                 </div>
 
-                <div class="form-section-title">5. Booking Securement & Payment Method Selection</div>
-                <div class="form-group">
-                    <label>Booking Payment Option</label>
-                    <div class="checkbox-group" style="margin-bottom: 10px;">
-                        <input type="radio" id="booking-opt-a" name="booking-option" value="A" checked />
-                        <label for="booking-opt-a"><strong>Option A: Full Payment Upfront.</strong> I wish to wire the total 90-day Licence Fee within the next 24 hours to lock in the dates and fully secure this booking.</label>
+                <div class="form-section-title">5. Contract Term</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="arrival-date">Arrival Date</label>
+                        <input type="date" id="arrival-date" onchange="calculateContractPrice()" required />
                     </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="booking-opt-b" name="booking-option" value="B" />
-                        <label for="booking-opt-b"><strong>Option B: Secure via $1,000 Booking Deposit.</strong> I wish to pay a $1,000.00 NZD Booking Securement Fee now to take the apartment off the market. I acknowledge that the remaining balance must be fully cleared into the Licensor's account no later than 7 days prior to my arrival date.</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Preferred Transfer Mechanism</label>
-                    <div style="display: flex; gap: 20px; margin-top: 5px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="radio" id="transfer-wire" name="transfer-method" value="wire" checked style="accent-color: var(--accent-gold);" />
-                            <label for="transfer-wire" style="font-size: 0.9rem;">Direct International SWIFT Bank Wire</label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="radio" id="transfer-digital" name="transfer-method" value="digital" style="accent-color: var(--accent-gold);" />
-                            <label for="transfer-digital" style="font-size: 0.9rem;">Digital Portal (Wise, Stripe, Credit Card - 2.5% fee)</label>
-                        </div>
+                    <div class="form-group">
+                        <label for="arrival-time">Arrival Time</label>
+                        <input type="time" id="arrival-time" value="14:00" required />
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="payment-date">Intended Date of Payment Initiation</label>
-                    <input type="date" id="payment-date" required />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departure-date">Departure Date</label>
+                        <input type="date" id="departure-date" onchange="calculateContractPrice()" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="departure-time">Departure Time</label>
+                        <input type="time" id="departure-time" value="10:00" required />
+                    </div>
                 </div>
 
-                <div class="form-section-title">6. Body Corporate Opt-In</div>
-                <div class="checkbox-group">
+                <!-- Price & Date Live Preview Box -->
+                <div style="border: 1px dashed var(--accent-gold); border-radius: 4px; padding: 20px; background: rgba(201, 169, 110, 0.02); margin-top: 20px; margin-bottom: 25px;">
+                    <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">contract term & billing summary</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 12px; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="color: var(--text-muted);">Contract Commencement Date:</span>
+                            <span id="preview-commence-date" style="font-weight: 600; color: #fff;">—</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="color: var(--text-muted);">Contract Expiry Date:</span>
+                            <span id="preview-expiry-date" style="font-weight: 600; color: #fff;">—</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 12px;">
+                            <span style="color: var(--text-muted);">Contract Duration (Check-in/out days included):</span>
+                            <span id="preview-duration-days" style="font-weight: 600; color: var(--accent-gold);">—</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="color: var(--text-muted);">Contract Rate:</span>
+                            <span id="preview-base-rate-text" style="font-weight: 600; color: #fff;">—</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="color: var(--text-muted);">Daily Calculation Rate:</span>
+                            <span id="preview-daily-rate-text" style="font-weight: 600; color: #fff;">—</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <span style="color: var(--text-muted);">Monthly Reference Rate:</span>
+                            <span id="preview-monthly-rate-text" style="font-weight: 600; color: #fff;">—</span>
+                        </div>
+                        
+                        <div style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Total License Fee (Exclusive of GST):</span>
+                                <span id="preview-price-excl" style="font-weight: 600; color: #fff;">—</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
+                                <span style="color: var(--text-muted);">15% Goods & Services Tax (GST):</span>
+                                <span id="preview-gst" style="font-weight: 600; color: #fff;">—</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; border-top: 1px solid rgba(201, 169, 110, 0.3); padding-top: 10px; margin-top: 5px;">
+                                <span style="color: var(--accent-gold);">Total Contract Value (Inclusive of GST):</span>
+                                <span id="preview-price-incl" style="color: var(--accent-gold);">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-title">6. Booking Payments</div>
+                
+                <!-- Dynamic Payment Terms Block populated by JS based on admin choice -->
+                <div id="payment-terms-display" class="info-banner" style="margin-bottom: 25px;">
+                    <!-- Will be populated dynamically -->
+                </div>
+
+                <!-- Payment Suboptions for Option 1 (Full) - hidden if Option 2 (Monthly) is active -->
+                <div id="payment-suboptions-block" class="form-group" style="display: none;">
+                    <label>Select Booking Securement Choice</label>
+                    <div class="checkbox-group" style="margin-bottom: 10px;">
+                        <input type="radio" id="booking-opt-a" name="booking-option" value="A" checked style="width: auto; accent-color: var(--accent-gold);" />
+                        <label for="booking-opt-a" style="cursor: pointer;"><strong>Option A: Full Payment Upfront.</strong> I wish to pay 100% of the total Licence Fee upfront within 24 hours to secure the booking.</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="booking-opt-b" name="booking-option" value="B" style="width: auto; accent-color: var(--accent-gold);" />
+                        <label for="booking-opt-b" style="cursor: pointer;"><strong>Option B: 1-Month Deposit.</strong> I wish to pay a 1-month securement deposit now to secure the booking, and the balance 14 days prior to check-in.</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label>Preferred Payment Mechanism</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" id="transfer-wire" name="transfer-method" value="wire" checked style="accent-color: var(--accent-gold); width: auto;" />
+                            <label for="transfer-wire" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Direct International SWIFT Bank Wire</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" id="transfer-digital" name="transfer-method" value="digital" style="accent-color: var(--accent-gold); width: auto;" />
+                            <label for="transfer-digital" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Digital Portal (Wise, Stripe - 2.5% surcharge)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SWIFT Bank Details Box -->
+                <div style="border: 1px solid var(--border); border-radius: 4px; padding: 20px; background: rgba(0,0,0,0.3); margin-bottom: 25px;" id="swift-details-box">
+                    <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">payment instructions</h4>
+                    <p style="font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px; font-weight: 500;">SWIFT Bank Transfer Details:</p>
+                    <div style="font-family: monospace; font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); background: rgba(255,255,255,0.02); padding: 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.03);">
+                        <strong>Bank:</strong> ANZ Bank New Zealand Ltd<br/>
+                        <strong>SWIFT:</strong> ANZBNZ22<br/>
+                        <strong>Account No:</strong> 06-0254-00443418-000<br/>
+                        <strong>Reference:</strong> 66Hamilton
+                    </div>
+                </div>
+
+                <!-- Payment Confirmation Checkbox -->
+                <div class="checkbox-group" style="margin-bottom: 20px; border: 1px solid rgba(201, 169, 110, 0.25); background: rgba(201, 169, 110, 0.03); padding: 15px; border-radius: 4px;">
+                    <input type="checkbox" id="payment-confirmation-checkbox" onchange="toggleProceedButton()" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
+                    <label for="payment-confirmation-checkbox" style="font-size: 0.9rem; font-weight: 500; cursor: pointer; color: var(--text-primary);">I confirm that I have initiated the bank transfer as outlined in the payment instructions above.</label>
+                </div>
+
+                <div class="form-section-title">7. Body Corporate Opt-In</div>
+                <div class="checkbox-group" style="margin-bottom: 25px;">
                     <input type="checkbox" id="regulatory-opt-in" required />
                     <label for="regulatory-opt-in">I explicitly acknowledge and agree that Apartment 1, 66 Hamilton Road is governed by strict Body Corporate Operational Rules (including regulations regarding rubbish disposal, designated parking, and community noise parameters). I have read and understood the <a href="/body-corporate-rules.html" target="_blank" style="color: var(--accent-gold); text-decoration: underline;">Body Corporate Rules</a> and certify that all members of my party will abide fully by these rules during our stay.</label>
                 </div>
 
-                <div class="info-banner" style="margin-top: 30px;">
-                    <h4>Check-In Release Protocols</h4>
-                    Full self-check-in instructions, key safe entry codes, smart building fobs, and the digital House Manual will be released via email and WhatsApp only after 100% of the total 90-day fee balance has successfully cleared into our New Zealand bank account.
+                <div class="info-banner" style="margin-top: 30px;" id="checkin-release-banner">
+                    <!-- Populated dynamically -->
                 </div>
 
                 <div style="text-align: right; margin-top: 30px;">
-                    <button type="submit" class="btn">Proceed to Contract</button>
+                    <button type="submit" class="btn" id="btn-proceed-to-contract" disabled>Proceed to Contract</button>
                 </div>
             </form>
         </div>
@@ -698,27 +835,22 @@
                 <h3 style="text-align: left; font-size: 11pt;">Background:</h3>
                 <p class="no-indent">A. The Licensor is the master lease holder of the residential property located at Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand (the "Premises"), and possesses all necessary commercial and legal authority to grant non-exclusive temporary licenses to occupy the property.</p>
                 <p class="no-indent">B. The Licensor operates the property as premium, short-term commercial serviced accommodation.</p>
-                <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly ninety (90) days, subject to the active delivery of commercial services by the Licensor.</p>
+                <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly <span class="fill-contract-days">_____</span>, subject to the active delivery of commercial services by the Licensor.</p>
                 <p class="no-indent">D. The parties explicitly agree that this arrangement is not a residential tenancy and is expressly excluded from the operations of the New Zealand Residential Tenancies Act 1986 pursuant to Section 5 of that Act (relating to temporary, transient, and serviced accommodation).</p>
 
                 <h3 style="text-align: left; font-size: 11pt;">Operative Terms:</h3>
                 <p class="no-indent"><strong>1. Grant of Licence</strong></p>
-                <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly ninety (90) days, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
+                <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
                 <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
 
                 <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
-                <p class="no-indent">2.1 The term of this Licence shall be for exactly 90 Days, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+                <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
                 <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
 
-                <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Surcharges</strong></p>
-                <p class="no-indent">3.1 The total bundled weekly cost for the serviced accommodation is NZD $2,400.00 inclusive of GST.</p>
-                <p class="no-indent">3.2 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until either:</p>
-                <p class="no-indent" style="margin-left: 20px;">(a) 100% of the total 90-day Licence Fee has been paid and fully cleared into the Licensor's account; or</p>
-                <p class="no-indent" style="margin-left: 20px;">(b) A non-refundable securement fee of NZD $1,000.00 (the "Booking Deposit") has been paid and fully cleared into the Licensor's account.</p>
-                <p class="no-indent">3.3 Market Withdrawal: Upon verified receipt and bank clearance of either option in clause 3.2, the Licensor shall immediately withdraw the Premises from TradeMe and all other advertising channels, securing the dates exclusively for the Licensee.</p>
-                <p class="no-indent">3.4 Balance Due Condition Precedent: If the Licensee elects to secure the property via the Booking Deposit, the remaining balance of the total 90-day Licence Fee must clear into the Licensor's nominated New Zealand bank account no later than seven (7) days prior to the Commencement Date. The Booking Deposit will be credited in full against the total balance due.</p>
-                <p class="no-indent">3.5 Processing Fees: If payments are executed via credit card or online payment gateways (e.g., Stripe, Wise link), a non-refundable 2.5% transaction surcharge will be added to the invoice and borne entirely by the Licensee.</p>
-                <p class="no-indent">3.6 Forfeiture and Cancellation: If the remaining balance has not fully cleared into the Licensor's account by the strict 7-day pre-arrival deadline, this agreement shall automatically terminate. The $1,000.00 Booking Deposit shall be strictly non-refundable and forfeited in full to the Licensor as pre-estimated liquidated damages for removing the asset from the commercial market. The Licensor will immediately re-list the property for public booking, and physical access/fobs to the Premises will be withheld.</p>
+                <div id="contract-clause-3">
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until the upfront payment terms have been fully cleared.</p>
+                </div>
 
                 <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
                 <p class="no-indent">4.1 The weekly Licence Fee includes the active provision of the following commercial services by the Licensor:</p>
@@ -846,6 +978,34 @@
 
         <!-- STAGE 3: Completed Tenant Portal -->
         <div id="stage-portal" class="card" style="display: none;">
+            <!-- Special Pending State View for Step 3 (Politely confirming that the portal will unlock after admin countersigns & payment clears) -->
+            <div id="portal-pending-approval-view" style="display: none; padding: 40px 20px; text-align: center; background: rgba(201, 169, 110, 0.03); border: 1px solid var(--accent-gold); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); margin-bottom: 20px;">
+                <div style="font-size: 3.5rem; margin-bottom: 20px; color: var(--accent-gold); line-height: 1;">✍</div>
+                <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: #fff; margin-bottom: 15px; font-weight: normal; letter-spacing: 0.5px;">Agreement Executed & Under Review</h2>
+                <p style="font-size: 1.05rem; line-height: 1.7; color: var(--text-light); max-width: 600px; margin: 0 auto 20px; font-family: 'Outfit', sans-serif;">
+                    Thank you for completing and signing the serviced accommodation Licence to Occupy agreement. Your signed agreement has been successfully registered in our system.
+                </p>
+                <div style="border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 25px 20px; margin: 25px auto; max-width: 550px; text-align: left; background: rgba(255,255,255,0.01); border-radius: 6px; line-height: 1.6; font-size: 0.95rem;">
+                    <p style="margin-bottom: 15px; color: var(--accent-gold); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        Next Steps for Portal Activation:
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; list-style-type: decimal; color: var(--text-muted); display: grid; gap: 8px;">
+                        <li><strong>Licensor Execution:</strong> The administrative team will counter-sign the Licence to Occupy agreement.</li>
+                        <li><strong>Payment Verification:</strong> The admin will confirm that the required initial securement payment (wire transfer or booking deposit) has successfully cleared.</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted); font-style: italic; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 12px; margin-bottom: 0;">
+                        Access to the Apartment Codes, Digital House Manual, and smart Wi-Fi details will automatically unlock in this portal immediately once these validation steps are complete.
+                    </p>
+                </div>
+                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-muted); max-width: 600px; margin: 0 auto 30px;">
+                    A finalized copy of the executed contract will be sent directly to your registered email address for your files.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="mailto:grant@orcacom.co.nz" class="btn" style="padding: 12px 28px; font-size: 0.85rem; text-decoration: none;">Contact Support</a>
+                </div>
+            </div>
+
             <div class="portal-header">
                 <button class="portal-tab active" onclick="switchPortalTab('manual')">House Manual</button>
                 <button class="portal-tab" onclick="switchPortalTab('wifi')">Wi-Fi Connection</button>
@@ -1115,8 +1275,51 @@
             if (document.getElementById('pending-approval-banner')) document.getElementById('pending-approval-banner').style.display = 'none';
             if (document.getElementById('sig-pad-section')) document.getElementById('sig-pad-section').style.display = 'block';
 
+            // Populate Dynamic Payment Terms and Protocols
+            const pTerms = applicationData.paymentTermsChoice || 'full';
+            const displayEl = document.getElementById('payment-terms-display');
+            const suboptionsBlock = document.getElementById('payment-suboptions-block');
+            const checkinReleaseEl = document.getElementById('checkin-release-banner');
+
+            if (pTerms === 'full') {
+                if (displayEl) {
+                    displayEl.innerHTML = `
+                        <h4>Option 1: Full Contract Term Payment terms</h4>
+                        <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the full contract term payment to be cleared prior to check-in. You have the option to pay a 1-month equivalent deposit upon booking to secure the dates, with the remaining balance due 14 days prior to your check-in date.</p>
+                        <p style="margin-top: 10px; margin-bottom: 0; line-height: 1.5; font-size: 0.85rem; color: var(--accent-gold);"><strong>Cancellation Policy:</strong> A partial refund can be issued if the contract is cancelled at least 24 hours before the check-in date. The first month's payment block remains strictly non-refundable. No refunds are possible after the check-in date.</p>
+                    `;
+                }
+                if (suboptionsBlock) suboptionsBlock.style.display = 'block';
+                if (checkinReleaseEl) {
+                    checkinReleaseEl.innerHTML = `
+                        <h4>Check-In Release Protocols</h4>
+                        Full self-check-in instructions, key safe entry codes, smart building fobs, and the digital House Manual will be released via email and WhatsApp only after 100% of the total contract term fee balance has successfully cleared into our New Zealand bank account.
+                    `;
+                }
+            } else {
+                if (displayEl) {
+                    displayEl.innerHTML = `
+                        <h4>Option 2: Monthly Installments terms</h4>
+                        <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the first month payment to be paid in full upfront as a securement deposit to complete the booking. The remaining balance is due in consecutive monthly installments commencing 14 days after your check-in date.</p>
+                        <p style="margin-top: 10px; margin-bottom: 0; line-height: 1.5; font-size: 0.85rem; color: var(--accent-gold);"><strong>Cancellation Policy:</strong> A partial refund can be issued if the contract is cancelled at least 24 hours before the check-in date. The first month's upfront payment remains strictly non-refundable. No refunds are possible after the check-in date.</p>
+                    `;
+                }
+                if (suboptionsBlock) suboptionsBlock.style.display = 'none';
+                if (checkinReleaseEl) {
+                    checkinReleaseEl.innerHTML = `
+                        <h4>Check-In Release Protocols</h4>
+                        Full self-check-in instructions, key safe entry codes, smart building fobs, and the digital House Manual will be released via email and WhatsApp only after the first month's upfront securement payment has successfully cleared into our New Zealand bank account.
+                    `;
+                }
+            }
+
             if (applicationData.status === 'pending_tenant') {
                 goToStage(1);
+                // Set default arrival date from DB
+                if (!document.getElementById('arrival-date').value) {
+                    document.getElementById('arrival-date').value = applicationData.startDate || '';
+                    calculateContractPrice();
+                }
             } else if (applicationData.status === 'pending_tenant_signature') {
                 populateContractPreview();
                 goToStage(2);
@@ -1124,7 +1327,7 @@
                 populateContractPreview();
                 // Render tenant signature and hide pad
                 document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
-                document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString();
+                document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
                 document.getElementById('sig-pad-section').style.display = 'none';
                 if (document.getElementById('sig-action-buttons')) {
                     document.getElementById('sig-action-buttons').style.display = 'none';
@@ -1132,7 +1335,7 @@
                 if (document.getElementById('pending-approval-banner')) {
                     document.getElementById('pending-approval-banner').style.display = 'block';
                 }
-                goToStage(2);
+                goToStage(3);
             } else if (applicationData.status === 'completed') {
                 // Fully finalized portal! Unlocks House manual, wifi, and feedback logs
                 goToStage(3);
@@ -1161,36 +1364,194 @@
                 resizeCanvas();
                 setupSignaturePad();
             } else if (stageNum === 3) {
-                document.getElementById('portal-stepper').style.display = 'none';
-                document.getElementById('stage-portal').style.display = 'block';
+                if (applicationData.status === 'completed') {
+                    document.getElementById('portal-stepper').style.display = 'none';
+                    if (document.getElementById('portal-pending-approval-view')) {
+                        document.getElementById('portal-pending-approval-view').style.display = 'none';
+                    }
+                    if (document.querySelector('.portal-header')) {
+                        document.querySelector('.portal-header').style.display = 'flex';
+                    }
+                    document.querySelectorAll('.portal-panel').forEach(p => p.style.display = 'none');
+                    
+                    const activeTabBtn = document.querySelector('.portal-tab.active');
+                    if (activeTabBtn) {
+                        const tabName = activeTabBtn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        document.getElementById(`portal-panel-${tabName}`).style.display = 'block';
+                    } else {
+                        document.getElementById('portal-panel-manual').style.display = 'block';
+                    }
+                    document.getElementById('stage-portal').style.display = 'block';
+                } else {
+                    // pending_owner status (Step 3 stepper pending view)
+                    document.getElementById('portal-stepper').style.display = 'flex';
+                    document.getElementById('step-1').className = 'step completed';
+                    document.getElementById('step-2').className = 'step completed';
+                    document.getElementById('step-3').className = 'step active';
+                    
+                    if (document.querySelector('.portal-header')) {
+                        document.querySelector('.portal-header').style.display = 'none';
+                    }
+                    document.querySelectorAll('.portal-panel').forEach(p => p.style.display = 'none');
+                    
+                    if (document.getElementById('portal-pending-approval-view')) {
+                        document.getElementById('portal-pending-approval-view').style.display = 'block';
+                    }
+                    document.getElementById('stage-portal').style.display = 'block';
+                }
             }
+        }
+
+        function toggleLicenseeType() {
+            const isCompany = document.getElementById('licensee-company').checked;
+            const companyBlock = document.getElementById('company-details-block');
+            const labelName = document.getElementById('label-tenant-name');
+            const repInput = document.getElementById('company-rep');
+
+            if (isCompany) {
+                if (companyBlock) companyBlock.style.display = 'block';
+                if (labelName) labelName.textContent = 'Company Legal Name';
+                if (repInput) repInput.required = true;
+            } else {
+                if (companyBlock) companyBlock.style.display = 'none';
+                if (labelName) labelName.textContent = 'Full Legal Name';
+                if (repInput) {
+                    repInput.required = false;
+                    repInput.value = '';
+                }
+                document.getElementById('company-reg').value = '';
+            }
+        }
+
+        function toggleProceedButton() {
+            const checked = document.getElementById('payment-confirmation-checkbox').checked;
+            document.getElementById('btn-proceed-to-contract').disabled = !checked;
+        }
+
+        let calculatedPriceExcl = 0;
+        let calculatedPriceIncl = 0;
+        let calculatedGst = 0;
+        let calculatedDurationDays = 0;
+
+        function calculateContractPrice() {
+            const arrivalDateVal = document.getElementById('arrival-date').value;
+            const departureDateVal = document.getElementById('departure-date').value;
+
+            const previewCommence = document.getElementById('preview-commence-date');
+            const previewExpiry = document.getElementById('preview-expiry-date');
+            const previewDuration = document.getElementById('preview-duration-days');
+            const previewBaseRate = document.getElementById('preview-base-rate-text');
+            const previewDailyRate = document.getElementById('preview-daily-rate-text');
+            const previewMonthlyRate = document.getElementById('preview-monthly-rate-text');
+            const previewPriceExcl = document.getElementById('preview-price-excl');
+            const previewGst = document.getElementById('preview-gst');
+            const previewPriceIncl = document.getElementById('preview-price-incl');
+
+            if (!arrivalDateVal || !departureDateVal) return;
+
+            const start = new Date(arrivalDateVal);
+            const end = new Date(departureDateVal);
+
+            if (end < start) {
+                if (previewDuration) {
+                    previewDuration.textContent = 'Invalid Dates (Departure before Arrival)';
+                    previewDuration.style.color = 'var(--error)';
+                }
+                return;
+            }
+
+            if (previewDuration) previewDuration.style.color = 'var(--accent-gold)';
+
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // inclusive of check-in and check-out days
+            calculatedDurationDays = diffDays;
+
+            // Base rate info from database
+            const rateType = applicationData.rateType || 'weekly';
+            const rateValue = applicationData.rateValue || applicationData.rent || 2400;
+
+            let dailyRate = 0;
+            let monthlyRate = 0;
+
+            if (rateType === 'daily') {
+                dailyRate = rateValue;
+                monthlyRate = rateValue * 30;
+                if (previewBaseRate) previewBaseRate.textContent = `$${rateValue.toLocaleString('en-NZ')} NZD per day`;
+            } else if (rateType === 'weekly') {
+                dailyRate = rateValue / 7;
+                monthlyRate = (rateValue / 7) * 30;
+                if (previewBaseRate) previewBaseRate.textContent = `$${rateValue.toLocaleString('en-NZ')} NZD per week`;
+            } else if (rateType === 'monthly') {
+                dailyRate = rateValue / 30;
+                monthlyRate = rateValue;
+                if (previewBaseRate) previewBaseRate.textContent = `$${rateValue.toLocaleString('en-NZ')} NZD per month`;
+            }
+
+            // Price calculations
+            const subtotal = dailyRate * diffDays;
+            const gst = subtotal * 0.15;
+            const total = subtotal + gst;
+
+            calculatedPriceExcl = subtotal;
+            calculatedGst = gst;
+            calculatedPriceIncl = total;
+
+            // Update UI
+            if (previewCommence) previewCommence.textContent = start.toLocaleDateString('en-NZ', { dateStyle: 'long' });
+            if (previewExpiry) previewExpiry.textContent = end.toLocaleDateString('en-NZ', { dateStyle: 'long' });
+            if (previewDuration) previewDuration.textContent = `${diffDays} Day${diffDays > 1 ? 's' : ''}`;
+            if (previewDailyRate) previewDailyRate.textContent = `$${dailyRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD/day + GST`;
+            if (previewMonthlyRate) previewMonthlyRate.textContent = `$${monthlyRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD/month`;
+            if (previewPriceExcl) previewPriceExcl.textContent = `$${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+            if (previewGst) previewGst.textContent = `$${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+            if (previewPriceIncl) previewPriceIncl.textContent = `$${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
         }
 
         function populateQuestionnaireFields() {
             const td = applicationData.tenantDetails;
+            if (!td) return;
+
+            // Section 1
+            if (td.licenseeType === 'company') {
+                document.getElementById('licensee-company').checked = true;
+                document.getElementById('company-reg').value = td.companyReg || '';
+                document.getElementById('company-rep').value = td.companyRep || '';
+            } else {
+                document.getElementById('licensee-individual').checked = true;
+            }
+            toggleLicenseeType();
+
             document.getElementById('tenant-name').value = td.name || '';
             document.getElementById('tenant-address').value = td.address || '';
             document.getElementById('tenant-phone').value = td.phone || '';
             document.getElementById('tenant-email').value = td.email || '';
-            document.getElementById('expected-arrival-date').value = td.expectedArrivalDate || '';
-            document.getElementById('expected-arrival-time').value = td.expectedArrivalTime || '';
-            document.getElementById('emergency-name').value = td.emergencyName || '';
-            document.getElementById('emergency-relationship').value = td.emergencyRelationship || '';
-            document.getElementById('emergency-phone').value = td.emergencyPhone || '';
-            document.getElementById('emergency-email').value = td.emergencyEmail || '';
-            document.getElementById('payment-date').value = td.paymentDate || '';
-            
-            // Occupants
+
+            // Section 2 Primary Occupant
+            document.getElementById('prim-occ-name').value = td.primaryOccupantName || '';
+            document.getElementById('prim-occ-dob').value = td.primaryOccupantDob || '';
+            document.getElementById('prim-occ-phone').value = td.primaryOccupantPhone || '';
+            document.getElementById('prim-occ-email').value = td.primaryOccupantEmail || '';
+
+            // Occupants 2, 3, 4
             if (td.occupants) {
                 const names = document.querySelectorAll('.occ-name');
-                const ages = document.querySelectorAll('.occ-age');
+                const dobs = document.querySelectorAll('.occ-dob');
                 td.occupants.forEach((occ, idx) => {
                     if (names[idx]) names[idx].value = occ.name || '';
-                    if (ages[idx]) ages[idx].value = occ.age || '';
+                    if (dobs[idx]) dobs[idx].value = occ.dob || '';
                 });
             }
 
-            // Radio options
+            // Section 5 dates
+            document.getElementById('arrival-date').value = td.arrivalDate || '';
+            document.getElementById('arrival-time').value = td.arrivalTime || '14:00';
+            document.getElementById('departure-date').value = td.departureDate || '';
+            document.getElementById('departure-time').value = td.departureTime || '10:00';
+            calculateContractPrice();
+
+            // Section 6 Payment
             if (td.bookingOption === 'B') document.getElementById('booking-opt-b').checked = true;
             if (td.transferMethod === 'digital') document.getElementById('transfer-digital').checked = true;
 
@@ -1222,42 +1583,65 @@
         async function submitOnboarding(e) {
             e.preventDefault();
 
+            const isCompany = document.getElementById('licensee-company').checked;
+            const companyReg = document.getElementById('company-reg').value.trim();
+            const companyRep = document.getElementById('company-rep').value.trim();
+
             // Occupants
             const occupants = [];
             const occNames = document.querySelectorAll('.occ-name');
-            const occAges = document.querySelectorAll('.occ-age');
+            const occDobs = document.querySelectorAll('.occ-dob');
             occNames.forEach((input, index) => {
                 const name = input.value.trim();
-                const age = parseInt(occAges[index].value);
-                if (name && age) {
-                    occupants.push({ name, age });
+                const dob = occDobs[index].value;
+                if (name && dob) {
+                    occupants.push({ name, dob });
                 }
             });
 
-            // If passportBase64 is null, fetch the pre-existing one from loaded details
             const passportData = passportBase64 || (applicationData.tenantDetails ? applicationData.tenantDetails.passportData : null);
 
             if (!passportData) {
-                alert("Please upload your passport image for verification.");
+                alert("Please upload the primary occupant's passport scan for identity verification.");
+                return;
+            }
+
+            const arrivalDate = document.getElementById('arrival-date').value;
+            const departureDate = document.getElementById('departure-date').value;
+
+            if (new Date(departureDate) < new Date(arrivalDate)) {
+                alert("Error: Departure date must be after arrival date.");
                 return;
             }
 
             const tenantDetails = {
+                licenseeType: isCompany ? 'company' : 'individual',
+                companyReg: isCompany ? companyReg : '',
+                companyRep: isCompany ? companyRep : '',
                 name: document.getElementById('tenant-name').value.trim(),
                 address: document.getElementById('tenant-address').value.trim(),
                 phone: document.getElementById('tenant-phone').value.trim(),
                 email: document.getElementById('tenant-email').value.trim(),
+                
+                primaryOccupantName: document.getElementById('prim-occ-name').value.trim(),
+                primaryOccupantDob: document.getElementById('prim-occ-dob').value,
+                primaryOccupantPhone: document.getElementById('prim-occ-phone').value.trim(),
+                primaryOccupantEmail: document.getElementById('prim-occ-email').value.trim(),
                 occupants,
+                
                 passportData,
-                expectedArrivalDate: document.getElementById('expected-arrival-date').value,
-                expectedArrivalTime: document.getElementById('expected-arrival-time').value,
+                
+                arrivalDate,
+                arrivalTime: document.getElementById('arrival-time').value,
+                departureDate,
+                departureTime: document.getElementById('departure-time').value,
+                
+                bookingOption: applicationData.paymentTermsChoice === 'full' ? document.querySelector('input[name="booking-option"]:checked').value : 'A',
+                transferMethod: document.querySelector('input[name="transfer-method"]:checked').value,
                 emergencyName: document.getElementById('emergency-name').value.trim(),
                 emergencyRelationship: document.getElementById('emergency-relationship').value.trim(),
                 emergencyPhone: document.getElementById('emergency-phone').value.trim(),
-                emergencyEmail: document.getElementById('emergency-email').value.trim(),
-                bookingOption: document.querySelector('input[name="booking-option"]:checked').value,
-                transferMethod: document.querySelector('input[name="transfer-method"]:checked').value,
-                paymentDate: document.getElementById('payment-date').value
+                emergencyEmail: document.getElementById('emergency-email').value.trim()
             };
 
             try {
@@ -1282,20 +1666,93 @@
 
         function populateContractPreview() {
             const td = applicationData.tenantDetails;
-            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = td.name);
-            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = applicationData.startDate);
+            const isCompany = td.licenseeType === 'company';
+            const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
+
+            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = licenseeDisplayName);
             
-            // Expiry Date (Commencement Date + 90 Days)
-            const commenceDate = new Date(applicationData.startDate);
-            const expiryDate = new Date(commenceDate.getTime() + 90 * 24 * 60 * 60 * 1000);
-            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = expiryDate.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+            const start = new Date(td.arrivalDate);
+            const end = new Date(td.departureDate);
+            
+            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = start.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = end.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
 
-            // Dynamically calculate base rent (12.85 weeks * 2400)
-            const baseRent = applicationData.rent * (90/7);
-            document.querySelectorAll('.fill-rent').forEach(el => el.textContent = `$${baseRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`);
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+            
+            document.querySelectorAll('.fill-contract-days').forEach(el => el.textContent = `${diffDays} days`);
 
-            // Linen
-            document.querySelectorAll('.fill-linen-service').forEach(el => el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No');
+            // Rates calculation
+            const rateType = applicationData.rateType || 'weekly';
+            const rateValue = applicationData.rateValue || applicationData.rent || 2400;
+
+            let dailyRate = 0;
+            let monthlyRate = 0;
+            if (rateType === 'daily') {
+                dailyRate = rateValue;
+                monthlyRate = rateValue * 30;
+            } else if (rateType === 'weekly') {
+                dailyRate = rateValue / 7;
+                monthlyRate = (rateValue / 7) * 30;
+            } else if (rateType === 'monthly') {
+                dailyRate = rateValue / 30;
+                monthlyRate = rateValue;
+            }
+
+            const subtotal = dailyRate * diffDays;
+            const gst = subtotal * 0.15;
+            const totalVal = subtotal + gst;
+
+            document.querySelectorAll('.fill-rent').forEach(el => {
+                el.innerHTML = `$${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (inclusive of GST)<br/>` +
+                               `<small style="font-weight: normal; color: #555;">Calculated at a rate of $${rateValue.toLocaleString()}/${rateType} for exactly ${diffDays} days (${diffDays} days total, including check-in/out). Equivalent reference monthly rate: $${monthlyRate.toLocaleString('en-NZ', { maximumFractionDigits: 2 })} NZD.</small>`;
+            });
+
+            document.querySelectorAll('.fill-linen-service').forEach(el => {
+                el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No';
+            });
+
+            // Operative Clause 3 Dynamic Injections
+            const pTerms = applicationData.paymentTermsChoice || 'full';
+            let paymentClauseHtml = '';
+
+            if (pTerms === 'full') {
+                const subOpt = td.bookingOption || 'A';
+                const depositAmount = (dailyRate * 30) * 1.15; // 1 month deposit (30 days) incl GST
+                const balanceAmount = totalVal - depositAmount;
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
+                    ${subOpt === 'A' || balanceAmount <= 0 ? `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement.</p>
+                    ` : `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> The Licensee has elected to pay a securement deposit equal to approximately one (1) month of occupancy (<strong>$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>) immediately upon booking to secure the dates. The remaining balance of <strong>$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> must clear into the Licensor's nominated account no later than 14 days prior to the Commencement Date.</p>
+                    `}
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+            } else {
+                // Monthly Installments
+                const upfrontAmount = (dailyRate * 30) * 1.15; // 1 month upfront
+                const balanceAmount = totalVal - upfrontAmount;
+                const monthlyInst = (dailyRate * 30) * 1.15; // monthly installment
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong></p>
+                    <p class="no-indent" style="margin-left: 20px;">(a) <strong>Upfront Payment:</strong> The Licensee must pay the first month's payment block in full (<strong>$${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>, inclusive of GST) upon booking as a condition precedent to secure the booking.</p>
+                    <p class="no-indent" style="margin-left: 20px;">(b) <strong>Balance in Installments:</strong> The remaining balance of $${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD shall be paid in consecutive monthly installments of <strong>$${monthlyInst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> (or the final remaining balance block), with the first installment commencing exactly 14 days after the Commencement Date.</p>
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront payment ($${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+            }
+
+            const clause3El = document.getElementById('contract-clause-3');
+            if (clause3El) {
+                clause3El.innerHTML = paymentClauseHtml;
+            }
         }
 
         // --- Signature Pad Canvas Logic ---

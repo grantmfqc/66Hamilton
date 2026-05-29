@@ -65,6 +65,10 @@ export async function onRequestGet(context) {
               status: parsed.status,
               createdAt: parsed.createdAt,
               rent: parsed.rent,
+              rateType: parsed.rateType || 'weekly',
+              rateValue: parsed.rateValue || parsed.rent || 2400,
+              paymentTermsChoice: parsed.paymentTermsChoice || 'full',
+              linenService: !!parsed.linenService,
               startDate: parsed.startDate,
               tenantName: parsed.tenantDetails ? parsed.tenantDetails.name : 'Unknown'
             });

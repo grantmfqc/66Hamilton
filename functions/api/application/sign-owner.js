@@ -1,10 +1,14 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { token, ownerSignature, pdfData } = data;
+    const { token, ownerSignature, pdfData, initialPaymentReceived } = data;
 
     if (!token || !ownerSignature) {
       return new Response(JSON.stringify({ error: 'Missing token or signature' }), { status: 400 });
+    }
+
+    if (!initialPaymentReceived) {
+      return new Response(JSON.stringify({ error: 'Initial securement payment must be confirmed as received' }), { status: 400 });
     }
 
     const kv = context.env.APPLICATIONS_KV;
@@ -27,6 +31,7 @@ export async function onRequestPost(context) {
     // 2. Save owner signature and PDF data
     app.ownerSignature = ownerSignature;
     app.ownerSignedAt = new Date().toISOString();
+    app.initialPaymentReceived = true;
     app.status = 'completed';
     
     // Store PDF in the app object inside KV so it's always downloadable online

@@ -283,28 +283,22 @@
 
                 <h3 style="text-align: left; font-size: 11pt;">Background:</h3>
                 <p class="no-indent">A. The Licensor is the master lease holder of the residential property located at Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand (the "Premises"), and possesses all necessary commercial and legal authority to grant non-exclusive temporary licenses to occupy the property.</p>
-                <p class="no-indent">B. The Licensor operates the property as premium, short-term commercial serviced accommodation.</p>
-                <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly ninety (90) days, subject to the active delivery of commercial services by the Licensor.</p>
+                <p class="no-indent">B. The Licensor operates the property as premium, short-term commercial serviced accommodation.</p                <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly <span class="fill-contract-days">_____</span>, subject to the active delivery of commercial services by the Licensor.</p>
                 <p class="no-indent">D. The parties explicitly agree that this arrangement is not a residential tenancy and is expressly excluded from the operations of the New Zealand Residential Tenancies Act 1986 pursuant to Section 5 of that Act (relating to temporary, transient, and serviced accommodation).</p>
-
+ 
                 <h3 style="text-align: left; font-size: 11pt;">Operative Terms:</h3>
                 <p class="no-indent"><strong>1. Grant of Licence</strong></p>
-                <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly ninety (90) days, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
+                <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
                 <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
-
+ 
                 <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
-                <p class="no-indent">2.1 The term of this Licence shall be for exactly 90 Days, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+                <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
                 <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
-
-                <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Surcharges</strong></p>
-                <p class="no-indent">3.1 The total bundled weekly cost for the serviced accommodation is NZD $2,400.00 inclusive of GST.</p>
-                <p class="no-indent">3.2 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until either:</p>
-                <p class="no-indent" style="margin-left: 20px;">(a) 100% of the total 90-day Licence Fee has been paid and fully cleared into the Licensor's account; or</p>
-                <p class="no-indent" style="margin-left: 20px;">(b) A non-refundable securement fee of NZD $1,000.00 (the "Booking Deposit") has been paid and fully cleared into the Licensor's account.</p>
-                <p class="no-indent">3.3 Market Withdrawal: Upon verified receipt and bank clearance of either option in clause 3.2, the Licensor shall immediately withdraw the Premises from TradeMe and all other advertising channels, securing the dates exclusively for the Licensee.</p>
-                <p class="no-indent">3.4 Balance Due Condition Precedent: If the Licensee elects to secure the property via the Booking Deposit, the remaining balance of the total 90-day Licence Fee must clear into the Licensor's nominated New Zealand bank account no later than seven (7) days prior to the Commencement Date. The Booking Deposit will be credited in full against the total balance due.</p>
-                <p class="no-indent">3.5 Processing Fees: If payments are executed via credit card or online payment gateways (e.g., Stripe, Wise link), a non-refundable 2.5% transaction surcharge will be added to the invoice and borne entirely by the Licensee.</p>
-                <p class="no-indent">3.6 Forfeiture and Cancellation: If the remaining balance has not fully cleared into the Licensor's account by the strict 7-day pre-arrival deadline, this agreement shall automatically terminate. The $1,000.00 Booking Deposit shall be strictly non-refundable and forfeited in full to the Licensor as pre-estimated liquidated damages for removing the asset from the commercial market. The Licensor will immediately re-list the property for public booking, and physical access/fobs to the Premises will be withheld.</p>
+ 
+                <div id="contract-clause-3">
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until the upfront payment terms have been fully cleared.</p>
+                </div>
 
                 <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
                 <p class="no-indent">4.1 The weekly Licence Fee includes the active provision of the following commercial services by the Licensor:</p>
@@ -403,6 +397,13 @@
                 <button class="sig-clear" onclick="clearSignatureCanvas()">Clear Pad</button>
             </div>
 
+            <div style="margin-top: 25px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; margin-bottom: 15px;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; color: #fff; cursor: pointer; font-size: 0.9rem; line-height: 1.5; padding: 12px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.2); border-radius: 4px;">
+                    <input type="checkbox" id="confirm-initial-payment" style="margin-top: 4px; accent-color: var(--accent-gold); width: auto;" />
+                    <span><strong>Payment Confirmation:</strong> I confirm that the required initial securement payment (upfront weekly/monthly rate or booking deposit) has been successfully cleared and received in our nominated bank account.</span>
+                </label>
+            </div>
+
             <div style="text-align: right; margin-top: 30px;">
                 <button class="btn" onclick="submitOwnerSignature()">Counter-Sign & Finalize</button>
             </div>
@@ -453,30 +454,158 @@
 
         function populateTenantSummary() {
             const td = applicationData.tenantDetails;
-            document.getElementById('summary-name').textContent = td.name || '';
+            
+            // Licensee Details
+            const isCompany = td.licenseeType === 'company';
+            if (isCompany) {
+                document.getElementById('summary-name').innerHTML = `<strong>Company:</strong> ${td.name}<br/><strong>NZBN/Reg:</strong> ${td.companyReg || 'N/A'}<br/><strong>Representative:</strong> ${td.companyRep || 'N/A'}`;
+            } else {
+                document.getElementById('summary-name').innerHTML = `<strong>Individual:</strong> ${td.name}`;
+            }
+            
             document.getElementById('summary-address').textContent = td.address || '';
-            document.getElementById('summary-contact').innerHTML = `Email: ${td.email}<br/>Phone: ${td.phone}`;
-            document.getElementById('summary-travel').innerHTML = `Flight: ${td.flightNumber || 'N/A'}<br/>Landing: ${td.landingTime || 'N/A'}`;
-            document.getElementById('summary-booking').innerHTML = `Option ${td.bookingOption}<br/>${td.bookingOption === 'A' ? 'Full Upfront Wire' : '1,000 Booking Deposit'}`;
-            document.getElementById('summary-payment').innerHTML = `Method: ${td.transferMethod === 'wire' ? 'Bank SWIFT Wire' : 'Digital Portal'}<br/>Payment Date: ${td.paymentDate}`;
+            
+            // Contact details
+            document.getElementById('summary-contact').innerHTML = `
+                <strong>Licensee Email:</strong> ${td.email}<br/>
+                <strong>Licensee Phone:</strong> ${td.phone}<br/>
+                <strong>Primary Occupant:</strong> ${td.primaryOccupantName || 'Same as above'}<br/>
+                <strong>Primary Occupant DOB:</strong> ${td.primaryOccupantDob || 'N/A'}<br/>
+                <strong>Primary Occupant Phone:</strong> ${td.primaryOccupantPhone || 'N/A'}<br/>
+                <strong>Primary Occupant Email:</strong> ${td.primaryOccupantEmail || 'N/A'}
+            `;
+            
+            // Other occupants
+            let occupantsHtml = '';
+            if (td.occupants && td.occupants.length > 0) {
+                td.occupants.forEach((occ, i) => {
+                    occupantsHtml += `<br/><strong>Occupant ${i + 2}:</strong> ${occ.name} (DOB: ${occ.dob})`;
+                });
+            } else {
+                occupantsHtml = '<br/><em>No additional occupants</em>';
+            }
+            document.getElementById('summary-contact').innerHTML += occupantsHtml;
+
+            // Travel Logistics
+            document.getElementById('summary-travel').innerHTML = `
+                <strong>Arrival:</strong> ${td.arrivalDate} at ${td.arrivalTime || 'N/A'}<br/>
+                <strong>Departure:</strong> ${td.departureDate} at ${td.departureTime || 'N/A'}
+            `;
+            
+            // Booking Option & Payment Terms Choice
+            const paymentTerms = applicationData.paymentTermsChoice || 'full';
+            if (paymentTerms === 'full') {
+                const optLabel = td.bookingOption === 'A' ? 'Option A: Full Payment Upfront' : 'Option B: 1-Month Deposit & Balance 14 Days Prior';
+                document.getElementById('summary-booking').innerHTML = `<strong>Option 1 (Full Contract Payment)</strong><br/>Selected: ${optLabel}`;
+            } else {
+                document.getElementById('summary-booking').innerHTML = `<strong>Option 2 (Monthly Installments)</strong><br/>Upfront first month, then monthly starting 14 days after check-in.`;
+            }
+            
+            // Payment Confirmation and method
+            const isConfirmed = td.transferMethod ? 'Yes (Mandatory checkbox checked)' : 'No';
+            document.getElementById('summary-payment').innerHTML = `
+                <strong>Method:</strong> ${td.transferMethod === 'wire' ? 'ANZ SWIFT Wire Transfer' : 'Other'}<br/>
+                <strong>Transfer Initiated:</strong> ${isConfirmed}
+            `;
         }
 
         function populateContractPreview() {
             const td = applicationData.tenantDetails;
-            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = td.name);
-            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = applicationData.startDate);
-            
-            const commenceDate = new Date(applicationData.startDate);
-            const expiryDate = new Date(commenceDate.getTime() + 90 * 24 * 60 * 60 * 1000);
-            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = expiryDate.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+            const isCompany = td.licenseeType === 'company';
+            const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
 
-            const baseRent = applicationData.rent * (90/7);
-            document.querySelectorAll('.fill-rent').forEach(el => el.textContent = `$${baseRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`);
-            document.querySelectorAll('.fill-linen-service').forEach(el => el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No');
+            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = licenseeDisplayName);
+            
+            const start = new Date(td.arrivalDate);
+            const end = new Date(td.departureDate);
+            
+            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = start.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = end.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+            
+            document.querySelectorAll('.fill-contract-days').forEach(el => el.textContent = `${diffDays} days`);
+
+            // Rates calculation
+            const rateType = applicationData.rateType || 'weekly';
+            const rateValue = applicationData.rateValue || applicationData.rent || 2400;
+
+            let dailyRate = 0;
+            let monthlyRate = 0;
+            if (rateType === 'daily') {
+                dailyRate = rateValue;
+                monthlyRate = rateValue * 30;
+            } else if (rateType === 'weekly') {
+                dailyRate = rateValue / 7;
+                monthlyRate = (rateValue / 7) * 30;
+            } else if (rateType === 'monthly') {
+                dailyRate = rateValue / 30;
+                monthlyRate = rateValue;
+            }
+
+            const subtotal = dailyRate * diffDays;
+            const gst = subtotal * 0.15;
+            const totalVal = subtotal + gst;
+
+            document.querySelectorAll('.fill-rent').forEach(el => {
+                el.innerHTML = `$${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (inclusive of GST)<br/>` +
+                               `<small style="font-weight: normal; color: #555;">Calculated at a rate of $${rateValue.toLocaleString()}/${rateType} for exactly ${diffDays} days (${diffDays} days total, including check-in/out). Equivalent reference monthly rate: $${monthlyRate.toLocaleString('en-NZ', { maximumFractionDigits: 2 })} NZD.</small>`;
+            });
+
+            document.querySelectorAll('.fill-linen-service').forEach(el => {
+                el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No';
+            });
+
+            // Operative Clause 3 Dynamic Injections
+            const pTerms = applicationData.paymentTermsChoice || 'full';
+            let paymentClauseHtml = '';
+
+            if (pTerms === 'full') {
+                const subOpt = td.bookingOption || 'A';
+                const depositAmount = (dailyRate * 30) * 1.15; // 1 month deposit (30 days) incl GST
+                const balanceAmount = totalVal - depositAmount;
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
+                    ${subOpt === 'A' || balanceAmount <= 0 ? `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement.</p>
+                    ` : `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> The Licensee has elected to pay a securement deposit equal to approximately one (1) month of occupancy (<strong>$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>) immediately upon booking to secure the dates. The remaining balance of <strong>$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> must clear into the Licensor's nominated account no later than 14 days prior to the Commencement Date.</p>
+                    `}
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+            } else {
+                // Monthly Installments
+                const upfrontAmount = (dailyRate * 30) * 1.15; // 1 month upfront
+                const balanceAmount = totalVal - upfrontAmount;
+                const monthlyInst = (dailyRate * 30) * 1.15; // monthly installment
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong></p>
+                    <p class="no-indent" style="margin-left: 20px;">(a) <strong>Upfront Payment:</strong> The Licensee must pay the first month's payment block in full (<strong>$${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>, inclusive of GST) upon booking as a condition precedent to secure the booking.</p>
+                    <p class="no-indent" style="margin-left: 20px;">(b) <strong>Balance in Installments:</strong> The remaining balance of $${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD shall be paid in consecutive monthly installments of <strong>$${monthlyInst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> (or the final remaining balance block), with the first installment commencing exactly 14 days after the Commencement Date.</p>
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront payment ($${upfrontAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+            }
+
+            const clause3El = document.getElementById('contract-clause-3');
+            if (clause3El) {
+                clause3El.innerHTML = paymentClauseHtml;
+            }
 
             // Render tenant signature and date
-            document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
-            document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString();
+            if (applicationData.tenantSignature) {
+                document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
+            }
+            if (applicationData.tenantSignedAt) {
+                document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
+            }
         }
 
         function openPassportModal() {
@@ -562,6 +691,12 @@
         async function submitOwnerSignature() {
             const dataUrl = canvas.toDataURL();
             
+            const confirmPayment = document.getElementById('confirm-initial-payment');
+            if (!confirmPayment || !confirmPayment.checked) {
+                alert("Please confirm that the initial securement payment has been received by ticking the checkbox.");
+                return;
+            }
+            
             if (confirm("Are you sure you want to execute and finalize this Licence to Occupy agreement?")) {
                 try {
                     // Show a loading indicator
@@ -639,7 +774,8 @@
                         body: JSON.stringify({ 
                             token, 
                             ownerSignature: dataUrl,
-                            pdfData: pdfData
+                            pdfData: pdfData,
+                            initialPaymentReceived: true
                         })
                     });
 

@@ -26,7 +26,12 @@ export async function onRequestPost(context) {
     }
 
     // 2. Validate details
-    const required = ['name', 'address', 'phone', 'email', 'emergencyName', 'emergencyRelationship', 'emergencyPhone', 'emergencyEmail', 'bookingOption', 'transferMethod', 'paymentDate'];
+    const required = [
+      'name', 'address', 'phone', 'email',
+      'primaryOccupantName', 'primaryOccupantDob', 'primaryOccupantPhone', 'primaryOccupantEmail',
+      'emergencyName', 'emergencyRelationship', 'emergencyPhone', 'emergencyEmail',
+      'transferMethod', 'arrivalDate', 'arrivalTime', 'departureDate', 'departureTime'
+    ];
     for (const field of required) {
       if (!tenantDetails[field]) {
         return new Response(JSON.stringify({ error: `Missing required field: ${field}` }), { status: 400 });
@@ -44,7 +49,11 @@ export async function onRequestPost(context) {
       address: tenantDetails.address,
       phone: tenantDetails.phone,
       email: tenantDetails.email,
-      occupants: tenantDetails.occupants || [], // array of { name, age }
+      primaryOccupantName: tenantDetails.primaryOccupantName,
+      primaryOccupantDob: tenantDetails.primaryOccupantDob,
+      primaryOccupantPhone: tenantDetails.primaryOccupantPhone,
+      primaryOccupantEmail: tenantDetails.primaryOccupantEmail,
+      occupants: tenantDetails.occupants || [], // array of { name, dob }
       passportData: tenantDetails.passportData, // base64 data url
       flightNumber: tenantDetails.flightNumber || '',
       landingTime: tenantDetails.landingTime || '',
@@ -52,9 +61,12 @@ export async function onRequestPost(context) {
       emergencyRelationship: tenantDetails.emergencyRelationship,
       emergencyPhone: tenantDetails.emergencyPhone,
       emergencyEmail: tenantDetails.emergencyEmail,
-      bookingOption: tenantDetails.bookingOption, // 'A' or 'B'
+      bookingOption: tenantDetails.bookingOption || '', // sub-option for payment Option 1 (e.g. 'A' or 'B')
       transferMethod: tenantDetails.transferMethod, // 'wire' or 'digital'
-      paymentDate: tenantDetails.paymentDate
+      arrivalDate: tenantDetails.arrivalDate,
+      arrivalTime: tenantDetails.arrivalTime,
+      departureDate: tenantDetails.departureDate,
+      departureTime: tenantDetails.departureTime
     };
 
     // Keep status as 'pending_tenant' but indicate details are uploaded, ready for signature
