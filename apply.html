@@ -757,10 +757,6 @@
                             <input type="radio" id="transfer-wire" name="transfer-method" value="wire" checked style="accent-color: var(--accent-gold); width: auto;" />
                             <label for="transfer-wire" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Direct International SWIFT Bank Wire</label>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="radio" id="transfer-digital" name="transfer-method" value="digital" style="accent-color: var(--accent-gold); width: auto;" />
-                            <label for="transfer-digital" style="font-size: 0.9rem; margin-bottom: 0; cursor: pointer;">Digital Portal (Wise, Stripe - 2.5% surcharge)</label>
-                        </div>
                     </div>
                 </div>
 
@@ -1556,7 +1552,9 @@
 
             // Section 6 Payment
             if (td.bookingOption === 'B') document.getElementById('booking-opt-b').checked = true;
-            if (td.transferMethod === 'digital') document.getElementById('transfer-digital').checked = true;
+            if (td.transferMethod === 'digital' && document.getElementById('transfer-digital')) {
+                document.getElementById('transfer-digital').checked = true;
+            }
 
             // Preview passport if exists
             if (td.passportData) {
