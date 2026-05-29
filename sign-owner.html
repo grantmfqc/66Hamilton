@@ -121,6 +121,11 @@
             border: none;
         }
 
+        #passport-thumbnail:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 15px rgba(201, 169, 110, 0.45);
+        }
+
         #passport-modal {
             position: fixed;
             inset: 0;
@@ -244,7 +249,17 @@
                 <tr><th>Full Legal Name</th><td id="summary-name"></td></tr>
                 <tr><th>Permanent Address</th><td id="summary-address"></td></tr>
                 <tr><th>Contact Details</th><td id="summary-contact"></td></tr>
-                <tr><th>Identity Documents</th><td><button class="passport-btn" onclick="openPassportModal()">View Uploaded Passport</button></td></tr>
+                <tr>
+                    <th>Identity Documents</th>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div id="passport-thumbnail-container" style="display: none; line-height: 0;">
+                                <img id="passport-thumbnail" style="height: 50px; border-radius: 4px; border: 1px solid var(--accent-gold); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="openPassportModal()" title="Click to view full size and download" />
+                            </div>
+                            <button class="passport-btn" onclick="openPassportModal()">View Uploaded Passport</button>
+                        </div>
+                    </td>
+                </tr>
                 <tr><th>Travel Logistics</th><td id="summary-travel"></td></tr>
                 <tr><th>Booking Securement</th><td id="summary-booking"></td></tr>
                 <tr><th>Payment Details</th><td id="summary-payment"></td></tr>
@@ -411,8 +426,20 @@
     </div>
 
     <!-- Passport Image Modal -->
-    <div id="passport-modal" onclick="closePassportModal()">
-        <img id="passport-modal-img" />
+    <div id="passport-modal" onclick="closePassportModal()" style="position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; display: none;">
+        <!-- Close button at the top right -->
+        <button onclick="closePassportModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 2.5rem; cursor: pointer; line-height: 1;">&times;</button>
+        
+        <!-- Image Container -->
+        <div style="position: relative; max-width: 90%; max-height: 80%; display: flex; flex-direction: column; align-items: center; gap: 20px;" onclick="event.stopPropagation()">
+            <img id="passport-modal-img" style="max-width: 100%; max-height: 70vh; border: 2px solid var(--accent-gold); border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+            
+            <!-- Download Button -->
+            <a id="passport-download-link" download="66_Hamilton_Passport.png" href="#" class="btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 0.85rem; text-decoration: none; background: var(--accent-gold); color: #000; font-weight: 600; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(201, 169, 110, 0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download Document
+            </a>
+        </div>
     </div>
 
     <script>
@@ -510,6 +537,16 @@
                 <strong>Method:</strong> ${td.transferMethod === 'wire' ? 'ANZ SWIFT Wire Transfer' : 'Other'}<br/>
                 <strong>Transfer Initiated:</strong> ${isConfirmed}
             `;
+
+            // Populate passport thumbnail next to heading
+            if (td.passportData) {
+                const thumbImg = document.getElementById('passport-thumbnail');
+                const thumbContainer = document.getElementById('passport-thumbnail-container');
+                if (thumbImg && thumbContainer) {
+                    thumbImg.src = td.passportData;
+                    thumbContainer.style.display = 'block';
+                }
+            }
         }
 
         function populateContractPreview() {
@@ -614,7 +651,13 @@
         function openPassportModal() {
             const modal = document.getElementById('passport-modal');
             const img = document.getElementById('passport-modal-img');
-            img.src = applicationData.tenantDetails.passportData;
+            const downloadLink = document.getElementById('passport-download-link');
+            const passportData = applicationData.tenantDetails.passportData;
+            
+            img.src = passportData;
+            if (downloadLink) {
+                downloadLink.href = passportData;
+            }
             modal.style.display = 'flex';
         }
 
@@ -809,6 +852,8 @@
                     verbatimBox.appendChild(rulesSection);
 
                     // 3. Temporarily update styling of contract container for clean PDF output
+                    const originalWidth = verbatimBox.style.width;
+                    const originalBoxSizing = verbatimBox.style.boxSizing;
                     const originalMaxHeight = verbatimBox.style.maxHeight;
                     const originalOverflowY = verbatimBox.style.overflowY;
                     const originalBorder = verbatimBox.style.border;
@@ -818,10 +863,12 @@
                     // Reset scroll position to top to prevent html2canvas offset rendering bug
                     verbatimBox.scrollTop = 0;
                     
+                    verbatimBox.style.width = '794px';
+                    verbatimBox.style.boxSizing = 'border-box';
                     verbatimBox.style.maxHeight = 'none';
                     verbatimBox.style.overflowY = 'visible';
                     verbatimBox.style.border = 'none';
-                    verbatimBox.style.padding = '0px';
+                    verbatimBox.style.padding = '40px';
 
                     const pdfHeader = verbatimBox.querySelector('.pdf-only-header');
                     const pdfFooter = verbatimBox.querySelector('.pdf-only-footer');
@@ -840,6 +887,8 @@
                     const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
 
                     // Restore original container styling and remove appended rules from UI
+                    verbatimBox.style.width = originalWidth;
+                    verbatimBox.style.boxSizing = originalBoxSizing;
                     verbatimBox.style.maxHeight = originalMaxHeight;
                     verbatimBox.style.overflowY = originalOverflowY;
                     verbatimBox.style.border = originalBorder;

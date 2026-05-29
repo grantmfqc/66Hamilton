@@ -59,7 +59,7 @@ export async function onRequestPost(context) {
     const clientIp = context.request.headers.get('cf-connecting-ip') || 'unknown-ip';
     const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
     const now = Date.now();
-    const expirationTtl = 7200; // Exactly 2 Hours (7200 seconds)
+    const expirationTtl = record.role === 'admin' ? 172800 : 7200; // Exactly 2 Days for admin (172800 seconds), 2 Hours for others
 
     const sessionData = {
       email,

@@ -2487,15 +2487,19 @@
             element.scrollTop = 0;
             
             // Temporarily update styling of contract container for clean PDF output
+            const originalWidth = element.style.width;
+            const originalBoxSizing = element.style.boxSizing;
             const originalMaxHeight = element.style.maxHeight;
             const originalOverflowY = element.style.overflowY;
             const originalBorder = element.style.border;
             const originalPadding = element.style.padding;
             
+            element.style.width = '794px';
+            element.style.boxSizing = 'border-box';
             element.style.maxHeight = 'none';
             element.style.overflowY = 'visible';
             element.style.border = 'none';
-            element.style.padding = '0px';
+            element.style.padding = '40px';
 
             const pdfHeader = element.querySelector('.pdf-only-header');
             const pdfFooter = element.querySelector('.pdf-only-footer');
@@ -2513,6 +2517,8 @@
             // Generate PDF
             html2pdf().from(element).set(opt).save().then(() => {
                 // Restore styling
+                element.style.width = originalWidth;
+                element.style.boxSizing = originalBoxSizing;
                 element.style.maxHeight = originalMaxHeight;
                 element.style.overflowY = originalOverflowY;
                 element.style.border = originalBorder;
