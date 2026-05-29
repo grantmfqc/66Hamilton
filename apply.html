@@ -2395,6 +2395,11 @@
 
             const element = document.getElementById('verbatim-contract-box');
             
+            // Save original scroll position
+            const originalScrollTop = element.scrollTop;
+            // Reset scroll position to top to prevent html2canvas offset rendering bug
+            element.scrollTop = 0;
+            
             // Temporarily update styling of contract container for clean PDF output
             const originalMaxHeight = element.style.maxHeight;
             const originalOverflowY = element.style.overflowY;
@@ -2415,7 +2420,7 @@
                 margin:       15,
                 filename:     isSigned ? `66_Hamilton_Road_Tenancy_Agreement.pdf` : `66_Hamilton_Road_Tenancy_Agreement_Draft.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, logging: false },
+                html2canvas:  { scale: 2, logging: false, scrollY: 0 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -2428,6 +2433,8 @@
                 element.style.padding = originalPadding;
                 if (pdfHeader) pdfHeader.style.display = 'none';
                 if (pdfFooter) pdfFooter.style.display = 'none';
+                // Restore original scroll position
+                element.scrollTop = originalScrollTop;
             });
         }
 
