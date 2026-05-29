@@ -711,6 +711,108 @@
             return fetch(url, options);
         }
 
+        function getPaymentSchedule(checkinDateStr, totalDays, dailyRateValue) {
+            const dailyRateInclGst = dailyRateValue * 1.15;
+            const checkinDate = new Date(checkinDateStr);
+            
+            let remainingDays = totalDays;
+            const schedule = [];
+            
+            // Payment 1
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                schedule.push({
+                    paymentNumber: 1,
+                    label: "Payment 1 (Upfront Booking Securement)",
+                    dueDate: "Prior to Check-in",
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days 1 to ${daysCovered}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 2
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = checkinDate + 14 days
+                const dueDate = new Date(checkinDate);
+                dueDate.setDate(dueDate.getDate() + 14);
+                
+                const startDayIndex = 31;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 2,
+                    label: "Payment 2 (Installment 1)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 3
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = Payment 2 Due Date + 30 days
+                const prevDueDate = schedule[1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = 61;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 3,
+                    label: "Payment 3 (Installment 2)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            // Payment 4 and onwards
+            let paymentIdx = 4;
+            while (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                // Due date = previous payment due date + 30 days
+                const prevDueDate = schedule[schedule.length - 1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = (paymentIdx - 1) * 30 + 1;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: paymentIdx,
+                    label: `Payment ${paymentIdx} (${daysCovered < 30 ? 'Final Part Installment' : `Installment ${paymentIdx - 1}`})`,
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                
+                remainingDays -= daysCovered;
+                paymentIdx++;
+            }
+            
+            return schedule;
+        }
+
         // Validate session on load
         validateAdminSession();
 
@@ -1022,6 +1124,64 @@
                     html += `  <div><span style="${labelStyle}">Payment Option Selection:</span><br/><span style="${valStyle}">${td.bookingOption === 'A' ? 'Plan A: Pay Full Upfront' : 'Plan B: 1-Month Deposit + Balance 14 Days Prior'}</span></div>`;
                 }
                 html += `  <div><span style="${labelStyle}">Payment Confirmation Status:</span><br/><span style="${valStyle}">${td.transferMethod ? '✅ Bank transfer initiated (Wise/SWIFT)' : '❌ Not initiated'}</span></div>`;
+
+                if (termsChoice === 'monthly') {
+                    let dailyRate = 0;
+                    if (rateType === 'daily') {
+                        dailyRate = totalVal;
+                    } else if (rateType === 'weekly') {
+                        dailyRate = totalVal / 7;
+                    } else if (rateType === 'monthly') {
+                        dailyRate = totalVal / 30;
+                    }
+                    
+                    let diffDays = 0;
+                    if (td.arrivalDate && td.departureDate) {
+                        const startD = new Date(td.arrivalDate);
+                        const endD = new Date(td.departureDate);
+                        startD.setHours(0,0,0,0);
+                        endD.setHours(0,0,0,0);
+                        diffDays = Math.ceil(Math.abs(endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+                    }
+                    
+                    if (diffDays > 0) {
+                        const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate);
+                        let scheduleRowsHtml = '';
+                        schedule.forEach(p => {
+                            scheduleRowsHtml += `
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                    <td style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--text-muted);">${p.paymentNumber}</td>
+                                    <td style="padding: 8px; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: #fff;">
+                                        <strong>${p.label}</strong><br/>
+                                        <small style="color: var(--text-muted); font-size: 0.75rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
+                                    </td>
+                                    <td style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: #fff; font-weight: 600;">${p.dueDate}</td>
+                                    <td style="padding: 8px; text-align: right; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600;">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `  <div style="grid-column: 1 / -1; margin-top: 10px;">
+                                     <span style="${labelStyle}">Calculated Payment Schedule:</span>
+                                     <div class="table-responsive" style="margin-top: 6px; overflow-x: auto; border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; background: rgba(0,0,0,0.2);">
+                                         <table style="width: 100%; border-collapse: collapse;">
+                                             <thead>
+                                                 <tr style="background: rgba(201, 169, 110, 0.08); border-bottom: 1px solid rgba(201, 169, 110, 0.15);">
+                                                     <th style="padding: 8px; text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--accent-gold); border-right: 1px solid rgba(201, 169, 110, 0.15); width: 10%;">Payment</th>
+                                                     <th style="padding: 8px; text-align: left; font-size: 0.78rem; font-weight: 600; color: var(--accent-gold); border-right: 1px solid rgba(201, 169, 110, 0.15); width: 40%;">Coverage / Description</th>
+                                                     <th style="padding: 8px; text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--accent-gold); border-right: 1px solid rgba(201, 169, 110, 0.15); width: 25%;">Due Date</th>
+                                                     <th style="padding: 8px; text-align: right; font-size: 0.78rem; font-weight: 600; color: var(--accent-gold); width: 25%;">Amount (incl. GST)</th>
+                                                 </tr>
+                                             </thead>
+                                             <tbody>
+                                                 ${scheduleRowsHtml}
+                                             </tbody>
+                                         </table>
+                                     </div>
+                                   </div>`;
+                    }
+                }
+
                 html += `</div>`;
                 
                 // 4. Identity & Legal Signatures

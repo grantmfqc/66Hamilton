@@ -1519,6 +1519,85 @@
             if (previewPriceExcl) previewPriceExcl.textContent = `$${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
             if (previewGst) previewGst.textContent = `$${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
             if (previewPriceIncl) previewPriceIncl.textContent = `$${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+
+            // Dynamically update the Booking Payments Section 6 details based on selected dates and option
+            const pTerms = applicationData.paymentTermsChoice || 'full';
+            const displayEl = document.getElementById('payment-terms-display');
+            if (displayEl) {
+                if (pTerms === 'full') {
+                    const depositAmount = (dailyRate * 30) * 1.15; // 1 month deposit (30 days) incl GST
+                    const balanceAmount = total - depositAmount;
+                    
+                    displayEl.innerHTML = `
+                        <h4>Option 1: Full Contract Term Payment terms</h4>
+                        <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the full contract term payment to be cleared prior to check-in. You have the option to pay a 1-month equivalent deposit upon booking to secure the dates, with the remaining balance due 14 days prior to your check-in date.</p>
+                        
+                        <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                            <h5 style="color: var(--accent-gold); margin: 0 0 10px 0; font-size: 0.95rem;">Dynamic Payment Breakdown:</h5>
+                            <ul style="margin: 0; padding-left: 20px; color: var(--text-light); font-size: 0.9rem; line-height: 1.6;">
+                                <li><strong>Option A (Full Upfront):</strong> $${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (due within 24 hours).</li>
+                                ${balanceAmount > 0 ? `
+                                <li><strong>Option B (1-Month Deposit):</strong>
+                                    <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                                        <li>Securement Deposit (due now): <strong style="color: #fff;">$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                        <li>Remaining Balance (due 14 days before check-in): <strong style="color: #fff;">$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                    </ul>
+                                </li>
+                                ` : ''}
+                            </ul>
+                        </div>
+                        
+                        <p style="margin-top: 15px; margin-bottom: 0; line-height: 1.5; font-size: 0.85rem; color: var(--accent-gold);"><strong>Cancellation Policy:</strong> A partial refund can be issued if the contract is cancelled at least 24 hours before the check-in date. The first month's payment block remains strictly non-refundable. No refunds are possible after the check-in date.</p>
+                    `;
+                } else {
+                    // Option 2: Monthly Installments
+                    const schedule = getPaymentSchedule(arrivalDateVal, diffDays, dailyRate);
+                    let scheduleRowsHtml = '';
+                    schedule.forEach(p => {
+                        scheduleRowsHtml += `
+                            <tr style="border-bottom: 1px solid var(--glass-border);">
+                                <td style="padding: 10px; text-align: center; border-right: 1px solid var(--glass-border);">${p.paymentNumber}</td>
+                                <td style="padding: 10px; border-right: 1px solid var(--glass-border); line-height: 1.3;">
+                                    <strong>${p.label}</strong><br/>
+                                    <small style="color: var(--text-muted); font-size: 0.85rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
+                                </td>
+                                <td style="padding: 10px; text-align: center; border-right: 1px solid var(--glass-border); font-weight: 600;">${p.dueDate}</td>
+                                <td style="padding: 10px; text-align: right; font-weight: 600; color: var(--accent-gold);">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    const scheduleTableHtml = `
+                        <div class="table-responsive" style="margin-top: 15px; overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: var(--text-light); border: 1px solid var(--glass-border);">
+                                <thead>
+                                    <tr style="background: rgba(201, 169, 110, 0.1); border-bottom: 1px solid var(--glass-border);">
+                                        <th style="padding: 10px; text-align: center; font-weight: 600; color: var(--accent-gold); border-right: 1px solid var(--glass-border); width: 12%;">Payment</th>
+                                        <th style="padding: 10px; text-align: left; font-weight: 600; color: var(--accent-gold); border-right: 1px solid var(--glass-border); width: 38%;">Coverage / Description</th>
+                                        <th style="padding: 10px; text-align: center; font-weight: 600; color: var(--accent-gold); border-right: 1px solid var(--glass-border); width: 25%;">Due Date</th>
+                                        <th style="padding: 10px; text-align: right; font-weight: 600; color: var(--accent-gold); width: 25%;">Amount (incl. GST)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${scheduleRowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+                    displayEl.innerHTML = `
+                        <h4>Option 2: Monthly Installments terms</h4>
+                        <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the first month payment to be paid in full upfront as a securement deposit to complete the booking. The remaining balance is due in consecutive monthly installments commencing 14 days after your check-in date.</p>
+                        
+                        <div style="margin-top: 15px;">
+                            <h5 style="color: var(--accent-gold); margin: 0 0 10px 0; font-size: 0.95rem;">Dynamic Calculated Payment Schedule:</h5>
+                            ${scheduleTableHtml}
+                        </div>
+                        
+                        <p style="margin-top: 15px; margin-bottom: 0; line-height: 1.5; font-size: 0.85rem; color: var(--accent-gold);"><strong>Cancellation Policy:</strong> A partial refund can be issued if the contract is cancelled at least 24 hours before the check-in date. The first month's upfront payment remains strictly non-refundable. No refunds are possible after the check-in date.</p>
+                    `;
+                }
+            }
         }
 
         function populateQuestionnaireFields() {
