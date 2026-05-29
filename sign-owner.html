@@ -423,6 +423,9 @@
         const canvas = document.getElementById('canvas-signature');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
+        let points = [];
+        let lastMidX = 0;
+        let lastMidY = 0;
 
         if (!token) {
             alert("Error: Secure application token is missing.");
@@ -641,30 +644,76 @@
 
         function startDrawing(e) {
             isDrawing = true;
+            const x = e.offsetX;
+            const y = e.offsetY;
+            points = [{ x, y }];
+            lastMidX = x;
+            lastMidY = y;
+
+            // Draw a tiny initial dot in case of a single tap/click
             ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
+            ctx.fillStyle = '#000';
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         function draw(e) {
             if (!isDrawing) return;
-            ctx.lineWidth = 2;
+            const x = e.offsetX;
+            const y = e.offsetY;
+            points.push({ x, y });
+
+            const lastPoint = points[points.length - 2];
+            const midX = (lastPoint.x + x) / 2;
+            const midY = (lastPoint.y + y) / 2;
+
+            ctx.beginPath();
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             ctx.strokeStyle = '#000';
-            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.moveTo(lastMidX, lastMidY);
+            ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
             ctx.stroke();
+
+            lastMidX = midX;
+            lastMidY = midY;
         }
 
         function stopDrawing() {
+            if (!isDrawing) return;
             isDrawing = false;
+
+            if (points.length > 0) {
+                const lastPoint = points[points.length - 1];
+                ctx.beginPath();
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = '#000';
+                ctx.moveTo(lastMidX, lastMidY);
+                ctx.lineTo(lastPoint.x, lastPoint.y);
+                ctx.stroke();
+            }
+            points = [];
         }
 
         function startDrawingTouch(e) {
             e.preventDefault();
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
             isDrawing = true;
+            points = [{ x, y }];
+            lastMidX = x;
+            lastMidY = y;
+
+            // Draw a tiny initial dot in case of a single tap/click
             ctx.beginPath();
-            ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.fillStyle = '#000';
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         function drawTouch(e) {
@@ -672,15 +721,43 @@
             if (!isDrawing) return;
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
-            ctx.lineWidth = 2;
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            points.push({ x, y });
+
+            const lastPoint = points[points.length - 2];
+            const midX = (lastPoint.x + x) / 2;
+            const midY = (lastPoint.y + y) / 2;
+
+            ctx.beginPath();
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
             ctx.strokeStyle = '#000';
-            ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            ctx.moveTo(lastMidX, lastMidY);
+            ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
             ctx.stroke();
+
+            lastMidX = midX;
+            lastMidY = midY;
         }
 
         function stopDrawingTouch() {
+            if (!isDrawing) return;
             isDrawing = false;
+
+            if (points.length > 0) {
+                const lastPoint = points[points.length - 1];
+                ctx.beginPath();
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = '#000';
+                ctx.moveTo(lastMidX, lastMidY);
+                ctx.lineTo(lastPoint.x, lastPoint.y);
+                ctx.stroke();
+            }
+            points = [];
         }
 
         function clearSignatureCanvas() {
