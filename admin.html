@@ -453,6 +453,10 @@
                             <input type="date" id="date-input" required />
                         </div>
                         <div class="form-group">
+                            <label for="end-date-input">Contract End Date</label>
+                            <input type="date" id="end-date-input" required />
+                        </div>
+                        <div class="form-group">
                             <label>Booking Payments Option</label>
                             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">
                                 <div style="display: flex; align-items: flex-start; gap: 8px;">
@@ -825,7 +829,7 @@
                         <span>Terms: ${paymentLabel}</span>
                     </div>
                     <div class="app-meta" style="margin-top: 4px;">
-                        <span>Starts: ${app.startDate}</span>
+                        <span>Starts: ${app.startDate} • Ends: ${app.endDate || 'N/A'}</span>
                         <span>Linen: ${app.linenService ? 'Yes' : 'No'}</span>
                     </div>
                     <div class="app-actions">
@@ -867,18 +871,24 @@
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Commencement Date</label>
                                     <input type="date" class="edit-start-date" value="${app.startDate}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
-                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center;">
-                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0; margin-top: 15px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.7rem; margin-bottom: 4px;">Contract End Date</label>
+                                    <input type="date" class="edit-end-date" value="${app.endDate || ''}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.7rem; margin-bottom: 4px;">Booking Payment Option</label>
+                                    <select class="edit-payment-choice" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
+                                        <option value="full" ${app.paymentTermsChoice === 'full' ? 'selected' : ''}>Option 1: Full Payment Prior to Check-in (1 Month Deposit Option)</option>
+                                        <option value="monthly" ${app.paymentTermsChoice === 'monthly' ? 'selected' : ''}>Option 2: Monthly Installments (1 Month Upfront)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; margin-top: 15px;">
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
                                         <input type="checkbox" class="edit-linen" ${app.linenService ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Linen service ($45/wk)
                                     </label>
                                 </div>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label style="font-size: 0.7rem; margin-bottom: 4px;">Booking Payment Option</label>
-                                <select class="edit-payment-choice" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
-                                    <option value="full" ${app.paymentTermsChoice === 'full' ? 'selected' : ''}>Option 1: Full Payment Prior to Check-in (1 Month Deposit Option)</option>
-                                    <option value="monthly" ${app.paymentTermsChoice === 'monthly' ? 'selected' : ''}>Option 2: Monthly Installments (1 Month Upfront)</option>
-                                </select>
                             </div>
                             
                             ${(app.status !== 'pending_owner' && app.status !== 'completed') ? `
@@ -906,6 +916,7 @@
             const rateValue = parseFloat(panel.querySelector('.edit-rate-val').value);
             const rateType = panel.querySelector('.edit-rate-type').value;
             const startDate = panel.querySelector('.edit-start-date').value;
+            const endDate = panel.querySelector('.edit-end-date').value;
             const linenService = panel.querySelector('.edit-linen').checked;
             const paymentTermsChoice = panel.querySelector('.edit-payment-choice').value;
 
@@ -920,6 +931,7 @@
                         rateValue,
                         rateType,
                         startDate,
+                        endDate,
                         linenService,
                         paymentTermsChoice
                     })
@@ -1410,6 +1422,7 @@
             const rateType = document.getElementById('rate-type-select').value;
             const paymentTermsChoice = document.querySelector('input[name="payment-terms-choice"]:checked').value;
             const startDate = document.getElementById('date-input').value;
+            const endDate = document.getElementById('end-date-input').value;
             const linenService = document.getElementById('linen-checkbox').checked;
 
             try {
@@ -1423,6 +1436,7 @@
                         rateType, 
                         paymentTermsChoice, 
                         startDate, 
+                        endDate,
                         linenService 
                     })
                 });

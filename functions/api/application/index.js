@@ -70,6 +70,7 @@ export async function onRequestGet(context) {
               paymentTermsChoice: parsed.paymentTermsChoice || 'full',
               linenService: !!parsed.linenService,
               startDate: parsed.startDate,
+              endDate: parsed.endDate || null,
               tenantName: parsed.tenantDetails ? parsed.tenantDetails.name : 'Unknown'
             });
           }

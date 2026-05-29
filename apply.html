@@ -1315,11 +1315,14 @@
 
             if (applicationData.status === 'pending_tenant') {
                 goToStage(1);
-                // Set default arrival date from DB
+                // Set default arrival and departure dates from DB
                 if (!document.getElementById('arrival-date').value) {
                     document.getElementById('arrival-date').value = applicationData.startDate || '';
-                    calculateContractPrice();
                 }
+                if (!document.getElementById('departure-date').value) {
+                    document.getElementById('departure-date').value = applicationData.endDate || '';
+                }
+                calculateContractPrice();
             } else if (applicationData.status === 'pending_tenant_signature') {
                 populateContractPreview();
                 goToStage(2);

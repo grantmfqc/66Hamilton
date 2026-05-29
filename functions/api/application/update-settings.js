@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { token, passcode, rateValue, rateType, startDate, linenService, paymentTermsChoice } = data;
+    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice } = data;
 
     if (!token) {
       return new Response(JSON.stringify({ error: 'Application token is required.' }), { status: 400 });
@@ -57,6 +57,7 @@ export async function onRequestPost(context) {
     if (rateValue !== undefined) app.rateValue = Number(rateValue);
     if (rateType !== undefined) app.rateType = rateType; // 'daily' | 'weekly' | 'monthly'
     if (startDate !== undefined) app.startDate = startDate;
+    if (endDate !== undefined) app.endDate = endDate;
     if (linenService !== undefined) app.linenService = !!linenService;
     if (paymentTermsChoice !== undefined) app.paymentTermsChoice = paymentTermsChoice; // 'full' | 'monthly'
 
