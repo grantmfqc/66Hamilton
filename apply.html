@@ -2859,7 +2859,7 @@
             element.style.maxHeight = 'none';
             element.style.overflowY = 'visible';
             element.style.border = 'none';
-            element.style.padding = '40px';
+            element.style.padding = '40px 60px 40px 40px';
 
             const pdfHeader = element.querySelector('.pdf-only-header');
             const pdfFooter = element.querySelector('.pdf-only-footer');
@@ -2870,7 +2870,7 @@
                 margin:       15,
                 filename:     isSigned ? `66_Hamilton_Road_Tenancy_Agreement.pdf` : `66_Hamilton_Road_Tenancy_Agreement_Draft.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, logging: false, scrollY: 0 },
+                html2canvas:  { scale: 2, logging: false, scrollY: 0, windowWidth: 794, width: 794 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
