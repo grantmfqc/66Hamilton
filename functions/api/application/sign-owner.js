@@ -45,6 +45,7 @@ export async function onRequestPost(context) {
 
     // 4. Send confirmation emails to both Tenant and Owner
     if (context.env.RESEND_API_KEY) {
+      const loginUrl = `${new URL(context.request.url).origin}/index.html`;
       const portalUrl = `${new URL(context.request.url).origin}/apply.html?token=${token}`;
       
       // Setup Resend attachments if PDF is available
@@ -58,7 +59,7 @@ export async function onRequestPost(context) {
       }
 
       // Email to Tenant
-      const emailToTenant = fetch('https://api.resend.com/emails', {
+      const emailToTenantPromise = fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
@@ -67,38 +68,44 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
           to: app.tenantDetails.email,
-          subject: 'Executed Agreement & Onboarding Portal - 66 Hamilton Road',
+          subject: 'Executed Tenancy Agreement & Portal Access - 66 Hamilton Road',
           attachments: emailAttachments,
           html: `
-            <div style="font-family: sans-serif; background-color: #0b0b0d; color: #ffffff; padding: 40px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #C9A96E; font-weight: normal; font-size: 24px;">Welcome to The Hamilton Residence</h2>
-              <p>Dear ${app.tenantDetails.name},</p>
-              <p>We are pleased to inform you that your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties.</p>
-              <p>A copy of your fully executed agreement has been attached to this email as a PDF.</p>
-              
-              <p>Your onboarding portal is now fully unlocked. You can use it to:</p>
-              <ul style="color: #a0a0a5; line-height: 1.6;">
-                <li>Download the fully executed PDF contract at any time.</li>
-                <li>Access the complete Apartment House Manual (including check-in keybox codes, rubbish schedules, and building guidelines).</li>
-                <li>Configure your mobile devices to automatically connect to the building's Wi-Fi network.</li>
-                <li>Submit maintenance requests, provide feedback, or leave a review.</li>
-              </ul>
-
-              <div style="text-align: center; margin: 35px 0;">
-                <a href="${portalUrl}" style="background-color: #C9A96E; color: #000000; font-weight: bold; padding: 14px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">ACCESS YOUR PORTAL</a>
+            <div style="font-family: 'Times New Roman', serif; background-color: #0b0b0d; color: #ffffff; padding: 40px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1a1a1c;">
+              <div style="text-align: center; border-bottom: 1px solid rgba(201, 169, 110, 0.2); padding-bottom: 20px; margin-bottom: 30px;">
+                <h1 style="color: #c9a96e; font-size: 26px; font-weight: normal; margin: 0; letter-spacing: 2px;">THE HAMILTON RESIDENCE</h1>
+                <p style="color: #888; font-size: 11px; margin: 5px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">Premium Serviced Accommodation</p>
               </div>
 
-              <p style="font-size: 13px; color: #a0a0a5;">Please keep this email secure, as the link below is your private key to access the tenant portal at any time during your stay.</p>
-              <p style="font-size: 12px; color: #555; border-top: 1px solid #2a2a2f; padding-top: 20px;">
-                Secure link: <a href="${portalUrl}" style="color: #C9A96E;">${portalUrl}</a>
-              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">Dear ${app.tenantDetails.name},</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">We are pleased to inform you that your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties.</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">A copy of your fully executed agreement has been attached to this email as a PDF.</p>
+              
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">To access your Resident Portal, please click the link below to visit the login page. You must log in using your registered email address: <strong style="color: #c9a96e;">${app.tenantDetails.email}</strong>. Once submitted, a secure 6-digit verification code will be sent to your email. Enter that code on the login page to authenticate and access the portal.</p>
+              
+              <div style="text-align: center; margin: 35px 0;">
+                <a href="${loginUrl}" style="background-color: #c9a96e; color: #000000; font-weight: bold; padding: 14px 28px; text-decoration: none; border-radius: 4px; display: inline-block; letter-spacing: 1px;">LOG IN TO RESIDENT PORTAL</a>
+              </div>
+
+              <p style="font-size: 15px; line-height: 1.6; color: #d0d0d5;">Once logged in, you will have full access to your premium portal utilities:</p>
+              <ul style="color: #a0a0a5; line-height: 1.8; font-size: 14px; padding-left: 20px;">
+                <li>View the complete <strong>Apartment House Manual</strong> (including check-in guidelines and building keycodes).</li>
+                <li>Access auto-configuration tools to connect your devices to the <strong>Smart Wi-Fi Network</strong>.</li>
+                <li>Track and view your <strong>Calculated Payment Schedule</strong>.</li>
+                <li>Submit <strong>Maintenance Requests</strong>, write feedback, or leave a review.</li>
+              </ul>
+              
+              <div style="border-top: 1px solid rgba(201, 169, 110, 0.1); padding-top: 20px; margin-top: 40px; text-align: center; font-size: 11px; color: #888;">
+                <p style="margin: 0;">Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand</p>
+                <p style="margin: 5px 0 0 0;">Confidential Access Control System</p>
+              </div>
             </div>
           `
         })
       });
 
       // Email to Owner
-      const emailToOwner = fetch('https://api.resend.com/emails', {
+      const emailToOwnerPromise = fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${context.env.RESEND_API_KEY}`,
@@ -114,7 +121,7 @@ export async function onRequestPost(context) {
               <h2 style="color: #C9A96E; font-weight: normal; font-size: 24px;">Contract Executed Successfully</h2>
               <p>Dear Grant,</p>
               <p>The agreement for <strong>${app.tenantDetails.name}</strong> is now fully signed and finalized. The executed PDF contract has been attached to this email and is safely stored in your secure administrative datastore.</p>
-              <p>The tenant has been sent their welcome email, the attached PDF, and tenant portal access details.</p>
+              <p>The tenant has been sent their welcome email directing them to the login page and explaining the email/OTP code sign-in flow.</p>
               
               <p>You can download the final PDF contract and view their onboarding details in your admin dashboard or via the private link below.</p>
               
@@ -130,7 +137,16 @@ export async function onRequestPost(context) {
         })
       });
 
-      await Promise.all([emailToTenant, emailToOwner]);
+      const [resTenant, resOwner] = await Promise.all([emailToTenantPromise, emailToOwnerPromise]);
+      
+      if (!resTenant.ok) {
+        const errText = await resTenant.text();
+        console.error("Failed to send welcome email to tenant:", errText);
+      }
+      if (!resOwner.ok) {
+        const errText = await resOwner.text();
+        console.error("Failed to send execution email to owner:", errText);
+      }
     }
 
     return new Response(JSON.stringify({ success: true, status: app.status }), { 

@@ -741,6 +741,14 @@
                     `;
                 });
                 
+                const totalScheduleAmount = schedule.reduce((sum, p) => sum + p.amount, 0);
+                scheduleRowsHtml += `
+                    <tr style="border: 1px solid #000; background-color: #f2f2f2; font-weight: bold;">
+                        <td colspan="3" style="text-align: right; border: 1px solid #000; padding: 6px;">Total Contract Cost (incl. GST):</td>
+                        <td style="text-align: right; border: 1px solid #000; padding: 6px; font-weight: bold;">$${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                    </tr>
+                `;
+                
                 const scheduleTableHtml = `
                     <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 9.5pt; font-family: 'Times New Roman', Times, serif; color: #000; border: 1px solid #000;" border="1" cellpadding="6">
                         <thead>
