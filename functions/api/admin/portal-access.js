@@ -78,7 +78,7 @@ export async function onRequestPost(context) {
 
       // Send welcome email via Resend (only when newly added)
       if (isNew && context.env.RESEND_API_KEY) {
-        const loginUrl = `${new URL(context.request.url).origin}/index.html`;
+        const loginUrl = `${new URL(context.request.url).origin}/index.html?login=1`;
         const emailRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {

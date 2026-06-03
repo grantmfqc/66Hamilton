@@ -65,8 +65,9 @@ export async function onRequestPost(context) {
     const emailErrors = [];
 
     if (context.env.RESEND_API_KEY) {
-      const loginUrl  = `${new URL(context.request.url).origin}/index.html`;
+      const loginUrl  = `${new URL(context.request.url).origin}/index.html?login=1`;
       const portalUrl = `${new URL(context.request.url).origin}/apply.html?token=${token}`;
+      const adminUrl  = `${new URL(context.request.url).origin}/admin.html`;
 
       // Build PDF attachment (if generated)
       const emailAttachments = [];
@@ -144,7 +145,7 @@ export async function onRequestPost(context) {
               <p>The agreement for <strong>${app.tenantDetails.name}</strong> is now fully signed. The executed PDF is attached and stored in your admin datastore.</p>
               <p>Tenant notified at: <strong>${app.tenantDetails?.email || 'unknown'}</strong></p>
               <div style="text-align:center;margin:35px 0;">
-                <a href="${portalUrl}" style="background-color:#C9A96E;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;">VIEW EXECUTED AGREEMENT</a>
+                <a href="${adminUrl}" style="background-color:#C9A96E;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;">VIEW EXECUTED AGREEMENT</a>
               </div>
               <p style="font-size:12px;color:#555;border-top:1px solid #2a2a2f;padding-top:20px;">
                 Tenant Link: <a href="${portalUrl}" style="color:#C9A96E;">${portalUrl}</a>

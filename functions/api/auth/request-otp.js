@@ -21,12 +21,13 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: 'Please wait 60 seconds before requesting another code.' }), { status: 429 });
     }
 
-    // 2. Enforce Per-IP Rate Limit (5 requests per hour)
+    // 2. Enforce Per-IP Rate Limit (100 requests per hour for testing purposes, bypass for owner's IP)
     const clientIp = context.request.headers.get('cf-connecting-ip') || 'unknown-ip';
+    const isOwnerIp = clientIp === '103.245.172.98';
     const ipRateKey = `ratelimit:ip:${clientIp}`;
     const ipAttemptsStr = await kv.get(ipRateKey);
     const ipAttempts = ipAttemptsStr ? parseInt(ipAttemptsStr, 10) : 0;
-    if (ipAttempts >= 5) {
+    if (!isOwnerIp && ipAttempts >= 100) {
       return new Response(JSON.stringify({ error: 'Hourly request limit exceeded. Please try again later.' }), { status: 429 });
     }
 
