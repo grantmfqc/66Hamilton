@@ -2873,70 +2873,94 @@
             }
 
             const verbatimBox = document.getElementById('verbatim-contract-box');
-            const scrollX = window.scrollX;
-            const scrollY = window.scrollY;
-            let clone = null;
 
-            try {
-                // 1. Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
-                clone = verbatimBox.cloneNode(true);
+            const opt = {
+                margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
+                filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true, 
+                    logging: false, 
+                    scrollY: 0,
+                    scrollX: 0,
+                    windowWidth: 794,
+                    onclone: (clonedDoc) => {
+                        const box = clonedDoc.getElementById('verbatim-contract-box');
+                        if (box) {
+                            // Strip scripts
+                            clonedDoc.querySelectorAll('script').forEach(el => el.remove());
 
-                // Show PDF-only headers and footers in the clone
-                clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                    el.style.display = 'block';
-                });
+                            // Style the box element for print layout
+                            box.style.position = 'static';
+                            box.style.margin = '0';
+                            box.style.padding = '40px';
+                            box.style.width = '794px';
+                            box.style.maxWidth = '794px';
+                            box.style.boxSizing = 'border-box';
+                            box.style.background = '#ffffff';
+                            box.style.color = '#000000';
+                            box.style.fontFamily = "'Times New Roman', Times, serif";
+                            box.style.fontSize = '11pt';
+                            box.style.lineHeight = '1.5';
+                            box.style.maxHeight = 'none';
+                            box.style.overflowY = 'visible';
+                            box.style.height = 'auto';
+                            box.style.display = 'block';
 
-                // Style the clone to sit at absolute top-left of body (not container) to prevent left shift
-                clone.style.position = 'absolute';
-                clone.style.top = '0';
-                clone.style.left = '0';
-                clone.style.width = '794px';
-                clone.style.maxWidth = '794px';
-                clone.style.boxSizing = 'border-box';
-                clone.style.padding = '40px';
-                clone.style.margin = '0';
-                clone.style.background = '#ffffff';
-                clone.style.color = '#000000';
-                clone.style.fontFamily = "'Times New Roman', Times, serif";
-                clone.style.fontSize = '11pt';
-                clone.style.lineHeight = '1.5';
-                clone.style.maxHeight = 'none';
-                clone.style.overflowY = 'visible';
-                clone.style.height = 'auto';
-                clone.style.zIndex = '999999';
-                clone.style.display = 'block';
+                            // Show PDF-only headers and footers
+                            box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                el.style.display = 'block';
+                            });
 
-                // 2. Append clone directly to body and scroll window to (0,0) so html2canvas starts rendering at (0,0)
-                document.body.appendChild(clone);
-                window.scrollTo(0, 0);
+                            // Traverse ancestors to reset margins, paddings, and hidden properties
+                            let current = box.parentElement;
+                            while (current && current !== clonedDoc.body && current !== clonedDoc.documentElement) {
+                                current.style.margin = '0';
+                                current.style.padding = '0';
+                                current.style.border = 'none';
+                                current.style.width = 'auto';
+                                current.style.height = 'auto';
+                                current.style.maxHeight = 'none';
+                                current.style.overflow = 'visible';
+                                current.style.position = 'static';
+                                current.style.boxShadow = 'none';
+                                
+                                // Hide all sibling elements of current ancestor
+                                if (current.parentElement) {
+                                    Array.from(current.parentElement.children).forEach(sibling => {
+                                        if (sibling !== current) {
+                                            sibling.style.display = 'none';
+                                        }
+                                    });
+                                }
+                                current = current.parentElement;
+                            }
 
-                const opt = {
-                    margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
-                    filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2, 
-                        useCORS: true, 
-                        allowTaint: true, 
-                        logging: false, 
-                        scrollY: 0,
-                        scrollX: 0,
-                        windowWidth: 794
-                    },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak:    { mode: ['css', 'legacy'] }
-                };
+                            // Reset cloned body and html styling
+                            clonedDoc.body.style.margin = '0';
+                            clonedDoc.body.style.padding = '0';
+                            clonedDoc.body.style.background = '#ffffff';
+                            clonedDoc.body.style.color = '#000000';
+                            clonedDoc.body.style.width = 'auto';
+                            clonedDoc.body.style.height = 'auto';
+                            clonedDoc.body.style.overflow = 'visible';
 
-                // Let browser repaint
-                await new Promise(r => requestAnimationFrame(r));
-                await html2pdf().from(clone).set(opt).save();
-            } finally {
-                // Restore state
-                if (clone && document.body.contains(clone)) {
-                    document.body.removeChild(clone);
-                }
-                window.scrollTo(scrollX, scrollY);
-            }
+                            // Hide any other direct descendants of body
+                            Array.from(clonedDoc.body.children).forEach(child => {
+                                if (!child.contains(box)) {
+                                    child.style.display = 'none';
+                                }
+                            });
+                        }
+                    }
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] }
+            };
+
+            await html2pdf().from(verbatimBox).set(opt).save();
         }
 
         function showToast(msg) {

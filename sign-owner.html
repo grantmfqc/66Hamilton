@@ -1021,9 +1021,7 @@
             
             if (confirm("Are you sure you want to execute and finalize this Licence to Occupy agreement?")) {
                 const verbatimBox = document.getElementById('verbatim-contract-box');
-                const scrollX = window.scrollX;
-                const scrollY = window.scrollY;
-                let clone = null;
+                let rulesSection = null;
 
                 try {
                     // Show a loading indicator
@@ -1044,16 +1042,8 @@
                     const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
                     const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
 
-                    // 3. Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
-                    clone = verbatimBox.cloneNode(true);
-
-                    // Show PDF-only headers and footers in the clone
-                    clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                        el.style.display = 'block';
-                    });
-
-                    // Create dynamic rules section inside the clone
-                    const rulesSection = document.createElement('div');
+                    // 3. Create dynamic rules section and append directly to verbatimBox
+                    rulesSection = document.createElement('div');
                     rulesSection.style.pageBreakBefore = 'always';
                     rulesSection.style.marginTop = '0px';
                     rulesSection.innerHTML = `
@@ -1062,31 +1052,7 @@
                             ${rulesContent}
                         </div>
                     `;
-                    clone.appendChild(rulesSection);
-
-                    // Style the clone to sit at absolute top-left of body (not container) to prevent left shift
-                    clone.style.position = 'absolute';
-                    clone.style.top = '0';
-                    clone.style.left = '0';
-                    clone.style.width = '794px';
-                    clone.style.maxWidth = '794px';
-                    clone.style.boxSizing = 'border-box';
-                    clone.style.padding = '40px';
-                    clone.style.margin = '0';
-                    clone.style.background = '#ffffff';
-                    clone.style.color = '#000000';
-                    clone.style.fontFamily = "'Times New Roman', Times, serif";
-                    clone.style.fontSize = '11pt';
-                    clone.style.lineHeight = '1.5';
-                    clone.style.maxHeight = 'none';
-                    clone.style.overflowY = 'visible';
-                    clone.style.height = 'auto';
-                    clone.style.zIndex = '999999';
-                    clone.style.display = 'block';
-
-                    // 4. Append clone directly to body and scroll window to (0,0) so html2canvas starts rendering at (0,0)
-                    document.body.appendChild(clone);
-                    window.scrollTo(0, 0);
+                    verbatimBox.appendChild(rulesSection);
 
                     const opt = {
                         margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -1099,17 +1065,84 @@
                             logging: false, 
                             scrollY: 0,
                             scrollX: 0,
-                            windowWidth: 794
+                            windowWidth: 794,
+                            onclone: (clonedDoc) => {
+                                const box = clonedDoc.getElementById('verbatim-contract-box');
+                                if (box) {
+                                    // Strip scripts
+                                    clonedDoc.querySelectorAll('script').forEach(el => el.remove());
+
+                                    // Style the box element for print layout
+                                    box.style.position = 'static';
+                                    box.style.margin = '0';
+                                    box.style.padding = '40px';
+                                    box.style.width = '794px';
+                                    box.style.maxWidth = '794px';
+                                    box.style.boxSizing = 'border-box';
+                                    box.style.background = '#ffffff';
+                                    box.style.color = '#000000';
+                                    box.style.fontFamily = "'Times New Roman', Times, serif";
+                                    box.style.fontSize = '11pt';
+                                    box.style.lineHeight = '1.5';
+                                    box.style.maxHeight = 'none';
+                                    box.style.overflowY = 'visible';
+                                    box.style.height = 'auto';
+                                    box.style.display = 'block';
+
+                                    // Show PDF-only headers and footers
+                                    box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                        el.style.display = 'block';
+                                    });
+
+                                    // Traverse ancestors to reset margins, paddings, and hidden properties
+                                    let current = box.parentElement;
+                                    while (current && current !== clonedDoc.body && current !== clonedDoc.documentElement) {
+                                        current.style.margin = '0';
+                                        current.style.padding = '0';
+                                        current.style.border = 'none';
+                                        current.style.width = 'auto';
+                                        current.style.height = 'auto';
+                                        current.style.maxHeight = 'none';
+                                        current.style.overflow = 'visible';
+                                        current.style.position = 'static';
+                                        current.style.boxShadow = 'none';
+                                        
+                                        // Hide all sibling elements of current ancestor
+                                        if (current.parentElement) {
+                                            Array.from(current.parentElement.children).forEach(sibling => {
+                                                if (sibling !== current) {
+                                                    sibling.style.display = 'none';
+                                                }
+                                            });
+                                        }
+                                        current = current.parentElement;
+                                    }
+
+                                    // Reset cloned body and html styling
+                                    clonedDoc.body.style.margin = '0';
+                                    clonedDoc.body.style.padding = '0';
+                                    clonedDoc.body.style.background = '#ffffff';
+                                    clonedDoc.body.style.color = '#000000';
+                                    clonedDoc.body.style.width = 'auto';
+                                    clonedDoc.body.style.height = 'auto';
+                                    clonedDoc.body.style.overflow = 'visible';
+
+                                    // Hide any other direct descendants of body
+                                    Array.from(clonedDoc.body.children).forEach(child => {
+                                        if (!child.contains(box)) {
+                                            child.style.display = 'none';
+                                        }
+                                    });
+                                }
+                            }
                         },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['css', 'legacy'] }
                     };
 
-                    // Let browser repaint
-                    await new Promise(r => requestAnimationFrame(r));
-                    const pdfData = await html2pdf().from(clone).set(opt).output('datauristring');
+                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
 
-                    // 5. Submit everything to backend api
+                    // 4. Submit everything to backend api
                     const res = await fetch('/api/application/sign-owner', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1138,19 +1171,16 @@
                     btn.textContent = "Counter-Sign & Finalize";
                 } finally {
                     // Restore state
-                    if (clone && document.body.contains(clone)) {
-                        document.body.removeChild(clone);
+                    if (rulesSection && verbatimBox.contains(rulesSection)) {
+                        verbatimBox.removeChild(rulesSection);
                     }
-                    window.scrollTo(scrollX, scrollY);
                 }
             }
         }
 
         async function previewPDF() {
             const verbatimBox = document.getElementById('verbatim-contract-box');
-            const scrollX = window.scrollX;
-            const scrollY = window.scrollY;
-            let clone = null;
+            let rulesSection = null;
 
             try {
                 // Fetch current signature from canvas and render temporarily for preview
@@ -1167,16 +1197,8 @@
                 const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
                 const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
 
-                // Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
-                clone = verbatimBox.cloneNode(true);
-
-                // Show PDF-only headers and footers in the clone
-                clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                    el.style.display = 'block';
-                });
-
-                // Create dynamic rules section inside the clone
-                const rulesSection = document.createElement('div');
+                // Create dynamic rules section and append directly to verbatimBox
+                rulesSection = document.createElement('div');
                 rulesSection.style.pageBreakBefore = 'always';
                 rulesSection.style.marginTop = '0px';
                 rulesSection.innerHTML = `
@@ -1185,31 +1207,7 @@
                         ${rulesContent}
                     </div>
                 `;
-                clone.appendChild(rulesSection);
-
-                // Style the clone to sit at absolute top-left of body to prevent left shift
-                clone.style.position = 'absolute';
-                clone.style.top = '0';
-                clone.style.left = '0';
-                clone.style.width = '794px';
-                clone.style.maxWidth = '794px';
-                clone.style.boxSizing = 'border-box';
-                clone.style.padding = '40px';
-                clone.style.margin = '0';
-                clone.style.background = '#ffffff';
-                clone.style.color = '#000000';
-                clone.style.fontFamily = "'Times New Roman', Times, serif";
-                clone.style.fontSize = '11pt';
-                clone.style.lineHeight = '1.5';
-                clone.style.maxHeight = 'none';
-                clone.style.overflowY = 'visible';
-                clone.style.height = 'auto';
-                clone.style.zIndex = '999999';
-                clone.style.display = 'block';
-
-                // Append clone directly to body and scroll window to (0,0) so html2canvas starts at (0,0)
-                document.body.appendChild(clone);
-                window.scrollTo(0, 0);
+                verbatimBox.appendChild(rulesSection);
 
                 const opt = {
                     margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -1222,23 +1220,89 @@
                         logging: false, 
                         scrollY: 0,
                         scrollX: 0,
-                        windowWidth: 794
+                        windowWidth: 794,
+                        onclone: (clonedDoc) => {
+                            const box = clonedDoc.getElementById('verbatim-contract-box');
+                            if (box) {
+                                // Strip scripts
+                                clonedDoc.querySelectorAll('script').forEach(el => el.remove());
+
+                                // Style the box element for print layout
+                                box.style.position = 'static';
+                                box.style.margin = '0';
+                                box.style.padding = '40px';
+                                box.style.width = '794px';
+                                box.style.maxWidth = '794px';
+                                box.style.boxSizing = 'border-box';
+                                box.style.background = '#ffffff';
+                                box.style.color = '#000000';
+                                box.style.fontFamily = "'Times New Roman', Times, serif";
+                                box.style.fontSize = '11pt';
+                                box.style.lineHeight = '1.5';
+                                box.style.maxHeight = 'none';
+                                box.style.overflowY = 'visible';
+                                box.style.height = 'auto';
+                                box.style.display = 'block';
+
+                                // Show PDF-only headers and footers
+                                box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                    el.style.display = 'block';
+                                });
+
+                                // Traverse ancestors to reset margins, paddings, and hidden properties
+                                let current = box.parentElement;
+                                while (current && current !== clonedDoc.body && current !== clonedDoc.documentElement) {
+                                    current.style.margin = '0';
+                                    current.style.padding = '0';
+                                    current.style.border = 'none';
+                                    current.style.width = 'auto';
+                                    current.style.height = 'auto';
+                                    current.style.maxHeight = 'none';
+                                    current.style.overflow = 'visible';
+                                    current.style.position = 'static';
+                                    current.style.boxShadow = 'none';
+                                    
+                                    // Hide all sibling elements of current ancestor
+                                    if (current.parentElement) {
+                                        Array.from(current.parentElement.children).forEach(sibling => {
+                                            if (sibling !== current) {
+                                                sibling.style.display = 'none';
+                                            }
+                                        });
+                                    }
+                                    current = current.parentElement;
+                                }
+
+                                // Reset cloned body and html styling
+                                clonedDoc.body.style.margin = '0';
+                                clonedDoc.body.style.padding = '0';
+                                clonedDoc.body.style.background = '#ffffff';
+                                clonedDoc.body.style.color = '#000000';
+                                clonedDoc.body.style.width = 'auto';
+                                clonedDoc.body.style.height = 'auto';
+                                clonedDoc.body.style.overflow = 'visible';
+
+                                // Hide any other direct descendants of body
+                                Array.from(clonedDoc.body.children).forEach(child => {
+                                    if (!child.contains(box)) {
+                                        child.style.display = 'none';
+                                    }
+                                });
+                            }
+                        }
                     },
                     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak:    { mode: ['css', 'legacy'] }
                 };
 
-                // Let browser repaint
-                await new Promise(r => requestAnimationFrame(r));
-                await html2pdf().from(clone).set(opt).save();
+                await html2pdf().from(verbatimBox).set(opt).save();
             } catch (err) {
                 alert("Failed to generate preview: " + err.message);
             } finally {
                 // Restore state
-                if (clone && document.body.contains(clone)) {
-                    document.body.removeChild(clone);
+                if (rulesSection && verbatimBox.contains(rulesSection)) {
+                    verbatimBox.removeChild(rulesSection);
                 }
-                window.scrollTo(scrollX, scrollY);
 
                 // Clear the preview signatures from screen
                 document.getElementById('render-owner-sig').innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>`;
