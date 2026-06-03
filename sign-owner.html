@@ -179,14 +179,12 @@
         .contract-box li { margin-bottom: 8px; }
 
         /* PDF Printing page-breaks */
-        .contract-box p, .contract-box li, .contract-box tr {
+        .contract-box tr {
             page-break-inside: avoid;
-            break-inside: avoid;
         }
         .contract-box h1, .contract-box h2, .contract-box h3, .contract-box h4 {
             page-break-inside: avoid;
             page-break-after: avoid;
-            break-after: avoid;
         }
 
         /* --- Signature Pad --- */
@@ -1074,27 +1072,24 @@
                                     clonedBox.style.fontSize = '11pt';
                                     clonedBox.style.lineHeight = '1.5';
 
-                                    // Force all text colors to black and backgrounds to transparent/white
-                                    clonedBox.querySelectorAll('*').forEach(el => {
-                                        el.style.color = '#000000';
-                                        if (el.tagName !== 'TH' && el.tagName !== 'TD') {
-                                            el.style.background = 'transparent';
-                                        }
-                                    });
-
                                     // Show PDF-only headers and footers
                                     clonedBox.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
                                         el.style.display = 'block';
                                     });
 
-                                    // Isolate the element to avoid any outer container clipping issues
-                                    clonedDoc.body.innerHTML = '';
-                                    clonedDoc.body.appendChild(clonedBox);
+                                    // Ensure all parents have overflow visible and no maxHeight, so they don't clip the expanded box
+                                    let parent = clonedBox.parentElement;
+                                    while (parent && parent.tagName !== 'BODY') {
+                                        parent.style.maxHeight = 'none';
+                                        parent.style.overflow = 'visible';
+                                        parent.style.overflowY = 'visible';
+                                        parent = parent.parentElement;
+                                    }
                                 }
                             }
                         },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+                        pagebreak:    { mode: ['css', 'legacy'] }
                     };
 
                     const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
