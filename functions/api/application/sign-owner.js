@@ -88,7 +88,7 @@ export async function onRequestPost(context) {
           body: JSON.stringify({
             from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
             to: tenantEmail,
-            subject: 'Executed Tenancy Agreement & Portal Access - 66 Hamilton Road',
+            subject: 'Your Executed Licence to Occupy — 66 Hamilton Road, Herne Bay',
             attachments: emailAttachments,
             html: `
               <div style="font-family:'Times New Roman',serif;background-color:#0b0b0d;color:#ffffff;padding:40px;border-radius:8px;max-width:600px;margin:0 auto;border:1px solid #1a1a1c;">
@@ -97,7 +97,7 @@ export async function onRequestPost(context) {
                   <p style="color:#888;font-size:11px;margin:5px 0 0;text-transform:uppercase;letter-spacing:1px;">Premium Serviced Accommodation</p>
                 </div>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Dear ${app.tenantDetails.name},</p>
-                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties. A copy is attached as a PDF.</p>
+                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties. A signed copy is attached to this email as a PDF.</p>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">To access your Resident Portal, click the button below and sign in using <strong style="color:#c9a96e;">${tenantEmail}</strong>. A 6-digit verification code will be sent to that email — enter it to log in.</p>
                 <div style="text-align:center;margin:35px 0;">
                   <a href="${loginUrl}" style="background-color:#c9a96e;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;letter-spacing:1px;">LOG IN TO RESIDENT PORTAL</a>

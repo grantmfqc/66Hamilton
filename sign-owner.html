@@ -1032,11 +1032,12 @@
                     `;
                     verbatimBox.appendChild(rulesSection);
 
-                    // 3. Clone verbatimBox and render it free of all parent layout constraints.
-                    // KEY: position:fixed at left:-9999px causes html2canvas to capture at the
-                    // off-screen viewport coordinate → blank canvas. Instead use position:absolute
-                    // at top:0,left:0 so the clone is in document flow at origin (behind page content)
-                    // and html2canvas captures its content correctly.
+                    // 3. Clone verbatimBox and render at VIEWPORT ORIGIN (position:fixed top:0 left:0)
+                    // WHY FIXED: position:absolute top:0 fails if the admin is scrolled down — the element
+                    // is at document y=0 which is ABOVE the viewport, giving getBoundingClientRect().top < 0
+                    // → html2canvas captures nothing (blank). A position:fixed element is ALWAYS at viewport
+                    // coordinate (0,0) regardless of scroll. High z-index ensures it renders visibly so
+                    // html2canvas captures it correctly. Brief flash is acceptable for an admin action.
                     const clone = verbatimBox.cloneNode(true);
 
                     // Show PDF-only header/footer in clone
@@ -1044,11 +1045,11 @@
                         el.style.display = 'block';
                     });
 
-                    // Place clone at body origin, behind all page content
-                    clone.style.position   = 'absolute';
+                    // Fixed at viewport origin, on top of everything — html2canvas needs visible coords
+                    clone.style.position   = 'fixed';
                     clone.style.top        = '0';
                     clone.style.left       = '0';
-                    clone.style.zIndex     = '-9999';
+                    clone.style.zIndex     = '99999';
                     clone.style.width      = '794px';
                     clone.style.boxSizing  = 'border-box';
                     clone.style.padding    = '40px';
@@ -1063,11 +1064,14 @@
                     clone.style.lineHeight = '1.5';
                     document.body.appendChild(clone);
 
+                    // Let browser paint the clone before html2canvas captures it
+                    await new Promise(r => requestAnimationFrame(r));
+
                     const opt = {
                         margin:       0,
                         filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, windowWidth: 794 },
+                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0 },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
                     };

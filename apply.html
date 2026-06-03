@@ -2883,11 +2883,13 @@
                 el.style.display = 'block';
             });
 
-            // Place clone at body origin, behind all page content
-            clone.style.position   = 'absolute';
+            // Place clone at FIXED VIEWPORT ORIGIN — position:fixed top:0 left:0 is always at viewport
+            // coordinate (0,0) regardless of scroll. position:absolute top:0 fails when the user is
+            // scrolled down (element is above viewport → blank canvas in html2canvas).
+            clone.style.position   = 'fixed';
             clone.style.top        = '0';
             clone.style.left       = '0';
-            clone.style.zIndex     = '-9999';
+            clone.style.zIndex     = '99999';
             clone.style.width      = '794px';
             clone.style.boxSizing  = 'border-box';
             clone.style.padding    = '40px';
@@ -2901,6 +2903,9 @@
             clone.style.fontSize   = '11pt';
             clone.style.lineHeight = '1.5';
             document.body.appendChild(clone);
+
+            // Let browser paint the clone before html2canvas captures it
+            await new Promise(r => requestAnimationFrame(r));
 
             const opt = {
                 margin:       0,
