@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licence Agreement Viewer — 66 Hamilton Road</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0B0D;
+            --bg-card: #121214;
+            --accent-gold: #C9A96E;
+            --text-primary: #F2EFE9;
+            --text-muted: rgba(242, 239, 233, 0.6);
+            --border: rgba(201, 169, 110, 0.2);
+            --border-hover: rgba(201, 169, 110, 0.4);
+            --success: #81c784;
+            --error: #e57373;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* --- Sticky Header --- */
+        .header-bar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #121214;
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            font-size: 0.82rem;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-gold {
+            background: var(--accent-gold);
+            color: #000;
+            border: 1px solid var(--accent-gold);
+        }
+
+        .btn-gold:hover {
+            background: #d4b882;
+            border-color: #d4b882;
+            box-shadow: 0 0 15px rgba(201, 169, 110, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* --- Viewer Main Container --- */
+        .viewer-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* --- Document Styled Box --- */
+        .contract-box {
+            background: #ffffff;
+            color: #000000;
+            padding: 60px 50px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.55;
+            border: 1px solid #ddd;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+            text-align: justify;
+            position: relative;
+            overflow: visible;
+        }
+
+        .contract-box > *:first-child {
+            margin-top: 0 !important;
+        }
+
+        .contract-box h1, .contract-box h2, .contract-box h3, .contract-box h4 {
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+            margin: 20px 0 12px 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .contract-box h1 { font-size: 14pt; font-weight: bold; margin-bottom: 25px; }
+        .contract-box h2 { font-size: 12pt; font-weight: bold; }
+        .contract-box p { margin-bottom: 12px; text-indent: 20px; }
+        .contract-box p.no-indent { text-indent: 0; }
+        .contract-box ol { margin: 10px 0 15px 25px; }
+        .contract-box li { margin-bottom: 8px; }
+
+        /* --- Loading State --- */
+        .loading-view {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(201, 169, 110, 0.2);
+            border-top: 3px solid var(--accent-gold);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Watermark --- */
+        .watermark {
+            display: none;
+            position: absolute;
+            top: 35%;
+            left: 5%;
+            width: 90%;
+            text-align: center;
+            font-size: 4.5rem;
+            color: rgba(220, 53, 69, 0.08);
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            transform: rotate(-30deg);
+            pointer-events: none;
+            user-select: none;
+            font-weight: 700;
+            letter-spacing: 5px;
+            border: 8px double rgba(220, 53, 69, 0.08);
+            padding: 10px;
+            z-index: 50;
+        }
+
+        .watermark-text-banner {
+            display: none;
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #ff8f9e;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .viewer-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .contract-box {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+
+            .pdf-only-header {
+                display: block !important;
+            }
+            .pdf-only-footer {
+                display: block !important;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3, h4 {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+
+            .watermark {
+                display: block !important;
+                color: rgba(0, 0, 0, 0.04) !important;
+                border-color: rgba(0, 0, 0, 0.04) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STICKY TOP BAR (NO-PRINT) -->
+    <div class="header-bar no-print">
+        <div class="header-title">66 Hamilton Road — Licence Agreement Viewer</div>
+        <div class="header-buttons">
+            <button class="btn btn-gold" onclick="window.print()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Print / Save PDF
+            </button>
+            <button class="btn btn-outline" onclick="window.close()">Close Viewer</button>
+        </div>
+    </div>
+
+    <!-- MAIN VIEWER CONTAINER -->
+    <div class="viewer-container">
+        
+        <!-- DRAFT BANNER (NO-PRINT) -->
+        <div id="draft-banner" class="watermark-text-banner no-print">
+            ⚠️ <strong>UNEXECUTED DRAFT AGREEMENT</strong> — This contract document is currently a preview and has not been finalized by both parties.
+        </div>
+
+        <!-- LOADING PLACEHOLDER -->
+        <div id="loading" class="loading-view">
+            <div class="spinner"></div>
+            <p style="color: var(--accent-gold); font-family: 'Outfit', sans-serif; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;">Loading Agreement Details...</p>
+        </div>
+
+        <!-- ERROR PLACEHOLDER -->
+        <div id="error-view" style="display: none; text-align: center; padding: 100px 0;">
+            <h2 id="error-message" style="color: var(--error); font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: normal; margin-bottom: 15px;">Failed to Load Agreement</h2>
+            <button class="btn btn-outline" onclick="window.location.reload()">Retry Connection</button>
+        </div>
+
+        <!-- THE CONTRACT BOX -->
+        <div class="contract-box" id="verbatim-contract-box" style="display: none;">
+            
+            <!-- WATERMARK OVERLAY -->
+            <div class="watermark" id="contract-watermark">Draft Preview</div>
+
+            <!-- PDF-Only Premium Header -->
+            <div class="pdf-only-header" style="display: none; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 25px;">
+                <table style="width: 100%; border: none; margin: 0; padding: 0; border-collapse: collapse;">
+                    <tr style="border: none;">
+                        <td style="border: none; padding: 0; text-align: left; font-family: 'Times New Roman', serif; font-size: 9pt; color: #444; line-height: 1.4;">
+                            <strong>66 HAMILTON ROAD</strong><br/>
+                            Herne Bay, Auckland, New Zealand
+                        </td>
+                        <td style="border: none; padding: 0; text-align: right; font-family: 'Times New Roman', serif; font-size: 9pt; color: #444; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <strong>Licence to Occupy Agreement</strong><br/>
+                            Confidential Serviced Accommodation
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <h1>Licence to Occupy for Serviced Accommodation</h1>
+            <p class="no-indent"><strong>THIS AGREEMENT</strong> is made on the date of final electronic execution by both parties.</p>
+            
+            <h3 style="text-align: left; font-size: 11pt;">Parties:</h3>
+            <ol>
+                <li><strong>GRANT DENNIS</strong> (the "Licensor")</li>
+                <li><strong><span class="fill-tenant-name">_____</span></strong>, identified as the Primary Licensee in Section 1 of the attached Onboarding Portal (the "Licensee")</li>
+            </ol>
+
+            <h3 style="text-align: left; font-size: 11pt;">Background:</h3>
+            <p class="no-indent">A. The Licensor is the master lease holder of the residential property located at Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand (the "Premises"), and possesses all necessary commercial and legal authority to grant non-exclusive temporary licenses to occupy the property.</p>
+            <p class="no-indent">B. The Licensor operates the property as premium, short-term commercial serviced accommodation.</p>
+            <p class="no-indent">C. The Licensee wishes to occupy the property for a temporary, transient period of exactly <span class="fill-contract-days">_____</span>, subject to the active delivery of commercial services by the Licensor.</p>
+            <p class="no-indent">D. The parties explicitly agree that this arrangement is not a residential tenancy and is expressly excluded from the operations of the New Zealand Residential Tenancies Act 1986 pursuant to Section 5 of that Act (relating to temporary, transient, and serviced accommodation).</p>
+
+            <h3 style="text-align: left; font-size: 11pt;">Operative Terms:</h3>
+            <p class="no-indent"><strong>1. Grant of Licence</strong></p>
+            <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
+            <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
+
+            <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
+            <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+            <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+
+            <div id="contract-clause-3">
+                <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                <p class="no-indent">3.1 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until the upfront payment terms have been fully cleared.</p>
+            </div>
+
+            <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
+            <p class="no-indent">4.1 The weekly Licence Fee includes the active provision of the following commercial services by the Licensor:</p>
+            <ul style="margin-left: 40px; list-style-type: square; margin-bottom: 10px;">
+                <li>Full provisioning and baseline usage allocation of residential utilities (electricity, gas, water, and unlimited high-speed broadband internet).</li>
+                <li>A mandatory, professional housekeeping and interior cleaning service conducted once per calendar week.</li>
+            </ul>
+            <p class="no-indent">4.2 Erosion of Quiet Enjoyment: Because this is a commercial serviced accommodation contract, the Licensor, their property managers, and contracted housekeeping staff retain an absolute, non-negotiable, and unhindered weekly right of entry to perform the mandatory cleaning services, verify chattel safety, and inspect the status of the asset. The Licensee cannot refuse, delay, or restrict this entry.</p>
+
+            <p class="no-indent"><strong>5. 24-Hour Inventory Reconciliation Window</strong></p>
+            <p class="no-indent">5.1 A complete inventory log of high-end furniture, electronics, and household chattels will be provided to the Licensee upon arrival.</p>
+            <p class="no-indent">5.2 The Licensee has exactly 24 hours from physical check-in to inspect the Premises and notify the Licensor via email or WhatsApp of any missing inventory or pre-existing damage.</p>
+            <p class="no-indent">5.3 If no discrepancy notice is received within this 24-hour window, the Premises and all listed chattels shall be legally deemed to have been delivered in immaculate condition. The Licensee shall be held fully liable for any defects, damages, or missing items recorded at the final checkout inspection.</p>
+
+            <p class="no-indent"><strong>6. Winter Utility Fair Use Cap Clause</strong></p>
+            <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $600.00 (inclusive of GST) per calendar month.</p>
+            <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $600.00 NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
+            <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 15% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
+
+            <p class="no-indent"><strong>7. Optional Linen & Bed Sheet Service</strong></p>
+            <p class="no-indent">7.1 The mandatory weekly cleaning service does not include bed sheet laundering and linen replacement.</p>
+            <p class="no-indent">7.2 If requested in writing by the Licensee, the Licensor can provide a complete premium linen and bed sheet replacement service at an additional cost of NZD $45.00 + GST ($51.75 incl. GST) per bed, per week. This service will be invoiced separately and must be paid in advance alongside the main Licence Fee block.</p>
+
+            <p class="no-indent"><strong>8. Conduct, House Rules & Liability Penalties</strong></p>
+            <p class="no-indent">8.1 Occupancy Restrictions: Only the specific individuals declared in Section 2 of the attached Onboarding Portal are permitted to reside in the Premises. Sub-licensing rooms or hosting additional permanent overnight guests is strictly prohibited.</p>
+            <p class="no-indent">8.2 Quiet Hours & Social Gatherings: The Premises is located in a strict residential building. Quiet hours must be observed between 10:00 PM and 7:00 AM daily. No parties or large social gatherings are permitted. If building management or noise control protocols require a security guard call-out due to loud behavior from the occupants, a mandatory NZD $250.00 enforcement fee will be billed instantly to the Licensee, alongside serving as immediate grounds for Licence revocation.</p>
+            <p class="no-indent">8.3 Fire Alarm False Call-Outs: Smoking and vaping are strictly prohibited inside the Premises or on the balconies. If the occupants trigger a false fire alarm via cooking negligence, smoking, or tampering with sensors that results in a Fire and Emergency New Zealand (FENZ) call-out, the Licensee is strictly liable for the full penalty fine levied by emergency services (historically $1,000.00+ GST), plus a 15% administrative fee.</p>
+            <p class="no-indent">8.4 Supervision of Minors: In strict accordance with New Zealand child safety laws, no children under the age of 14 years may be left unattended or without adult supervision anywhere within the Premises or common property of the building complex at any time.</p>
+
+            <p class="no-indent"><strong>9. Option to Request Extension</strong></p>
+            <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of between 1 and 90 additional days) by providing written notice to the Licensor no later than thirty (30) days prior to the Expiry Date.</p>
+            <p class="no-indent">9.2 The Licensor retains absolute discretion to accept or deny an extension request based on apartment availability, master lease parameters, or past conduct.</p>
+            <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the extension fee block in cleared funds at least ten (10) days prior to the original Expiry Date. All commercial services and weekly cleaning entry mandates will continue throughout any extension.</p>
+
+            <p class="no-indent"><strong>10. Immediate Revocation & Eviction</strong></p>
+            <p class="no-indent">10.1 If the Licensee commits a material breach of this agreement, fails to clear utility overage invoices, or violates structural building rules, the Licensor reserves the right to revoke this Licence immediately upon written notice.</p>
+            <p class="no-indent">10.2 Upon revocation, the Licensee's personal permission to occupy the space terminates instantly. They must vacate the premises and remove all personal belongings within twenty-four (24) hours without recourse to the New Zealand Tenancy Tribunal.</p>
+
+            <p class="no-indent"><strong>11. Jurisdiction</strong></p>
+            <p class="no-indent">11.1 This agreement is governed exclusively by the laws of New Zealand. Any contractual disputes that cannot be settled by mutual agreement shall be directed to the courts of New Zealand.</p>
+
+            <h2 style="margin-top: 30px; font-size: 12pt;">Execution Schedule</h2>
+            <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 10pt; color: #000; box-sizing: border-box; word-wrap: break-word;" border="1" cellpadding="8">
+                <colgroup>
+                    <col style="width: 40%;">
+                    <col style="width: 60%;">
+                </colgroup>
+                <tr><th>Licensor</th><td>Grant Dennis</td></tr>
+                <tr><th>Licensee</th><td><span class="fill-tenant-name">_____</span></td></tr>
+                <tr><th>Premises</th><td>Apartment 1, 66 Hamilton Road, Herne Bay, Auckland 1011, New Zealand</td></tr>
+                <tr><th>Commencement Date</th><td><span class="fill-commence-date">_____</span></td></tr>
+                <tr><th>Expiry Date</th><td><span class="fill-expiry-date">_____</span></td></tr>
+                <tr><th>Total Base Licence Fee Due<br/><small>(90 Days / 12.85 Weeks)</small></th><td><span class="fill-rent">_____</span></td></tr>
+                <tr><th>Optional Linen Service Selected</th><td><span class="fill-linen-service">_____</span></td></tr>
+            </table>
+
+            <!-- Dynamic Payment Schedule -->
+            <div id="contract-payment-schedule-section" style="display: none; margin-top: 30px;">
+                <h2 style="font-size: 12pt; text-align: center; text-transform: uppercase; font-weight: bold; margin-top: 25px; margin-bottom: 10px;">Payment Schedule (Monthly Option Structured)</h2>
+                <div id="execution-payment-schedule-container"></div>
+            </div>
+
+            <h2 style="margin-top: 40px; font-size: 12pt;">Digital Signatures</h2>
+            <p class="no-indent">By signing below, both parties acknowledge they have read, understood, and agreed to be legally bound by the terms of this commercial Licence to Occupy.</p>
+            
+            <table style="width: 100%; margin-top: 30px; border-collapse: collapse;" border="0" cellpadding="10">
+                <tr>
+                    <td style="width: 50%; vertical-align: bottom;">
+                        <strong>Licensor Digital Signature:</strong><br/>
+                        <div id="render-owner-sig" style="height: 60px; border-bottom: 1px solid #000; margin-top: 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;">
+                            <span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9rem; color: #000;"><strong>Licensor:</strong> Grant Dennis</div>
+                        <div style="margin-top: 5px;">Date: <span id="render-owner-date">__________</span></div>
+                    </td>
+                    <td style="width: 50%; vertical-align: bottom;">
+                        <strong>Licensee Digital Signature:</strong><br/>
+                        <div id="render-tenant-sig" style="height: 60px; border-bottom: 1px solid #000; margin-top: 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;">
+                            <span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Tenant Signature</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.9rem; color: #000;"><strong>Licensee:</strong> <span class="fill-tenant-name">_____</span></div>
+                        <div style="margin-top: 5px;">Date: <span id="render-tenant-date">__________</span></div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- PDF-Only Premium Footer -->
+            <div class="pdf-only-footer" style="display: none; border-top: 1px solid #ccc; padding-top: 12px; margin-top: 40px;">
+                <table style="width: 100%; border: none; margin: 0; padding: 0; border-collapse: collapse;">
+                    <tr style="border: none;">
+                        <td style="border: none; padding: 0; text-align: left; font-family: 'Times New Roman', serif; font-size: 8pt; color: #666;">
+                            Licence to Occupy for Serviced Accommodation • 66 Hamilton Road
+                        </td>
+                        <td style="border: none; padding: 0; text-align: right; font-family: 'Times New Roman', serif; font-size: 8pt; color: #666;">
+                            Auckland, New Zealand
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- BODY CORPORATE RULES DIV (APPENDED DYNAMICALLY) -->
+            <div id="body-corporate-rules-appendix" style="display: none;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const isDraftParam = urlParams.get('draft') === '1';
+        const isPreviewParam = urlParams.get('preview') === '1';
+
+        if (!token) {
+            showError("Invalid Access URL — secure token parameter is missing.");
+        } else {
+            fetchAgreementDetails();
+        }
+
+        function showError(msg) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error-message').textContent = msg;
+            document.getElementById('error-view').style.display = 'block';
+        }
+
+        async function fetchAgreementDetails() {
+            try {
+                const res = await fetch(`/api/application?token=${token}`);
+                if (!res.ok) throw new Error("Could not connect to database or invalid token.");
+                
+                const applicationData = await res.json();
+                populateContract(applicationData);
+            } catch (err) {
+                showError("Error loading agreement: " + err.message);
+            }
+        }
+
+        function populateContract(applicationData) {
+            const td = applicationData.tenantDetails;
+            if (!td) {
+                showError("Corrupt application data structure in database.");
+                return;
+            }
+
+            const isCompany = td.licenseeType === 'company';
+            const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
+
+            // Fill display licensee name
+            document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = licenseeDisplayName);
+
+            const start = new Date(td.arrivalDate);
+            const end = new Date(td.departureDate);
+
+            document.querySelectorAll('.fill-commence-date').forEach(el => el.textContent = start.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+            document.querySelectorAll('.fill-expiry-date').forEach(el => el.textContent = end.toLocaleDateString('en-NZ', { dateStyle: 'long' }));
+
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+            document.querySelectorAll('.fill-contract-days').forEach(el => el.textContent = `${diffDays} days`);
+
+            // Rates
+            const rateType = applicationData.rateType || 'weekly';
+            const rateValue = applicationData.rateValue || applicationData.rent || 2400;
+
+            let dailyRate = 0;
+            let monthlyRate = 0;
+            if (rateType === 'daily') {
+                dailyRate = rateValue;
+                monthlyRate = rateValue * 30;
+            } else if (rateType === 'weekly') {
+                dailyRate = rateValue / 7;
+                monthlyRate = (rateValue / 7) * 30;
+            } else if (rateType === 'monthly') {
+                dailyRate = rateValue / 30;
+                monthlyRate = rateValue;
+            }
+
+            const subtotal = dailyRate * diffDays;
+            const gst = subtotal * 0.15;
+            const totalVal = subtotal + gst;
+
+            document.querySelectorAll('.fill-rent').forEach(el => {
+                el.innerHTML = `$${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (inclusive of GST)<br/>` +
+                               `<small style="font-weight: normal; color: #555;">Calculated at a rate of $${rateValue.toLocaleString()}/${rateType} for exactly ${diffDays} days (${diffDays} days total, including check-in/out). Equivalent reference monthly rate: $${monthlyRate.toLocaleString('en-NZ', { maximumFractionDigits: 2 })} NZD.</small>`;
+            });
+
+            document.querySelectorAll('.fill-linen-service').forEach(el => {
+                el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No';
+            });
+
+            // Clause 3 Dynamic Injections
+            const pTerms = applicationData.paymentTermsChoice || 'full';
+            let paymentClauseHtml = '';
+
+            if (pTerms === 'full') {
+                const subOpt = td.bookingOption || 'A';
+                const depositAmount = (dailyRate * 30) * 1.15; // 1 month deposit (30 days) incl GST
+                const balanceAmount = totalVal - depositAmount;
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
+                    ${subOpt === 'A' || balanceAmount <= 0 ? `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement.</p>
+                    ` : `
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> The Licensee has elected to pay a securement deposit equal to approximately one (1) month of occupancy (<strong>$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>) immediately upon booking to secure the dates. The remaining balance of <strong>$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> must clear into the Licensor's nominated account no later than 14 days prior to the Commencement Date.</p>
+                    `}
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+                
+                // Hide payment schedule
+                const paymentSec = document.getElementById('contract-payment-schedule-section');
+                if (paymentSec) paymentSec.style.display = 'none';
+            } else {
+                // Monthly Installments
+                const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate);
+                
+                let scheduleRowsHtml = '';
+                schedule.forEach(p => {
+                    scheduleRowsHtml += `
+                        <tr style="border: 1px solid #000;">
+                            <td style="text-align: center; border: 1px solid #000; padding: 6px;">${p.paymentNumber}</td>
+                            <td style="border: 1px solid #000; padding: 6px;">${p.label}<br/><small style="color: #555; font-size: 0.85em;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small></td>
+                            <td style="text-align: center; border: 1px solid #000; padding: 6px; font-weight: bold;">${p.dueDate}</td>
+                            <td style="text-align: right; border: 1px solid #000; padding: 6px; font-weight: bold;">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                        </tr>
+                    `;
+                });
+                
+                const totalScheduleAmount = schedule.reduce((sum, p) => sum + p.amount, 0);
+                scheduleRowsHtml += `
+                    <tr style="border: 1px solid #000; background-color: #f2f2f2; font-weight: bold;">
+                        <td colspan="3" style="text-align: right; border: 1px solid #000; padding: 6px;">Total Contract Cost (incl. GST):</td>
+                        <td style="text-align: right; border: 1px solid #000; padding: 6px; font-weight: bold;">$${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                    </tr>
+                `;
+                
+                const scheduleTableHtml = `
+                    <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 9.5pt; font-family: 'Times New Roman', Times, serif; color: #000; border: 1px solid #000; box-sizing: border-box; word-wrap: break-word;" border="1" cellpadding="6">
+                        <thead>
+                            <tr style="background-color: #f2f2f2; border: 1px solid #000;">
+                                <th style="width: 12%; text-align: center; border: 1px solid #000; padding: 6px;">Payment</th>
+                                <th style="width: 38%; text-align: left; border: 1px solid #000; padding: 6px;">Coverage / Description</th>
+                                <th style="width: 25%; text-align: center; border: 1px solid #000; padding: 6px;">Due Date</th>
+                                <th style="width: 25%; text-align: right; border: 1px solid #000; padding: 6px;">Amount (incl. GST)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scheduleRowsHtml}
+                        </tbody>
+                    </table>
+                `;
+
+                paymentClauseHtml = `
+                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
+                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period:</p>
+                    ${scheduleTableHtml}
+                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront securement payment remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
+                `;
+                
+                // Show payment schedule
+                const paymentSec = document.getElementById('contract-payment-schedule-section');
+                const execContainer = document.getElementById('execution-payment-schedule-container');
+                if (paymentSec && execContainer) {
+                    execContainer.innerHTML = scheduleTableHtml;
+                    paymentSec.style.display = 'block';
+                }
+            }
+
+            const clause3El = document.getElementById('contract-clause-3');
+            if (clause3El) clause3El.innerHTML = paymentClauseHtml;
+
+            // Render Signatures
+            const tenantSigContainer = document.getElementById('render-tenant-sig');
+            if (applicationData.tenantSignature) {
+                tenantSigContainer.innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
+                document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
+            } else {
+                tenantSigContainer.innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Tenant Signature</span>`;
+                document.getElementById('render-tenant-date').textContent = '__________';
+            }
+
+            const ownerSigContainer = document.getElementById('render-owner-sig');
+            let hasOwnerSig = false;
+            let ownerSigData = applicationData.ownerSignature;
+            let ownerSigDateStr = applicationData.ownerSignedAt ? new Date(applicationData.ownerSignedAt).toLocaleDateString('en-NZ') : null;
+
+            // Preview override for signatures
+            if (isPreviewParam) {
+                const storedSig = sessionStorage.getItem('ownerSignature');
+                if (storedSig) {
+                    ownerSigData = storedSig;
+                    ownerSigDateStr = new Date().toLocaleDateString('en-NZ');
+                }
+            }
+
+            if (ownerSigData) {
+                ownerSigContainer.innerHTML = `<img src="${ownerSigData}" style="max-height: 50px;" />`;
+                document.getElementById('render-owner-date').textContent = ownerSigDateStr || new Date().toLocaleDateString('en-NZ');
+                hasOwnerSig = true;
+            } else {
+                ownerSigContainer.innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>`;
+                document.getElementById('render-owner-date').textContent = '__________';
+            }
+
+            // Watermark & Banner for Draft
+            const isCompleted = applicationData.status === 'completed';
+            const showDraft = isDraftParam || isPreviewParam || !isCompleted;
+
+            if (showDraft) {
+                document.getElementById('draft-banner').style.display = 'block';
+                const watermark = document.getElementById('contract-watermark');
+                watermark.textContent = isPreviewParam ? "PREVIEW COPY" : "DRAFT COPY";
+                watermark.style.display = 'block';
+                document.title = "DRAFT Licence Agreement — 66 Hamilton Road";
+            } else {
+                document.title = `Licence Agreement — ${td.name}`;
+            }
+
+            // Append Appendix (Body Corporate Rules) if completed or if requested
+            if (isCompleted || isPreviewParam) {
+                loadBodyCorporateRules();
+            } else {
+                finishLoading();
+            }
+        }
+
+        async function loadBodyCorporateRules() {
+            try {
+                const res = await fetch('/body-corporate-rules.html');
+                if (!res.ok) throw new Error("Rules loaded failed");
+                const htmlText = await res.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+                const rulesContent = doc.querySelector('.rules-content').innerHTML;
+
+                const appendixDiv = document.getElementById('body-corporate-rules-appendix');
+                appendixDiv.innerHTML = `
+                    <div style="page-break-before: always; margin-top: 40px;"></div>
+                    <h2 style="text-align: center; text-transform: uppercase; margin-top: 30px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
+                    <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.55; text-align: justify; color: #000;">
+                        ${rulesContent}
+                    </div>
+                `;
+                appendixDiv.style.display = 'block';
+            } catch (err) {
+                console.error("Could not fetch Body Corporate rules appendix:", err);
+            } finally {
+                finishLoading();
+            }
+        }
+
+        function finishLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('verbatim-contract-box').style.display = 'block';
+        }
+
+        function getPaymentSchedule(checkinDateStr, totalDays, dailyRateValue) {
+            const dailyRateInclGst = dailyRateValue * 1.15;
+            const checkinDate = new Date(checkinDateStr);
+            
+            let remainingDays = totalDays;
+            const schedule = [];
+            
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                schedule.push({
+                    paymentNumber: 1,
+                    label: "Payment 1 (Upfront Booking Securement)",
+                    dueDate: "On contract signed date",
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days 1 to ${daysCovered}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                const dueDate = new Date(checkinDate);
+                dueDate.setDate(dueDate.getDate() + 14);
+                
+                const startDayIndex = 31;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 2,
+                    label: "Payment 2 (Installment 1)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            if (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                const prevDueDate = schedule[1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = 61;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: 3,
+                    label: "Payment 3 (Installment 2)",
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                remainingDays -= daysCovered;
+            }
+            
+            let paymentIdx = 4;
+            while (remainingDays > 0) {
+                const daysCovered = Math.min(30, remainingDays);
+                const amount = daysCovered * dailyRateInclGst;
+                
+                const prevDueDate = schedule[schedule.length - 1].dueDateObj;
+                const dueDate = new Date(prevDueDate);
+                dueDate.setDate(dueDate.getDate() + 30);
+                
+                const startDayIndex = (paymentIdx - 1) * 30 + 1;
+                const endDayIndex = startDayIndex + daysCovered - 1;
+                
+                schedule.push({
+                    paymentNumber: paymentIdx,
+                    label: `Payment ${paymentIdx} (${daysCovered < 30 ? 'Final Part Installment' : `Installment ${paymentIdx - 1}`})`,
+                    dueDate: dueDate.toLocaleDateString('en-NZ', { dateStyle: 'medium' }),
+                    dueDateObj: dueDate,
+                    amount: amount,
+                    daysCovered: daysCovered,
+                    periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
+                });
+                
+                remainingDays -= daysCovered;
+                paymentIdx++;
+            }
+            
+            return schedule;
+        }
+    </script>
+</body>
+</html>

@@ -1055,7 +1055,7 @@
                         <a href="/apply.html?token=${app.id}" target="_blank" class="btn-link">Onboarding Page</a>
                         <a href="#" onclick="toggleContractDetails('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Contract Details</a>
                         ${app.status === 'pending_owner' ? `<a href="/sign-owner.html?token=${app.id}" class="btn-link" style="color: var(--accent-gold); font-weight: bold; margin-left: 10px;">Sign Contract</a>` : ''}
-                        ${app.status === 'completed' ? `<a href="#" onclick="downloadSignedPDFAdmin('${app.id}'); return false;" class="btn-link" style="color: var(--success); font-weight: bold; margin-left: 10px;">Download PDF</a>` : ''}
+                        ${app.status === 'completed' ? `<a href="/view-agreement.html?token=${app.id}" target="_blank" class="btn-link" style="color: var(--success); font-weight: bold; margin-left: 10px;">View & Print Contract</a>` : ''}
                         <a href="#" onclick="toggleAppSettings('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Settings</a>
                         <a href="#" onclick="deleteApplication('${app.id}', '${escapeHTML(app.tenantName)}'); return false;" class="btn-link" style="color: #ff6b6b; margin-left: auto;">Delete</a>
                     </div>
@@ -1422,31 +1422,9 @@
             }
         }
 
-        async function downloadSignedPDFAdmin(appId) {
-            try {
-                showToast('Retrieving signed contract...');
-                const res = await fetchAdmin(`/api/application?token=${appId}&passcode=${encodeURIComponent(adminPasscode)}`);
-                if (!res.ok) throw new Error('Could not retrieve agreement');
-                const app = await res.json();
-                
-                if (!app.signedPdfData) {
-                    throw new Error('Finalized PDF contract is missing in database.');
-                }
-                
-                const link = document.createElement('a');
-                link.href = app.signedPdfData;
-                link.download = `${(app.tenantDetails.name || 'Tenant').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Licence_Agreement.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast('Signed contract downloaded.');
-            } catch (err) {
-                alert('Download failed: ' + err.message);
-            }
-        }
 
         async function deleteApplication(appId, tenantName) {
-            const confirmed = confirm(`Are you sure you want to permanently delete the lease agreement for ${tenantName}?\n\nThis will permanently erase all associated onboarding forms, timeline notes, signature records, and executed PDF documents. This action CANNOT be undone.`);
+            const confirmed = confirm(`Are you sure you want to permanently delete the lease agreement for ${tenantName}?\n\nThis will permanently erase all associated onboarding forms, timeline notes, signature records, and executed agreement documents. This action CANNOT be undone.`);
             if (!confirmed) return;
 
             try {

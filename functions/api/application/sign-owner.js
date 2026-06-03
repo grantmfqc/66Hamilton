@@ -69,15 +69,6 @@ export async function onRequestPost(context) {
       const portalUrl = `${new URL(context.request.url).origin}/apply.html?token=${token}`;
       const adminUrl  = `${new URL(context.request.url).origin}/admin.html`;
 
-      // Build PDF attachment (if generated)
-      const emailAttachments = [];
-      if (pdfData) {
-        emailAttachments.push({
-          content: pdfData.split(';base64,').pop(),
-          filename: '66_Hamilton_Road_Licence_Agreement.pdf'
-        });
-      }
-
       // Respect Resend's 2 requests/sec limit by waiting 2 seconds before the first email
       await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -93,18 +84,19 @@ export async function onRequestPost(context) {
             from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
             to: tenantEmail,
             subject: 'Your Executed Licence to Occupy — 66 Hamilton Road, Herne Bay',
-            attachments: emailAttachments,
             html: `
               <div style="font-family:'Times New Roman',serif;background-color:#0b0b0d;color:#ffffff;padding:40px;border-radius:8px;max-width:600px;margin:0 auto;border:1px solid #1a1a1c;">
                 <div style="text-align:center;border-bottom:1px solid rgba(201,169,110,0.2);padding-bottom:20px;margin-bottom:30px;">
-                  <h1 style="color:#c9a96e;font-size:26px;font-weight:normal;margin:0;letter-spacing:2px;">THE HAMILTON RESIDENCE</h1>
-                  <p style="color:#888;font-size:11px;margin:5px 0 0;text-transform:uppercase;letter-spacing:1px;">Premium Serviced Accommodation</p>
+                   <h1 style="color:#c9a96e;font-size:26px;font-weight:normal;margin:0;letter-spacing:2px;">THE HAMILTON RESIDENCE</h1>
+                   <p style="color:#888;font-size:11px;margin:5px 0 0;text-transform:uppercase;letter-spacing:1px;">Premium Serviced Accommodation</p>
                 </div>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Dear ${app.tenantDetails.name},</p>
-                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties. A signed copy is attached to this email as a PDF.</p>
-                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">To access your Resident Portal, click the button below and sign in using <strong style="color:#c9a96e;">${tenantEmail}</strong>. A 6-digit verification code will be sent to that email — enter it to log in.</p>
+                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties.</p>
+                <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">You can view, download, or print a copy of your executed agreement at any time by clicking the button below:</p>
                 <div style="text-align:center;margin:35px 0;">
-                  <a href="${loginUrl}" style="background-color:#c9a96e;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;letter-spacing:1px;">LOG IN TO RESIDENT PORTAL</a>
+                  <a href="${new URL(context.request.url).origin}/view-agreement.html?token=${token}" style="background-color:#c9a96e;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;letter-spacing:1px;margin-bottom:15px;">VIEW EXECUTED AGREEMENT</a>
+                  <br/><br/>
+                  <a href="${loginUrl}" style="color:#c9a96e;text-decoration:underline;font-size:14px;">Log in to Resident Portal</a>
                 </div>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Once logged in you can access:</p>
                 <ul style="color:#a0a0a5;line-height:1.8;font-size:14px;padding-left:20px;">
@@ -137,18 +129,19 @@ export async function onRequestPost(context) {
           from: 'The Hamilton Residence <prospectus@contact.premiumservice.ai>',
           to: 'grant@orcacom.co.nz',
           subject: `Executed Contract Finalized: ${app.tenantDetails.name}`,
-          attachments: emailAttachments,
           html: `
             <div style="font-family:sans-serif;background-color:#0b0b0d;color:#ffffff;padding:40px;border-radius:8px;max-width:600px;margin:0 auto;">
               <h2 style="color:#C9A96E;font-weight:normal;font-size:24px;">Contract Executed Successfully</h2>
               <p>Dear Grant,</p>
-              <p>The agreement for <strong>${app.tenantDetails.name}</strong> is now fully signed. The executed PDF is attached and stored in your admin datastore.</p>
+              <p>The agreement for <strong>${app.tenantDetails.name}</strong> is now fully signed and stored in your admin datastore.</p>
               <p>Tenant notified at: <strong>${app.tenantDetails?.email || 'unknown'}</strong></p>
               <div style="text-align:center;margin:35px 0;">
                 <a href="${adminUrl}" style="background-color:#C9A96E;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;">VIEW EXECUTED AGREEMENT</a>
               </div>
               <p style="font-size:12px;color:#555;border-top:1px solid #2a2a2f;padding-top:20px;">
-                Tenant Link: <a href="${portalUrl}" style="color:#C9A96E;">${portalUrl}</a>
+                Direct Contract Viewer Link: <a href="${new URL(context.request.url).origin}/view-agreement.html?token=${token}" style="color:#C9A96E;">View Contract</a>
+                <br/><br/>
+                Tenant Onboarding Link: <a href="${portalUrl}" style="color:#C9A96E;">${portalUrl}</a>
               </p>
             </div>
           `

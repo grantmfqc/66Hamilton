@@ -807,7 +807,7 @@
         <div id="stage-contract" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap;">
                 <h2 style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">Review License Agreement</h2>
-                <button class="btn btn-outline" onclick="downloadUnsignedPDF()" style="padding: 10px 20px; font-size: 0.8rem; margin: 0;">Download Draft PDF</button>
+                <button class="btn btn-outline" onclick="downloadUnsignedPDF()" style="padding: 10px 20px; font-size: 0.8rem; margin: 0;">View & Print Draft</button>
             </div>
             
             <!-- Verbatim lease text box -->
@@ -1036,7 +1036,7 @@
                 <div class="info-banner" style="margin-top: 10px; margin-bottom: 30px;">
                     <h4>Download Executed Contract</h4>
                     <p style="margin-bottom: 10px;">Your Licence to Occupy agreement is fully signed and legally completed by both parties.</p>
-                    <button class="btn btn-outline" onclick="downloadSignedPDF()" style="padding: 10px 20px; font-size: 0.8rem;">Download Signed PDF</button>
+                    <button class="btn btn-outline" onclick="downloadSignedPDF()" style="padding: 10px 20px; font-size: 0.8rem;">View & Print Agreement</button>
                 </div>
 
                 <div class="form-group">
@@ -1957,30 +1957,6 @@
                     <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                 `;
                 
-                const scheduleTableHtml = `
-                    <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 9.5pt; font-family: 'Times New Roman', Times, serif; color: #000; border: 1px solid #000; box-sizing: border-box; word-wrap: break-word;" border="1" cellpadding="6">
-                        <thead>
-                            <tr style="background-color: #f2f2f2; border: 1px solid #000;">
-                                <th style="width: 12%; text-align: center; border: 1px solid #000; padding: 6px;">Payment</th>
-                                <th style="width: 38%; text-align: left; border: 1px solid #000; padding: 6px;">Coverage / Description</th>
-                                <th style="width: 25%; text-align: center; border: 1px solid #000; padding: 6px;">Due Date</th>
-                                <th style="width: 25%; text-align: right; border: 1px solid #000; padding: 6px;">Amount (incl. GST)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${scheduleRowsHtml}
-                        </tbody>
-                    </table>
-                `;
-
-                paymentClauseHtml = `
-                    <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                    <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
-                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period:</p>
-                    ${scheduleTableHtml}
-                    <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront securement payment remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
-                `;
-                
                 // Hide payment schedule section
                 const paymentSec = document.getElementById('contract-payment-schedule-section');
                 if (paymentSec) paymentSec.style.display = 'none';
@@ -2833,134 +2809,13 @@
             }
         }
 
-        // --- Client-Side PDF Generation ---
+        // --- Client-Side Agreement Viewer Redirects ---
         function downloadSignedPDF() {
-            downloadPDF(true);
+            window.open(`/view-agreement.html?token=${token}`, '_blank');
         }
 
         function downloadUnsignedPDF() {
-            downloadPDF(false);
-        }
-
-        async function downloadPDF(isSigned) {
-            // If it is the signed contract and we already have the finalized PDF stored on the backend, download it directly!
-            if (isSigned && applicationData && applicationData.signedPdfData) {
-                const link = document.createElement('a');
-                link.href = applicationData.signedPdfData;
-                link.download = `66_Hamilton_Road_Licence_Agreement.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                return;
-            }
-
-            // Render contract signatures if signed, otherwise use placeholders
-            if (isSigned) {
-                if (applicationData && applicationData.ownerSignature) {
-                    document.getElementById('render-owner-sig').innerHTML = `<img src="${applicationData.ownerSignature}" style="max-height: 50px;" />`;
-                    document.getElementById('render-owner-date').textContent = new Date(applicationData.ownerSignedAt).toLocaleDateString('en-NZ');
-                }
-                if (applicationData && applicationData.tenantSignature) {
-                    document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
-                    document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
-                }
-            } else {
-                // Keep draft placeholders
-                document.getElementById('render-owner-sig').innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>`;
-                document.getElementById('render-owner-date').textContent = '__________';
-                document.getElementById('render-tenant-sig').innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Tenant Signature</span>`;
-                document.getElementById('render-tenant-date').textContent = '__________';
-            }
-
-            const verbatimBox = document.getElementById('verbatim-contract-box');
-
-            const opt = {
-                margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
-                filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: true, 
-                    logging: false, 
-                    scrollY: 0,
-                    scrollX: 0,
-                    windowWidth: 794,
-                    onclone: (clonedDoc) => {
-                        const box = clonedDoc.getElementById('verbatim-contract-box');
-                        if (box) {
-                            // Strip scripts
-                            clonedDoc.querySelectorAll('script').forEach(el => el.remove());
-
-                            // Style the box element for print layout
-                            box.style.position = 'static';
-                            box.style.margin = '0';
-                            box.style.padding = '40px';
-                            box.style.width = '794px';
-                            box.style.maxWidth = '794px';
-                            box.style.boxSizing = 'border-box';
-                            box.style.background = '#ffffff';
-                            box.style.color = '#000000';
-                            box.style.fontFamily = "'Times New Roman', Times, serif";
-                            box.style.fontSize = '11pt';
-                            box.style.lineHeight = '1.5';
-                            box.style.maxHeight = 'none';
-                            box.style.overflowY = 'visible';
-                            box.style.height = 'auto';
-                            box.style.display = 'block';
-
-                            // Show PDF-only headers and footers
-                            box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                                el.style.display = 'block';
-                            });
-
-                            // Traverse ancestors to reset margins, paddings, and hidden properties
-                            let current = box.parentElement;
-                            while (current && current !== clonedDoc.body && current !== clonedDoc.documentElement) {
-                                current.style.margin = '0';
-                                current.style.padding = '0';
-                                current.style.border = 'none';
-                                current.style.width = 'auto';
-                                current.style.height = 'auto';
-                                current.style.maxHeight = 'none';
-                                current.style.overflow = 'visible';
-                                current.style.position = 'static';
-                                current.style.boxShadow = 'none';
-                                
-                                // Hide all sibling elements of current ancestor
-                                if (current.parentElement) {
-                                    Array.from(current.parentElement.children).forEach(sibling => {
-                                        if (sibling !== current) {
-                                            sibling.style.display = 'none';
-                                        }
-                                    });
-                                }
-                                current = current.parentElement;
-                            }
-
-                            // Reset cloned body and html styling
-                            clonedDoc.body.style.margin = '0';
-                            clonedDoc.body.style.padding = '0';
-                            clonedDoc.body.style.background = '#ffffff';
-                            clonedDoc.body.style.color = '#000000';
-                            clonedDoc.body.style.width = 'auto';
-                            clonedDoc.body.style.height = 'auto';
-                            clonedDoc.body.style.overflow = 'visible';
-
-                            // Hide any other direct descendants of body
-                            Array.from(clonedDoc.body.children).forEach(child => {
-                                if (!child.contains(box)) {
-                                    child.style.display = 'none';
-                                }
-                            });
-                        }
-                    }
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'] }
-            };
-
-            await html2pdf().from(verbatimBox).set(opt).save();
+            window.open(`/view-agreement.html?token=${token}&draft=1`, '_blank');
         }
 
         function showToast(msg) {
