@@ -2874,47 +2874,6 @@
 
             const element = document.getElementById('verbatim-contract-box');
 
-            // Clone the element to isolate it completely from any parent stylesheet/layout constraints
-            const clone = element.cloneNode(true);
-
-            // Show PDF-only headers and footers in the clone
-            clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                el.style.display = 'block';
-            });
-
-            // Style the clone to sit at the absolute top-left of the page, white background, black text, A4 width
-            clone.style.position = 'absolute';
-            clone.style.top = '0';
-            clone.style.left = '0';
-            clone.style.width = '794px';
-            clone.style.maxWidth = '794px';
-            clone.style.boxSizing = 'border-box';
-            clone.style.padding = '40px';
-            clone.style.margin = '0';
-            clone.style.background = '#ffffff';
-            clone.style.color = '#000000';
-            clone.style.fontFamily = "'Times New Roman', Times, serif";
-            clone.style.fontSize = '11pt';
-            clone.style.lineHeight = '1.5';
-            clone.style.maxHeight = 'none';
-            clone.style.overflowY = 'visible';
-            clone.style.height = 'auto';
-            clone.style.zIndex = '999999';
-            clone.style.display = 'block';
-
-            // Save current scroll position
-            const scrollX = window.scrollX;
-            const scrollY = window.scrollY;
-
-            // Hide the main page container (.container)
-            const mainContainer = document.querySelector('.container');
-            const originalDisplay = mainContainer.style.display;
-            mainContainer.style.setProperty('display', 'none', 'important');
-
-            // Append clone directly to body, and scroll to top to ensure html2canvas starts at (0,0)
-            document.body.appendChild(clone);
-            window.scrollTo(0, 0);
-
             const opt = {
                 margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
                 filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
@@ -2926,22 +2885,30 @@
                     logging: false, 
                     scrollY: 0,
                     scrollX: 0,
-                    windowWidth: 794
+                    windowWidth: 794,
+                    onclone: (clonedDoc) => {
+                        const box = clonedDoc.getElementById('verbatim-contract-box');
+                        if (box) {
+                            box.style.maxHeight = 'none';
+                            box.style.overflowY = 'visible';
+                            box.style.height = 'auto';
+                            box.style.padding = '40px';
+                            box.style.margin = '0';
+                            box.style.background = '#ffffff';
+                            box.style.color = '#000000';
+                            
+                            // Show PDF-only headers and footers in the clone
+                            box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                el.style.display = 'block';
+                            });
+                        }
+                    }
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['css', 'legacy'] }
             };
 
-            try {
-                // Let browser repaint
-                await new Promise(r => requestAnimationFrame(r));
-                await html2pdf().from(clone).set(opt).save();
-            } finally {
-                // Restore page state
-                document.body.removeChild(clone);
-                mainContainer.style.display = originalDisplay;
-                window.scrollTo(scrollX, scrollY);
-            }
+            await html2pdf().from(element).set(opt).save();
         }
 
         function showToast(msg) {

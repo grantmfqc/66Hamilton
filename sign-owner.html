@@ -241,6 +241,17 @@
         .btn:hover {
             background: #b5945b;
         }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -438,7 +449,8 @@
                 </label>
             </div>
 
-            <div style="text-align: right; margin-top: 30px;">
+            <div style="text-align: right; margin-top: 30px; display: flex; justify-content: flex-end; gap: 15px; align-items: center;">
+                <button class="btn btn-outline" type="button" onclick="previewPDF()">Preview PDF Layout</button>
                 <button class="btn" onclick="submitOwnerSignature()">Counter-Sign & Finalize</button>
             </div>
         </div>
@@ -1018,7 +1030,7 @@
                     document.getElementById('render-owner-sig').innerHTML = `<img src="${dataUrl}" style="max-height: 50px;" />`;
                     document.getElementById('render-owner-date').textContent = new Date().toLocaleDateString('en-NZ');
 
-                    // 2. Fetch and append Body Corporate Rules to the verbatim contract block
+                    // 2. Fetch Body Corporate Rules
                     const rulesRes = await fetch('/body-corporate-rules.html');
                     if (!rulesRes.ok) throw new Error("Could not load Body Corporate Rules");
                     const rulesHtml = await rulesRes.text();
@@ -1028,59 +1040,6 @@
                     const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
 
                     const verbatimBox = document.getElementById('verbatim-contract-box');
-
-                    // Create dynamic rules section for the PDF
-                    const rulesSection = document.createElement('div');
-                    rulesSection.style.pageBreakBefore = 'always';
-                    rulesSection.style.marginTop = '0px';
-                    rulesSection.innerHTML = `
-                        <h2 style="text-align: center; text-transform: uppercase; margin-top: 0px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
-                        <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; text-align: justify; color: #000;">
-                            ${rulesContent}
-                        </div>
-                    `;
-                    verbatimBox.appendChild(rulesSection);
-
-                    // 3. Clone verbatimBox to isolate it completely from any parent stylesheet/layout constraints
-                    const clone = verbatimBox.cloneNode(true);
-
-                    // Show PDF-only headers and footers in the clone
-                    clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                        el.style.display = 'block';
-                    });
-
-                    // Style the clone to sit at the absolute top-left of the page, white background, black text, A4 width
-                    clone.style.position = 'absolute';
-                    clone.style.top = '0';
-                    clone.style.left = '0';
-                    clone.style.width = '794px';
-                    clone.style.maxWidth = '794px';
-                    clone.style.boxSizing = 'border-box';
-                    clone.style.padding = '40px';
-                    clone.style.margin = '0';
-                    clone.style.background = '#ffffff';
-                    clone.style.color = '#000000';
-                    clone.style.fontFamily = "'Times New Roman', Times, serif";
-                    clone.style.fontSize = '11pt';
-                    clone.style.lineHeight = '1.5';
-                    clone.style.maxHeight = 'none';
-                    clone.style.overflowY = 'visible';
-                    clone.style.height = 'auto';
-                    clone.style.zIndex = '999999';
-                    clone.style.display = 'block';
-
-                    // Save current scroll position
-                    const scrollX = window.scrollX;
-                    const scrollY = window.scrollY;
-
-                    // Hide the main page container (.container)
-                    const mainContainer = document.querySelector('.container');
-                    const originalDisplay = mainContainer.style.display;
-                    mainContainer.style.setProperty('display', 'none', 'important');
-
-                    // Append clone directly to body, and scroll to top to ensure html2canvas starts at (0,0)
-                    document.body.appendChild(clone);
-                    window.scrollTo(0, 0);
 
                     const opt = {
                         margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -1093,26 +1052,44 @@
                             logging: false, 
                             scrollY: 0,
                             scrollX: 0,
-                            windowWidth: 794
+                            windowWidth: 794,
+                            onclone: (clonedDoc) => {
+                                const box = clonedDoc.getElementById('verbatim-contract-box');
+                                if (box) {
+                                    box.style.maxHeight = 'none';
+                                    box.style.overflowY = 'visible';
+                                    box.style.height = 'auto';
+                                    box.style.padding = '40px';
+                                    box.style.margin = '0';
+                                    box.style.background = '#ffffff';
+                                    box.style.color = '#000000';
+                                    
+                                    // Show PDF-only headers and footers in the clone
+                                    box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                        el.style.display = 'block';
+                                    });
+
+                                    // Create dynamic rules section inside the clone
+                                    const rulesSection = clonedDoc.createElement('div');
+                                    rulesSection.style.pageBreakBefore = 'always';
+                                    rulesSection.style.marginTop = '0px';
+                                    rulesSection.innerHTML = `
+                                        <h2 style="text-align: center; text-transform: uppercase; margin-top: 0px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
+                                        <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; text-align: justify; color: #000;">
+                                            ${rulesContent}
+                                        </div>
+                                    `;
+                                    box.appendChild(rulesSection);
+                                }
+                            }
                         },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['css', 'legacy'] }
                     };
 
-                    let pdfData;
-                    try {
-                        // Let browser repaint
-                        await new Promise(r => requestAnimationFrame(r));
-                        pdfData = await html2pdf().from(clone).set(opt).output('datauristring');
-                    } finally {
-                        // Clean up: remove clone, restore main container display, restore scroll position
-                        document.body.removeChild(clone);
-                        mainContainer.style.display = originalDisplay;
-                        window.scrollTo(scrollX, scrollY);
-                    }
-
-                    // Clean up original verbatimBox in main DOM
-                    verbatimBox.removeChild(rulesSection);
+                    // Let browser repaint
+                    await new Promise(r => requestAnimationFrame(r));
+                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
 
                     // 4. Submit everything to backend api
                     const res = await fetch('/api/application/sign-owner', {
@@ -1144,6 +1121,82 @@
                 }
             }
         }
+
+        async function previewPDF() {
+            try {
+                // Fetch current signature from canvas and render temporarily for preview
+                const dataUrl = canvas.toDataURL();
+                document.getElementById('render-owner-sig').innerHTML = `<img src="${dataUrl}" style="max-height: 50px;" />`;
+                document.getElementById('render-owner-date').textContent = new Date().toLocaleDateString('en-NZ');
+
+                // Fetch Body Corporate Rules
+                const rulesRes = await fetch('/body-corporate-rules.html');
+                if (!rulesRes.ok) throw new Error("Could not load Body Corporate Rules");
+                const rulesHtml = await rulesRes.text();
+                
+                const parser = new DOMParser();
+                const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
+                const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
+
+                const verbatimBox = document.getElementById('verbatim-contract-box');
+
+                const opt = {
+                    margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
+                    filename:     `66_Hamilton_Road_Licence_Agreement_Preview.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        allowTaint: true, 
+                        logging: false, 
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794,
+                        onclone: (clonedDoc) => {
+                            const box = clonedDoc.getElementById('verbatim-contract-box');
+                            if (box) {
+                                box.style.maxHeight = 'none';
+                                box.style.overflowY = 'visible';
+                                box.style.height = 'auto';
+                                box.style.padding = '40px';
+                                box.style.margin = '0';
+                                box.style.background = '#ffffff';
+                                box.style.color = '#000000';
+                                
+                                // Show PDF-only headers and footers in the clone
+                                box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                    el.style.display = 'block';
+                                });
+
+                                // Create dynamic rules section inside the clone
+                                const rulesSection = clonedDoc.createElement('div');
+                                rulesSection.style.pageBreakBefore = 'always';
+                                rulesSection.style.marginTop = '0px';
+                                rulesSection.innerHTML = `
+                                    <h2 style="text-align: center; text-transform: uppercase; margin-top: 0px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
+                                    <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; text-align: justify; color: #000;">
+                                        ${rulesContent}
+                                    </div>
+                                `;
+                                box.appendChild(rulesSection);
+                            }
+                        }
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: ['css', 'legacy'] }
+                };
+
+                await html2pdf().from(verbatimBox).set(opt).save();
+            } catch (err) {
+                alert("Failed to generate preview: " + err.message);
+            } finally {
+                // Clear the preview signatures from screen
+                document.getElementById('render-owner-sig').innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Owner Signature</span>`;
+                document.getElementById('render-owner-date').textContent = '__________';
+            }
+        }
+
+
     </script>
 </body>
 </html>
