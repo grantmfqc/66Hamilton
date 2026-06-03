@@ -1021,13 +1021,9 @@
             
             if (confirm("Are you sure you want to execute and finalize this Licence to Occupy agreement?")) {
                 const verbatimBox = document.getElementById('verbatim-contract-box');
-                let rulesSection = null;
-                let pdfHeaderFooters = [];
-                const originalMaxHeight = verbatimBox.style.maxHeight;
-                const originalOverflowY = verbatimBox.style.overflowY;
-                const originalHeight = verbatimBox.style.height;
                 const scrollX = window.scrollX;
                 const scrollY = window.scrollY;
+                let clone = null;
 
                 try {
                     // Show a loading indicator
@@ -1048,20 +1044,16 @@
                     const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
                     const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
 
-                    // 3. Temporarily remove scroll limits so html2pdf can measure it correctly
-                    verbatimBox.style.maxHeight = 'none';
-                    verbatimBox.style.overflowY = 'visible';
-                    verbatimBox.style.height = 'auto';
+                    // 3. Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
+                    clone = verbatimBox.cloneNode(true);
 
-                    // 4. Scroll window to (0,0) to prevent html2canvas clipping
-                    window.scrollTo(0, 0);
+                    // Show PDF-only headers and footers in the clone
+                    clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                        el.style.display = 'block';
+                    });
 
-                    // 5. Show PDF-only headers and footers
-                    pdfHeaderFooters = verbatimBox.querySelectorAll('.pdf-only-header, .pdf-only-footer');
-                    pdfHeaderFooters.forEach(el => el.style.display = 'block');
-
-                    // 6. Create dynamic rules section for the PDF
-                    rulesSection = document.createElement('div');
+                    // Create dynamic rules section inside the clone
+                    const rulesSection = document.createElement('div');
                     rulesSection.style.pageBreakBefore = 'always';
                     rulesSection.style.marginTop = '0px';
                     rulesSection.innerHTML = `
@@ -1070,7 +1062,31 @@
                             ${rulesContent}
                         </div>
                     `;
-                    verbatimBox.appendChild(rulesSection);
+                    clone.appendChild(rulesSection);
+
+                    // Style the clone to sit at absolute top-left of body (not container) to prevent left shift
+                    clone.style.position = 'absolute';
+                    clone.style.top = '0';
+                    clone.style.left = '0';
+                    clone.style.width = '794px';
+                    clone.style.maxWidth = '794px';
+                    clone.style.boxSizing = 'border-box';
+                    clone.style.padding = '40px';
+                    clone.style.margin = '0';
+                    clone.style.background = '#ffffff';
+                    clone.style.color = '#000000';
+                    clone.style.fontFamily = "'Times New Roman', Times, serif";
+                    clone.style.fontSize = '11pt';
+                    clone.style.lineHeight = '1.5';
+                    clone.style.maxHeight = 'none';
+                    clone.style.overflowY = 'visible';
+                    clone.style.height = 'auto';
+                    clone.style.zIndex = '999999';
+                    clone.style.display = 'block';
+
+                    // 4. Append clone directly to body and scroll window to (0,0) so html2canvas starts rendering at (0,0)
+                    document.body.appendChild(clone);
+                    window.scrollTo(0, 0);
 
                     const opt = {
                         margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -1091,9 +1107,9 @@
 
                     // Let browser repaint
                     await new Promise(r => requestAnimationFrame(r));
-                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
+                    const pdfData = await html2pdf().from(clone).set(opt).output('datauristring');
 
-                    // 7. Submit everything to backend api
+                    // 5. Submit everything to backend api
                     const res = await fetch('/api/application/sign-owner', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1121,14 +1137,10 @@
                     btn.disabled = false;
                     btn.textContent = "Counter-Sign & Finalize";
                 } finally {
-                    // Restore styles and state
-                    if (rulesSection && verbatimBox.contains(rulesSection)) {
-                        verbatimBox.removeChild(rulesSection);
+                    // Restore state
+                    if (clone && document.body.contains(clone)) {
+                        document.body.removeChild(clone);
                     }
-                    pdfHeaderFooters.forEach(el => el.style.display = 'none');
-                    verbatimBox.style.maxHeight = originalMaxHeight;
-                    verbatimBox.style.overflowY = originalOverflowY;
-                    verbatimBox.style.height = originalHeight;
                     window.scrollTo(scrollX, scrollY);
                 }
             }
@@ -1136,13 +1148,9 @@
 
         async function previewPDF() {
             const verbatimBox = document.getElementById('verbatim-contract-box');
-            let rulesSection = null;
-            let pdfHeaderFooters = [];
-            const originalMaxHeight = verbatimBox.style.maxHeight;
-            const originalOverflowY = verbatimBox.style.overflowY;
-            const originalHeight = verbatimBox.style.height;
             const scrollX = window.scrollX;
             const scrollY = window.scrollY;
+            let clone = null;
 
             try {
                 // Fetch current signature from canvas and render temporarily for preview
@@ -1159,20 +1167,16 @@
                 const rulesDoc = parser.parseFromString(rulesHtml, 'text/html');
                 const rulesContent = rulesDoc.querySelector('.rules-content').innerHTML;
 
-                // Temporarily remove scroll limits so html2pdf can measure it correctly
-                verbatimBox.style.maxHeight = 'none';
-                verbatimBox.style.overflowY = 'visible';
-                verbatimBox.style.height = 'auto';
+                // Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
+                clone = verbatimBox.cloneNode(true);
 
-                // Scroll window to (0,0) to prevent html2canvas clipping
-                window.scrollTo(0, 0);
-
-                // Show PDF-only headers and footers
-                pdfHeaderFooters = verbatimBox.querySelectorAll('.pdf-only-header, .pdf-only-footer');
-                pdfHeaderFooters.forEach(el => el.style.display = 'block');
+                // Show PDF-only headers and footers in the clone
+                clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                    el.style.display = 'block';
+                });
 
                 // Create dynamic rules section inside the clone
-                rulesSection = document.createElement('div');
+                const rulesSection = document.createElement('div');
                 rulesSection.style.pageBreakBefore = 'always';
                 rulesSection.style.marginTop = '0px';
                 rulesSection.innerHTML = `
@@ -1181,7 +1185,31 @@
                         ${rulesContent}
                     </div>
                 `;
-                verbatimBox.appendChild(rulesSection);
+                clone.appendChild(rulesSection);
+
+                // Style the clone to sit at absolute top-left of body to prevent left shift
+                clone.style.position = 'absolute';
+                clone.style.top = '0';
+                clone.style.left = '0';
+                clone.style.width = '794px';
+                clone.style.maxWidth = '794px';
+                clone.style.boxSizing = 'border-box';
+                clone.style.padding = '40px';
+                clone.style.margin = '0';
+                clone.style.background = '#ffffff';
+                clone.style.color = '#000000';
+                clone.style.fontFamily = "'Times New Roman', Times, serif";
+                clone.style.fontSize = '11pt';
+                clone.style.lineHeight = '1.5';
+                clone.style.maxHeight = 'none';
+                clone.style.overflowY = 'visible';
+                clone.style.height = 'auto';
+                clone.style.zIndex = '999999';
+                clone.style.display = 'block';
+
+                // Append clone directly to body and scroll window to (0,0) so html2canvas starts at (0,0)
+                document.body.appendChild(clone);
+                window.scrollTo(0, 0);
 
                 const opt = {
                     margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -1202,18 +1230,14 @@
 
                 // Let browser repaint
                 await new Promise(r => requestAnimationFrame(r));
-                await html2pdf().from(verbatimBox).set(opt).save();
+                await html2pdf().from(clone).set(opt).save();
             } catch (err) {
                 alert("Failed to generate preview: " + err.message);
             } finally {
-                // Restore styles and state
-                if (rulesSection && verbatimBox.contains(rulesSection)) {
-                    verbatimBox.removeChild(rulesSection);
+                // Restore state
+                if (clone && document.body.contains(clone)) {
+                    document.body.removeChild(clone);
                 }
-                pdfHeaderFooters.forEach(el => el.style.display = 'none');
-                verbatimBox.style.maxHeight = originalMaxHeight;
-                verbatimBox.style.overflowY = originalOverflowY;
-                verbatimBox.style.height = originalHeight;
                 window.scrollTo(scrollX, scrollY);
 
                 // Clear the preview signatures from screen

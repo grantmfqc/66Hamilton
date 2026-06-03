@@ -2873,25 +2873,42 @@
             }
 
             const verbatimBox = document.getElementById('verbatim-contract-box');
-            let pdfHeaderFooters = [];
-            const originalMaxHeight = verbatimBox.style.maxHeight;
-            const originalOverflowY = verbatimBox.style.overflowY;
-            const originalHeight = verbatimBox.style.height;
             const scrollX = window.scrollX;
             const scrollY = window.scrollY;
+            let clone = null;
 
             try {
-                // Temporarily remove scroll limits so html2pdf can measure it correctly
-                verbatimBox.style.maxHeight = 'none';
-                verbatimBox.style.overflowY = 'visible';
-                verbatimBox.style.height = 'auto';
+                // 1. Clone verbatimBox to isolate it and position absolutely at (0,0) to prevent offsets/shifts
+                clone = verbatimBox.cloneNode(true);
 
-                // Scroll window to (0,0) to prevent html2canvas clipping
+                // Show PDF-only headers and footers in the clone
+                clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                    el.style.display = 'block';
+                });
+
+                // Style the clone to sit at absolute top-left of body (not container) to prevent left shift
+                clone.style.position = 'absolute';
+                clone.style.top = '0';
+                clone.style.left = '0';
+                clone.style.width = '794px';
+                clone.style.maxWidth = '794px';
+                clone.style.boxSizing = 'border-box';
+                clone.style.padding = '40px';
+                clone.style.margin = '0';
+                clone.style.background = '#ffffff';
+                clone.style.color = '#000000';
+                clone.style.fontFamily = "'Times New Roman', Times, serif";
+                clone.style.fontSize = '11pt';
+                clone.style.lineHeight = '1.5';
+                clone.style.maxHeight = 'none';
+                clone.style.overflowY = 'visible';
+                clone.style.height = 'auto';
+                clone.style.zIndex = '999999';
+                clone.style.display = 'block';
+
+                // 2. Append clone directly to body and scroll window to (0,0) so html2canvas starts rendering at (0,0)
+                document.body.appendChild(clone);
                 window.scrollTo(0, 0);
-
-                // Show PDF-only headers and footers
-                pdfHeaderFooters = verbatimBox.querySelectorAll('.pdf-only-header, .pdf-only-footer');
-                pdfHeaderFooters.forEach(el => el.style.display = 'block');
 
                 const opt = {
                     margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
@@ -2912,13 +2929,12 @@
 
                 // Let browser repaint
                 await new Promise(r => requestAnimationFrame(r));
-                await html2pdf().from(verbatimBox).set(opt).save();
+                await html2pdf().from(clone).set(opt).save();
             } finally {
-                // Restore styles and state
-                pdfHeaderFooters.forEach(el => el.style.display = 'none');
-                verbatimBox.style.maxHeight = originalMaxHeight;
-                verbatimBox.style.overflowY = originalOverflowY;
-                verbatimBox.style.height = originalHeight;
+                // Restore state
+                if (clone && document.body.contains(clone)) {
+                    document.body.removeChild(clone);
+                }
                 window.scrollTo(scrollX, scrollY);
             }
         }
