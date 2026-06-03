@@ -55,6 +55,16 @@ export async function onRequestPost(context) {
           }
         }
       }
+
+      // Fallback: check portal_access_emails (manually granted access, e.g. additional occupants)
+      if (!role) {
+        const portalRaw = await kv.get('portal_access_emails');
+        const portalEmails = portalRaw ? JSON.parse(portalRaw) : [];
+        if (portalEmails.includes(email)) {
+          role = 'tenant';
+          tokenId = null; // no specific application — portal access only
+        }
+      }
     }
 
     // 4. Save Cooldown & IP Rates (Independent of whether email is registered, to prevent abuse)

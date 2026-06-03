@@ -490,8 +490,11 @@ async function handleVerifyOTP(e) {
       closeLoginModal();
       if (data.role === 'admin') {
         window.location.href = 'admin.html';
-      } else {
+      } else if (data.tokenId) {
         window.location.href = `apply.html?token=${data.tokenId}`;
+      } else {
+        // Portal-access-only user (manually added, no specific application)
+        window.location.href = 'index.html';
       }
     }, 1500);
 

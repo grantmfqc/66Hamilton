@@ -1094,7 +1094,11 @@
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error);
 
-                    alert("Agreement successfully executed and finalized! Redirecting to admin panel.");
+                    let successMsg = "Agreement successfully executed and finalized! Redirecting to admin panel.";
+                    if (data.emailErrors && data.emailErrors.length) {
+                        successMsg += "\n\n⚠️ Email warnings:\n" + data.emailErrors.join('\n');
+                    }
+                    alert(successMsg);
                     window.location.href = '/admin.html';
                 } catch (err) {
                     alert('Error saving counter-signature: ' + err.message);

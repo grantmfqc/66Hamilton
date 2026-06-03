@@ -984,7 +984,11 @@
                 if (!res.ok) throw new Error(data.error || 'Failed to add');
                 input.value = '';
                 renderPortalAccessList(data.emails || []);
-                showToast('Email added to portal access.');
+                if (data.warning) {
+                    showToast('⚠️ ' + data.warning);
+                } else {
+                    showToast('Email added — welcome email sent.');
+                }
             } catch (err) {
                 showToast('Error: ' + err.message);
             }
