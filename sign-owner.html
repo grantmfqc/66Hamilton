@@ -1032,10 +1032,11 @@
                     `;
                     verbatimBox.appendChild(rulesSection);
 
-                    // 3. Clone verbatimBox and render it free of all parent layout constraints
-                    // The original element sits inside .card (padding:40px) inside .container (max-width:800px)
-                    // inside body (padding:40px 20px) — this chain constrains the effective render width
-                    // to ~674px even when we set width:794px inline. Cloning to body root fixes this.
+                    // 3. Clone verbatimBox and render it free of all parent layout constraints.
+                    // KEY: position:fixed at left:-9999px causes html2canvas to capture at the
+                    // off-screen viewport coordinate → blank canvas. Instead use position:absolute
+                    // at top:0,left:0 so the clone is in document flow at origin (behind page content)
+                    // and html2canvas captures its content correctly.
                     const clone = verbatimBox.cloneNode(true);
 
                     // Show PDF-only header/footer in clone
@@ -1043,10 +1044,11 @@
                         el.style.display = 'block';
                     });
 
-                    // Position clone off-screen, directly on body, fully independent
-                    clone.style.position   = 'fixed';
-                    clone.style.left       = '-9999px';
+                    // Place clone at body origin, behind all page content
+                    clone.style.position   = 'absolute';
                     clone.style.top        = '0';
+                    clone.style.left       = '0';
+                    clone.style.zIndex     = '-9999';
                     clone.style.width      = '794px';
                     clone.style.boxSizing  = 'border-box';
                     clone.style.padding    = '40px';
@@ -1065,7 +1067,7 @@
                         margin:       0,
                         filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0 },
+                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, windowWidth: 794 },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
                     };

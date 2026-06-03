@@ -2873,8 +2873,9 @@
             }
 
             // Clone the contract element and render it free of all parent layout constraints.
-            // Rendering in-place inside .card (padding:40px) + .container (max-width) squeezes
-            // the effective render width to ~674px regardless of the inline width:794px we set.
+            // KEY: position:fixed at left:-9999px causes html2canvas to capture at the off-screen
+            // viewport coordinate → blank canvas. Use position:absolute at top:0,left:0 so the clone
+            // is in document flow at origin (behind page content) and renders correctly.
             const clone = element.cloneNode(true);
 
             // Show PDF-only header/footer in the clone
@@ -2882,10 +2883,11 @@
                 el.style.display = 'block';
             });
 
-            // Attach clone directly to body, off-screen, fully independent of parent layout
-            clone.style.position   = 'fixed';
-            clone.style.left       = '-9999px';
+            // Place clone at body origin, behind all page content
+            clone.style.position   = 'absolute';
             clone.style.top        = '0';
+            clone.style.left       = '0';
+            clone.style.zIndex     = '-9999';
             clone.style.width      = '794px';
             clone.style.boxSizing  = 'border-box';
             clone.style.padding    = '40px';
@@ -2904,7 +2906,7 @@
                 margin:       0,
                 filename:     isSigned ? `66_Hamilton_Road_Tenancy_Agreement.pdf` : `66_Hamilton_Road_Tenancy_Agreement_Draft.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0 },
+                html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, windowWidth: 794 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
             };
