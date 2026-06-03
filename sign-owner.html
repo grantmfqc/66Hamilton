@@ -1032,53 +1032,52 @@
                     `;
                     verbatimBox.appendChild(rulesSection);
 
-                    // 3. Temporarily update styling of contract container for clean PDF output
-                    const originalWidth = verbatimBox.style.width;
-                    const originalBoxSizing = verbatimBox.style.boxSizing;
-                    const originalMaxHeight = verbatimBox.style.maxHeight;
-                    const originalOverflowY = verbatimBox.style.overflowY;
-                    const originalBorder = verbatimBox.style.border;
-                    const originalPadding = verbatimBox.style.padding;
-                    const originalScrollTop = verbatimBox.scrollTop;
-                    
-                    // Reset scroll position to top to prevent html2canvas offset rendering bug
-                    verbatimBox.scrollTop = 0;
-                    
-                    verbatimBox.style.width = '794px';
-                    verbatimBox.style.boxSizing = 'border-box';
-                    verbatimBox.style.maxHeight = 'none';
-                    verbatimBox.style.overflowY = 'visible';
-                    verbatimBox.style.border = 'none';
-                    verbatimBox.style.padding = '40px 40px 40px 40px';
+                    // 3. Clone verbatimBox and render it free of all parent layout constraints
+                    // The original element sits inside .card (padding:40px) inside .container (max-width:800px)
+                    // inside body (padding:40px 20px) — this chain constrains the effective render width
+                    // to ~674px even when we set width:794px inline. Cloning to body root fixes this.
+                    const clone = verbatimBox.cloneNode(true);
 
-                    const pdfHeader = verbatimBox.querySelector('.pdf-only-header');
-                    const pdfFooter = verbatimBox.querySelector('.pdf-only-footer');
-                    if (pdfHeader) pdfHeader.style.display = 'block';
-                    if (pdfFooter) pdfFooter.style.display = 'block';
+                    // Show PDF-only header/footer in clone
+                    clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                        el.style.display = 'block';
+                    });
+
+                    // Position clone off-screen, directly on body, fully independent
+                    clone.style.position   = 'fixed';
+                    clone.style.left       = '-9999px';
+                    clone.style.top        = '0';
+                    clone.style.width      = '794px';
+                    clone.style.boxSizing  = 'border-box';
+                    clone.style.padding    = '40px';
+                    clone.style.margin     = '0';
+                    clone.style.maxHeight  = 'none';
+                    clone.style.overflowY  = 'visible';
+                    clone.style.border     = 'none';
+                    clone.style.background = '#ffffff';
+                    clone.style.color      = '#000000';
+                    clone.style.fontFamily = "'Times New Roman', Times, serif";
+                    clone.style.fontSize   = '11pt';
+                    clone.style.lineHeight = '1.5';
+                    document.body.appendChild(clone);
 
                     const opt = {
                         margin:       0,
                         filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, windowWidth: 794, width: 794 },
+                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0 },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
                     };
 
-                    // Generate raw base64 string from html2pdf
-                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
+                    // Generate raw base64 string from html2pdf using the isolated clone
+                    const pdfData = await html2pdf().from(clone).set(opt).output('datauristring');
 
-                    // Restore original container styling and remove appended rules from UI
-                    verbatimBox.style.width = originalWidth;
-                    verbatimBox.style.boxSizing = originalBoxSizing;
-                    verbatimBox.style.maxHeight = originalMaxHeight;
-                    verbatimBox.style.overflowY = originalOverflowY;
-                    verbatimBox.style.border = originalBorder;
-                    verbatimBox.style.padding = originalPadding;
-                    if (pdfHeader) pdfHeader.style.display = 'none';
-                    if (pdfFooter) pdfFooter.style.display = 'none';
+                    // Remove clone — original verbatimBox is untouched
+                    document.body.removeChild(clone);
+
+                    // Clean up: remove rules section from original verbatimBox
                     verbatimBox.removeChild(rulesSection);
-                    verbatimBox.scrollTop = originalScrollTop;
 
                     // 4. Submit everything to backend api
                     const res = await fetch('/api/application/sign-owner', {
