@@ -2842,7 +2842,7 @@
             downloadPDF(false);
         }
 
-        function downloadPDF(isSigned) {
+        async function downloadPDF(isSigned) {
             // If it is the signed contract and we already have the finalized PDF stored on the backend, download it directly!
             if (isSigned && applicationData && applicationData.signedPdfData) {
                 const link = document.createElement('a');
@@ -2872,10 +2872,9 @@
                 document.getElementById('render-tenant-date').textContent = '__________';
             }
 
-            // Clone the contract element and render it free of all parent layout constraints.
-            // KEY: position:fixed at left:-9999px causes html2canvas to capture at the off-screen
-            // viewport coordinate → blank canvas. Use position:absolute at top:0,left:0 so the clone
-            // is in document flow at origin (behind page content) and renders correctly.
+            // Clone contract box and render at FIXED VIEWPORT ORIGIN (position:fixed top:0 left:0 z-index:99999)
+            // so html2canvas always captures it at a valid viewport coordinate regardless of scroll.
+            const element = document.getElementById('verbatim-contract-box');
             const clone = element.cloneNode(true);
 
             // Show PDF-only header/footer in the clone
@@ -2917,9 +2916,8 @@
             };
 
             // Generate and save PDF from the isolated clone
-            html2pdf().from(clone).set(opt).save().then(() => {
-                document.body.removeChild(clone);
-            });
+            await html2pdf().from(clone).set(opt).save();
+            document.body.removeChild(clone);
         }
 
         function showToast(msg) {
