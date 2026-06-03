@@ -1435,7 +1435,7 @@
                 
                 const link = document.createElement('a');
                 link.href = app.signedPdfData;
-                link.download = `${(app.tenantDetails.name || 'Tenant').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Tenancy_Agreement.pdf`;
+                link.download = `${(app.tenantDetails.name || 'Tenant').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_Licence_Agreement.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

@@ -178,6 +178,17 @@
         .contract-box ol { margin: 10px 0 15px 25px; }
         .contract-box li { margin-bottom: 8px; }
 
+        /* PDF Printing page-breaks */
+        .contract-box p, .contract-box li, .contract-box tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .contract-box h1, .contract-box h2, .contract-box h3, .contract-box h4 {
+            page-break-inside: avoid;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
         /* --- Signature Pad --- */
         .sig-container {
             border: 1px solid rgba(201, 169, 110, 0.3);
@@ -1032,55 +1043,61 @@
                     `;
                     verbatimBox.appendChild(rulesSection);
 
-                    // 3. Clone verbatimBox and render at VIEWPORT ORIGIN (position:fixed top:0 left:0)
-                    // WHY FIXED: position:absolute top:0 fails if the admin is scrolled down — the element
-                    // is at document y=0 which is ABOVE the viewport, giving getBoundingClientRect().top < 0
-                    // → html2canvas captures nothing (blank). A position:fixed element is ALWAYS at viewport
-                    // coordinate (0,0) regardless of scroll. High z-index ensures it renders visibly so
-                    // html2canvas captures it correctly. Brief flash is acceptable for an admin action.
-                    const clone = verbatimBox.cloneNode(true);
-
-                    // Show PDF-only header/footer in clone
-                    clone.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                        el.style.display = 'block';
-                    });
-
-                    // Fixed at viewport origin, on top of everything — html2canvas needs visible coords
-                    clone.style.position   = 'fixed';
-                    clone.style.top        = '0';
-                    clone.style.left       = '0';
-                    clone.style.zIndex     = '99999';
-                    clone.style.width      = '794px';
-                    clone.style.boxSizing  = 'border-box';
-                    clone.style.padding    = '40px';
-                    clone.style.margin     = '0';
-                    clone.style.maxHeight  = 'none';
-                    clone.style.overflowY  = 'visible';
-                    clone.style.border     = 'none';
-                    clone.style.background = '#ffffff';
-                    clone.style.color      = '#000000';
-                    clone.style.fontFamily = "'Times New Roman', Times, serif";
-                    clone.style.fontSize   = '11pt';
-                    clone.style.lineHeight = '1.5';
-                    document.body.appendChild(clone);
-
-                    // Let browser paint the clone before html2canvas captures it
-                    await new Promise(r => requestAnimationFrame(r));
-
+                    // 3. Generate PDF using html2pdf's built-in cloning and onclone styling
                     const opt = {
-                        margin:       0,
-                        filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
+                        margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
+                        filename:     `66_Hamilton_Road_Licence_Agreement.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0 },
+                        html2canvas:  { 
+                            scale: 2, 
+                            useCORS: true, 
+                            allowTaint: true, 
+                            logging: false, 
+                            scrollY: 0,
+                            scrollX: 0,
+                            windowWidth: 794, // Standard A4 logical width
+                            onclone: (clonedDoc) => {
+                                const clonedBox = clonedDoc.getElementById('verbatim-contract-box');
+                                if (clonedBox) {
+                                    // Remove scroll/height limits and fit A4 width
+                                    clonedBox.style.maxHeight = 'none';
+                                    clonedBox.style.overflowY = 'visible';
+                                    clonedBox.style.height = 'auto';
+                                    clonedBox.style.width = '794px';
+                                    clonedBox.style.boxSizing = 'border-box';
+                                    clonedBox.style.padding = '40px';
+                                    clonedBox.style.margin = '0 auto';
+                                    clonedBox.style.border = 'none';
+                                    clonedBox.style.background = '#ffffff';
+                                    clonedBox.style.color = '#000000';
+                                    clonedBox.style.fontFamily = "'Times New Roman', Times, serif";
+                                    clonedBox.style.fontSize = '11pt';
+                                    clonedBox.style.lineHeight = '1.5';
+
+                                    // Force all text colors to black and backgrounds to transparent/white
+                                    clonedBox.querySelectorAll('*').forEach(el => {
+                                        el.style.color = '#000000';
+                                        if (el.tagName !== 'TH' && el.tagName !== 'TD') {
+                                            el.style.background = 'transparent';
+                                        }
+                                    });
+
+                                    // Show PDF-only headers and footers
+                                    clonedBox.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
+                                        el.style.display = 'block';
+                                    });
+
+                                    // Isolate the element to avoid any outer container clipping issues
+                                    clonedDoc.body.innerHTML = '';
+                                    clonedDoc.body.appendChild(clonedBox);
+                                }
+                            }
+                        },
                         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                         pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
                     };
 
-                    // Generate raw base64 string from html2pdf using the isolated clone
-                    const pdfData = await html2pdf().from(clone).set(opt).output('datauristring');
-
-                    // Remove clone — original verbatimBox is untouched
-                    document.body.removeChild(clone);
+                    const pdfData = await html2pdf().from(verbatimBox).set(opt).output('datauristring');
 
                     // Clean up: remove rules section from original verbatimBox
                     verbatimBox.removeChild(rulesSection);

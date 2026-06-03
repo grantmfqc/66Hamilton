@@ -73,9 +73,12 @@ export async function onRequestPost(context) {
       if (pdfData) {
         emailAttachments.push({
           content: pdfData.split(';base64,').pop(),
-          filename: '66_Hamilton_Road_Tenancy_Agreement.pdf'
+          filename: '66_Hamilton_Road_Licence_Agreement.pdf'
         });
       }
+
+      // Respect Resend's 2 requests/sec limit by waiting 2 seconds before the first email
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // --- Email 1: Tenant (billing email only) ---
       const tenantEmail = app.tenantDetails?.email?.trim().toLowerCase();
@@ -122,8 +125,8 @@ export async function onRequestPost(context) {
         }
       }
 
-      // 700ms pause — respect Resend's 2 requests/sec rate limit
-      await new Promise(resolve => setTimeout(resolve, 700));
+      // 2000ms pause — respect Resend's 2 requests/sec rate limit
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // --- Email 2: Admin/Owner ---
       const resOwner = await fetch('https://api.resend.com/emails', {
