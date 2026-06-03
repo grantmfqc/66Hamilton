@@ -387,27 +387,41 @@
             display: flex;
             border-bottom: 1px solid var(--border);
             margin-bottom: 30px;
-            overflow-x: auto;
+            overflow: visible;
+            flex-wrap: nowrap;
+            justify-content: space-between;
         }
 
         .portal-tab {
-            padding: 12px 20px;
+            flex: 1 1 0px;
+            text-align: center;
+            padding: 12px 2px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-family: 'Outfit', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all 0.3s;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .portal-tab.active {
             color: var(--accent-gold);
             border-bottom-color: var(--accent-gold);
+        }
+
+        @media (min-width: 600px) {
+            .portal-tab {
+                padding: 12px 15px;
+                font-size: 0.82rem;
+                letter-spacing: 1.5px;
+            }
         }
 
         .portal-panel {
@@ -992,7 +1006,9 @@
         </div>
 
         <!-- STAGE 3: Completed Tenant Portal -->
-        <div id="stage-portal" class="card" style="display: none;">
+        <div id="stage-portal" class="card" style="display: none; position: relative;">
+            <!-- Logout Button -->
+            <button onclick="handleLogout()" class="btn btn-outline no-print" style="position: absolute; top: 15px; right: 15px; padding: 6px 12px; font-size: 0.75rem; border-color: rgba(229, 115, 115, 0.4); color: #e57373; z-index: 100;">Logout</button>
             <!-- Special Pending State View for Step 3 (Politely confirming that the portal will unlock after admin countersigns & payment clears) -->
             <div id="portal-pending-approval-view" style="display: none; padding: 40px 20px; text-align: center; background: rgba(201, 169, 110, 0.03); border: 1px solid var(--accent-gold); border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); margin-bottom: 20px;">
                 <div style="font-size: 3.5rem; margin-bottom: 20px; color: var(--accent-gold); line-height: 1;">✍</div>
@@ -1023,10 +1039,11 @@
 
             <div class="portal-header">
                 <button class="portal-tab active" onclick="switchPortalTab('manual', this)">House Manual</button>
-                <button class="portal-tab" onclick="switchPortalTab('wifi', this)">Wi-Fi Connection</button>
+                <button class="portal-tab" onclick="switchPortalTab('wifi', this)">Wi-Fi</button>
                 <button class="portal-tab" onclick="switchPortalTab('maintenance', this)">Maintenance</button>
-                <button class="portal-tab" onclick="switchPortalTab('schedule', this)">Payments Schedule</button>
-                <button class="portal-tab" onclick="switchPortalTab('reviews', this)">Leave Review</button>
+                <button class="portal-tab" onclick="switchPortalTab('schedule', this)">Payments</button>
+                <button class="portal-tab" onclick="switchPortalTab('reviews', this)">Feedback</button>
+                <button class="portal-tab" onclick="switchPortalTab('contact', this)">Contact</button>
             </div>
 
             <!-- TAB PANEL: Manual -->
@@ -1253,6 +1270,20 @@
                     <!-- Dynamic Calculated Schedule of Payments Table will be populated here -->
                 </div>
             </div>
+
+            <!-- TAB PANEL: Contact -->
+            <div id="portal-panel-contact" class="portal-panel">
+                <h2>Contact details</h2>
+                <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">For any urgent inquiries, maintenance escalations, or lease questions, please contact the property management team directly.</p>
+                
+                <div class="info-banner" style="margin-top: 10px; margin-bottom: 30px;">
+                    <h3 style="color: var(--accent-gold); font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: normal; margin-bottom: 8px; border: none; padding: 0;">Direct Email Contact</h3>
+                    <p style="font-size: 1.1rem; font-family: monospace; font-weight: bold; margin-bottom: 12px; margin-top: 10px;">
+                        <a href="mailto:grant@orcacom.co.nz" style="color: var(--accent-gold); text-decoration: none;">grant@orcacom.co.nz</a>
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Please include your name and apartment number in all communications.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1370,6 +1401,22 @@
                 goToStage(3);
             } else if (applicationData.status === 'completed') {
                 // Fully finalized portal! Unlocks House manual, wifi, and feedback logs
+                const sessionEmail = localStorage.getItem('session_email');
+                const tenantEmail = applicationData.tenantDetails?.email;
+                const occupantEmail = applicationData.tenantDetails?.primaryOccupantEmail;
+                
+                const isAuthorized = sessionEmail && (
+                    sessionEmail.trim().toLowerCase() === tenantEmail?.trim().toLowerCase() ||
+                    sessionEmail.trim().toLowerCase() === occupantEmail?.trim().toLowerCase() ||
+                    localStorage.getItem('session_role') === 'admin'
+                );
+
+                if (!isAuthorized) {
+                    const prepopulateEmail = tenantEmail || '';
+                    window.location.href = `/index.html?login=1&email=${encodeURIComponent(prepopulateEmail)}`;
+                    return;
+                }
+
                 goToStage(3);
                 populatePortalWelcome();
             }
@@ -2816,6 +2863,15 @@
 
         function downloadUnsignedPDF() {
             window.open(`/view-agreement.html?token=${token}&draft=1`, '_blank');
+        }
+
+        function handleLogout() {
+            if (confirm("Are you sure you want to log out of your Resident Portal?")) {
+                localStorage.removeItem('session_token');
+                localStorage.removeItem('session_role');
+                localStorage.removeItem('session_email');
+                window.location.href = 'index.html?login=1';
+            }
         }
 
         function showToast(msg) {

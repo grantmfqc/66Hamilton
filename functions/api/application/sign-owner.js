@@ -94,9 +94,7 @@ export async function onRequestPost(context) {
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Your Licence to Occupy agreement for 66 Hamilton Road has been fully executed by both parties.</p>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">You can view, download, or print a copy of your executed agreement at any time by clicking the button below:</p>
                 <div style="text-align:center;margin:35px 0;">
-                  <a href="${new URL(context.request.url).origin}/view-agreement.html?token=${token}" style="background-color:#c9a96e;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;letter-spacing:1px;margin-bottom:15px;">VIEW EXECUTED AGREEMENT</a>
-                  <br/><br/>
-                  <a href="${loginUrl}" style="color:#c9a96e;text-decoration:underline;font-size:14px;">Log in to Resident Portal</a>
+                  <a href="${new URL(context.request.url).origin}/index.html?login=1&email=${encodeURIComponent(tenantEmail)}" style="background-color:#c9a96e;color:#000000;font-weight:bold;padding:14px 28px;text-decoration:none;border-radius:4px;display:inline-block;letter-spacing:1px;">VIEW EXECUTED AGREEMENT</a>
                 </div>
                 <p style="font-size:15px;line-height:1.6;color:#d0d0d5;">Once logged in you can access:</p>
                 <ul style="color:#a0a0a5;line-height:1.8;font-size:14px;padding-left:20px;">

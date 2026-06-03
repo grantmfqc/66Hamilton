@@ -646,6 +646,25 @@
 
             // Watermark & Banner for Draft
             const isCompleted = applicationData.status === 'completed';
+
+            if (isCompleted && !isPreviewParam) {
+                // Verify session
+                const sessionEmail = localStorage.getItem('session_email');
+                const sessionRole = localStorage.getItem('session_role');
+                const tenantEmail = td.email;
+                const occupantEmail = td.primaryOccupantEmail;
+
+                const isAuthorized = sessionRole === 'admin' || (sessionEmail && (
+                    sessionEmail.trim().toLowerCase() === tenantEmail?.trim().toLowerCase() ||
+                    sessionEmail.trim().toLowerCase() === occupantEmail?.trim().toLowerCase()
+                ));
+
+                if (!isAuthorized) {
+                    window.location.href = `/index.html?login=1&email=${encodeURIComponent(tenantEmail || '')}`;
+                    return;
+                }
+            }
+
             const showDraft = isDraftParam || isPreviewParam || !isCompleted;
 
             if (showDraft) {

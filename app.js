@@ -132,6 +132,13 @@ function init() {
   // Auto-trigger login modal if login=1 query parameter is present (e.g. redirected from session timeout)
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('login')) {
+    const emailParam = urlParams.get('email');
+    if (emailParam) {
+      const emailInput = document.getElementById('login-email-input');
+      if (emailInput) {
+        emailInput.value = emailParam;
+      }
+    }
     setTimeout(() => { openLoginModal(); }, 300);
   }
 
