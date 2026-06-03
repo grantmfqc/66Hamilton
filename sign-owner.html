@@ -1060,8 +1060,9 @@
                         margin:       0,
                         filename:     `66_Hamilton_Road_Tenancy_Agreement.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, logging: false, scrollY: 0, windowWidth: 794, width: 794 },
-                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        html2canvas:  { scale: 2, useCORS: true, allowTaint: true, logging: false, scrollY: 0, windowWidth: 794, width: 794 },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
                     };
 
                     // Generate raw base64 string from html2pdf

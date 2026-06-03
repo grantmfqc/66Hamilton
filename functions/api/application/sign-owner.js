@@ -41,7 +41,24 @@ export async function onRequestPost(context) {
 
     await kv.put(`application:${token}`, JSON.stringify(app));
 
-
+    // 3. Auto-register tenant emails in portal_access_emails
+    try {
+      const portalKey = 'portal_access_emails';
+      const rawPortal = await kv.get(portalKey);
+      const portalEmails = rawPortal ? JSON.parse(rawPortal) : [];
+      const toAdd = [
+        app.tenantDetails?.email?.trim().toLowerCase(),
+        app.tenantDetails?.primaryOccupantEmail?.trim().toLowerCase()
+      ].filter(e => e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+      for (const email of toAdd) {
+        if (!portalEmails.includes(email)) {
+          portalEmails.push(email);
+        }
+      }
+      await kv.put(portalKey, JSON.stringify(portalEmails));
+    } catch (portalErr) {
+      console.error('Failed to update portal_access_emails:', portalErr);
+    }
 
     // 4. Send confirmation emails to both Tenant and Owner
     if (context.env.RESEND_API_KEY) {

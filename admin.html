@@ -493,6 +493,7 @@
                     <button class="tab-btn" onclick="switchTab('manual')">House Manual</button>
                     <button class="tab-btn" onclick="switchTab('maintenance')">Maintenance</button>
                     <button class="tab-btn" onclick="switchTab('reviews')">Reviews</button>
+                    <button class="tab-btn" onclick="switchTab('portal-access')">Portal Access</button>
                 </div>
 
                 <!-- TAB: Applications -->
@@ -685,6 +686,28 @@
                         <h2>Tenant Feedback & Reviews</h2>
                         <div id="reviews-list">
                             <p style="color: var(--text-muted);">No reviews submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Portal Access -->
+                <div id="tab-portal-access" class="tab-content">
+                    <div class="card">
+                        <h2>Portal Access Management</h2>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">Manage which email addresses can log into the Resident Portal via OTP. Tenant emails are added automatically when a contract is countersigned.</p>
+
+                        <!-- Add Email Form -->
+                        <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+                                <label for="portal-email-input" style="font-size: 0.75rem;">Email Address</label>
+                                <input type="email" id="portal-email-input" placeholder="name@example.com" style="padding: 10px 14px; font-size: 0.9rem;" />
+                            </div>
+                            <button class="btn-primary" onclick="addPortalEmail()" style="padding: 10px 20px; font-size: 0.85rem; white-space: nowrap;">+ Add Email</button>
+                        </div>
+
+                        <!-- Email List -->
+                        <div id="portal-access-list">
+                            <p style="color: var(--text-muted);">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -892,6 +915,96 @@
             // Set active button
             event.target.classList.add('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Load Portal Access list on demand
+            if (tabName === 'portal-access') {
+                loadPortalAccess();
+            }
+        }
+
+        async function loadPortalAccess() {
+            const listEl = document.getElementById('portal-access-list');
+            if (!listEl) return;
+            listEl.innerHTML = '<p style="color: var(--text-muted);">Loading...</p>';
+            try {
+                const res = await fetchAdmin('/api/admin/portal-access');
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to load');
+                renderPortalAccessList(data.emails || []);
+            } catch (err) {
+                listEl.innerHTML = `<p style="color: var(--error);">Error: ${err.message}</p>`;
+            }
+        }
+
+        function renderPortalAccessList(emails) {
+            const listEl = document.getElementById('portal-access-list');
+            if (!emails.length) {
+                listEl.innerHTML = '<p style="color: var(--text-muted); font-style: italic;">No portal access emails configured yet.</p>';
+                return;
+            }
+            listEl.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <th style="text-align: left; padding: 8px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: normal;">#</th>
+                            <th style="text-align: left; padding: 8px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: normal;">Email Address</th>
+                            <th style="text-align: right; padding: 8px 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: normal;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${emails.map((email, i) => `
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.2s;" onmouseover="this.style.background='rgba(201,169,110,0.04)'" onmouseout="this.style.background=''">
+                                <td style="padding: 12px 12px; font-size: 0.85rem; color: var(--text-muted);">${i + 1}</td>
+                                <td style="padding: 12px 12px; font-size: 0.9rem; font-family: monospace; color: var(--text-primary);">${escapeHTML(email)}</td>
+                                <td style="padding: 12px 12px; text-align: right;">
+                                    <a href="#" onclick="removePortalEmail('${escapeHTML(email)}'); return false;" style="color: #ff6b6b; font-size: 0.8rem; text-decoration: none; border: 1px solid rgba(255,107,107,0.3); padding: 4px 10px; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,107,107,0.1)'" onmouseout="this.style.background=''">Remove</a>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">${emails.length} email${emails.length !== 1 ? 's' : ''} with portal access.</p>
+            `;
+        }
+
+        async function addPortalEmail() {
+            const input = document.getElementById('portal-email-input');
+            const email = (input?.value || '').trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showToast('Please enter a valid email address.');
+                return;
+            }
+            try {
+                const res = await fetchAdmin('/api/admin/portal-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'add', email })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to add');
+                input.value = '';
+                renderPortalAccessList(data.emails || []);
+                showToast('Email added to portal access.');
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
+        }
+
+        async function removePortalEmail(email) {
+            if (!confirm(`Remove portal access for ${email}?`)) return;
+            try {
+                const res = await fetchAdmin('/api/admin/portal-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'remove', email })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to remove');
+                renderPortalAccessList(data.emails || []);
+                showToast('Email removed from portal access.');
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
         }
 
         async function loadDashboardData() {
