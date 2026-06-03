@@ -2872,43 +2872,55 @@
                 document.getElementById('render-tenant-date').textContent = '__________';
             }
 
-            const element = document.getElementById('verbatim-contract-box');
+            const verbatimBox = document.getElementById('verbatim-contract-box');
+            let pdfHeaderFooters = [];
+            const originalMaxHeight = verbatimBox.style.maxHeight;
+            const originalOverflowY = verbatimBox.style.overflowY;
+            const originalHeight = verbatimBox.style.height;
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
 
-            const opt = {
-                margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
-                filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: true, 
-                    logging: false, 
-                    scrollY: 0,
-                    scrollX: 0,
-                    windowWidth: 794,
-                    onclone: (clonedDoc) => {
-                        const box = clonedDoc.getElementById('verbatim-contract-box');
-                        if (box) {
-                            box.style.maxHeight = 'none';
-                            box.style.overflowY = 'visible';
-                            box.style.height = 'auto';
-                            box.style.padding = '40px';
-                            box.style.margin = '0';
-                            box.style.background = '#ffffff';
-                            box.style.color = '#000000';
-                            
-                            // Show PDF-only headers and footers in the clone
-                            box.querySelectorAll('.pdf-only-header, .pdf-only-footer').forEach(el => {
-                                el.style.display = 'block';
-                            });
-                        }
-                    }
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'] }
-            };
+            try {
+                // Temporarily remove scroll limits so html2pdf can measure it correctly
+                verbatimBox.style.maxHeight = 'none';
+                verbatimBox.style.overflowY = 'visible';
+                verbatimBox.style.height = 'auto';
 
-            await html2pdf().from(element).set(opt).save();
+                // Scroll window to (0,0) to prevent html2canvas clipping
+                window.scrollTo(0, 0);
+
+                // Show PDF-only headers and footers
+                pdfHeaderFooters = verbatimBox.querySelectorAll('.pdf-only-header, .pdf-only-footer');
+                pdfHeaderFooters.forEach(el => el.style.display = 'block');
+
+                const opt = {
+                    margin:       [10, 10, 10, 10], // Margins to prevent cutting off text near edges
+                    filename:     isSigned ? `66_Hamilton_Road_Licence_Agreement.pdf` : `66_Hamilton_Road_Licence_Agreement_Draft.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        allowTaint: true, 
+                        logging: false, 
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 794
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: ['css', 'legacy'] }
+                };
+
+                // Let browser repaint
+                await new Promise(r => requestAnimationFrame(r));
+                await html2pdf().from(verbatimBox).set(opt).save();
+            } finally {
+                // Restore styles and state
+                pdfHeaderFooters.forEach(el => el.style.display = 'none');
+                verbatimBox.style.maxHeight = originalMaxHeight;
+                verbatimBox.style.overflowY = originalOverflowY;
+                verbatimBox.style.height = originalHeight;
+                window.scrollTo(scrollX, scrollY);
+            }
         }
 
         function showToast(msg) {
