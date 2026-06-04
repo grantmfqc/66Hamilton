@@ -554,33 +554,81 @@
                             <div class="form-group" style="border: 1px solid var(--border); border-radius: 6px; padding: 20px; background: rgba(255,255,255,0.01); margin-bottom: 25px;">
                                 <label style="font-weight: bold; color: var(--accent-gold); font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">Access Codes</label>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                    <div>
-                                        <label for="access-pedestrian" style="font-size: 0.75rem;">Pedestrian Gate</label>
-                                        <input type="text" id="access-pedestrian" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-pedestrian" style="font-size: 0.75rem; font-weight: 500;">Pedestrian Gate</label>
+                                        <input type="text" id="access-pedestrian" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-pedestrian-image-data', 'access-pedestrian-preview', 'access-pedestrian-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-pedestrian-image-data" value="" />
+                                            <div id="access-pedestrian-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-pedestrian-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-pedestrian-image-data', 'access-pedestrian-preview', 'access-pedestrian-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label for="access-driveway" style="font-size: 0.75rem;">Driveway Gate</label>
-                                        <input type="text" id="access-driveway" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-driveway" style="font-size: 0.75rem; font-weight: 500;">Driveway Gate</label>
+                                        <input type="text" id="access-driveway" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-driveway-image-data', 'access-driveway-preview', 'access-driveway-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-driveway-image-data" value="" />
+                                            <div id="access-driveway-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-driveway-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-driveway-image-data', 'access-driveway-preview', 'access-driveway-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                    <div>
-                                        <label for="access-street-glass" style="font-size: 0.75rem;">Street Level Glass Doors</label>
-                                        <input type="text" id="access-street-glass" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-street-glass" style="font-size: 0.75rem; font-weight: 500;">Street Level Glass Doors</label>
+                                        <input type="text" id="access-street-glass" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-street-glass-image-data', 'access-street-glass-preview', 'access-street-glass-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-street-glass-image-data" value="" />
+                                            <div id="access-street-glass-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-street-glass-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-street-glass-image-data', 'access-street-glass-preview', 'access-street-glass-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label for="access-basement-glass" style="font-size: 0.75rem;">Basement Glass Doors</label>
-                                        <input type="text" id="access-basement-glass" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-basement-glass" style="font-size: 0.75rem; font-weight: 500;">Basement Glass Doors</label>
+                                        <input type="text" id="access-basement-glass" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-basement-glass-image-data', 'access-basement-glass-preview', 'access-basement-glass-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-basement-glass-image-data" value="" />
+                                            <div id="access-basement-glass-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-basement-glass-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-basement-glass-image-data', 'access-basement-glass-preview', 'access-basement-glass-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div>
-                                        <label for="access-apartment" style="font-size: 0.75rem;">Apartment Door</label>
-                                        <input type="text" id="access-apartment" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-apartment" style="font-size: 0.75rem; font-weight: 500;">Apartment Door</label>
+                                        <input type="text" id="access-apartment" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-apartment-image-data', 'access-apartment-preview', 'access-apartment-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-apartment-image-data" value="" />
+                                            <div id="access-apartment-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-apartment-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-apartment-image-data', 'access-apartment-preview', 'access-apartment-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label for="access-garage" style="font-size: 0.75rem;">Garage</label>
-                                        <input type="text" id="access-garage" required />
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <label for="access-garage" style="font-size: 0.75rem; font-weight: 500;">Garage</label>
+                                        <input type="text" id="access-garage" required style="margin-bottom: 4px;" />
+                                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                            <input type="file" accept="image/*" onchange="handleStandardSectionImage(event, 'access-garage-image-data', 'access-garage-preview', 'access-garage-preview-container')" style="width: auto; font-size: 0.75rem; padding: 4px 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); max-width: 180px;" />
+                                            <input type="hidden" id="access-garage-image-data" value="" />
+                                            <div id="access-garage-preview-container" style="display: none; position: relative; width: 45px; height: 45px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000;">
+                                                <img id="access-garage-preview" src="" style="width: 100%; height: 100%; object-fit: cover;" />
+                                                <button type="button" onclick="removeStandardSectionImage('access-garage-image-data', 'access-garage-preview', 'access-garage-preview-container')" style="position: absolute; top: 1px; right: 1px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 14px; height: 14px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; padding: 0;">×</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1570,6 +1618,67 @@
             document.getElementById('access-basement-glass').value = manual.accessBasementGlass || manual.checkinCode || '';
             document.getElementById('access-apartment').value = manual.accessApartment || manual.checkinCode || '';
             document.getElementById('access-garage').value = manual.accessGarage || manual.checkinCode || '';
+
+            // Populate Access Codes Images
+            const pedestrianImg = manual.accessPedestrianImage || '';
+            document.getElementById('access-pedestrian-image-data').value = pedestrianImg;
+            if (pedestrianImg) {
+                document.getElementById('access-pedestrian-preview').src = pedestrianImg;
+                document.getElementById('access-pedestrian-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-pedestrian-preview').src = '';
+                document.getElementById('access-pedestrian-preview-container').style.display = 'none';
+            }
+
+            const drivewayImg = manual.accessDrivewayImage || '';
+            document.getElementById('access-driveway-image-data').value = drivewayImg;
+            if (drivewayImg) {
+                document.getElementById('access-driveway-preview').src = drivewayImg;
+                document.getElementById('access-driveway-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-driveway-preview').src = '';
+                document.getElementById('access-driveway-preview-container').style.display = 'none';
+            }
+
+            const streetGlassImg = manual.accessStreetGlassImage || '';
+            document.getElementById('access-street-glass-image-data').value = streetGlassImg;
+            if (streetGlassImg) {
+                document.getElementById('access-street-glass-preview').src = streetGlassImg;
+                document.getElementById('access-street-glass-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-street-glass-preview').src = '';
+                document.getElementById('access-street-glass-preview-container').style.display = 'none';
+            }
+
+            const basementGlassImg = manual.accessBasementGlassImage || '';
+            document.getElementById('access-basement-glass-image-data').value = basementGlassImg;
+            if (basementGlassImg) {
+                document.getElementById('access-basement-glass-preview').src = basementGlassImg;
+                document.getElementById('access-basement-glass-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-basement-glass-preview').src = '';
+                document.getElementById('access-basement-glass-preview-container').style.display = 'none';
+            }
+
+            const apartmentImg = manual.accessApartmentImage || '';
+            document.getElementById('access-apartment-image-data').value = apartmentImg;
+            if (apartmentImg) {
+                document.getElementById('access-apartment-preview').src = apartmentImg;
+                document.getElementById('access-apartment-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-apartment-preview').src = '';
+                document.getElementById('access-apartment-preview-container').style.display = 'none';
+            }
+
+            const garageImg = manual.accessGarageImage || '';
+            document.getElementById('access-garage-image-data').value = garageImg;
+            if (garageImg) {
+                document.getElementById('access-garage-preview').src = garageImg;
+                document.getElementById('access-garage-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('access-garage-preview').src = '';
+                document.getElementById('access-garage-preview-container').style.display = 'none';
+            }
             
             document.getElementById('checkin-details').value = manual.checkinDetails || '';
             document.getElementById('rubbish-details').value = manual.rubbishDetails || '';
@@ -2045,11 +2154,17 @@
                 
                 // Save access codes
                 accessPedestrian: document.getElementById('access-pedestrian').value.trim(),
+                accessPedestrianImage: document.getElementById('access-pedestrian-image-data').value || '',
                 accessDriveway: document.getElementById('access-driveway').value.trim(),
+                accessDrivewayImage: document.getElementById('access-driveway-image-data').value || '',
                 accessStreetGlass: document.getElementById('access-street-glass').value.trim(),
+                accessStreetGlassImage: document.getElementById('access-street-glass-image-data').value || '',
                 accessBasementGlass: document.getElementById('access-basement-glass').value.trim(),
+                accessBasementGlassImage: document.getElementById('access-basement-glass-image-data').value || '',
                 accessApartment: document.getElementById('access-apartment').value.trim(),
+                accessApartmentImage: document.getElementById('access-apartment-image-data').value || '',
                 accessGarage: document.getElementById('access-garage').value.trim(),
+                accessGarageImage: document.getElementById('access-garage-image-data').value || '',
                 
                 checkinDetails: document.getElementById('checkin-details').value.trim(),
                 checkinDetailsImage: document.getElementById('checkin-details-image-data').value || '',

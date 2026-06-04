@@ -1080,29 +1080,59 @@
                 <div class="form-group">
                     <label>Access Codes</label>
                     <div class="access-codes-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Pedestrian Gate</div>
-                            <div id="portal-access-pedestrian" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Pedestrian Gate</div>
+                                <div id="portal-access-pedestrian" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-pedestrian-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Pedestrian Gate')">
+                                <img id="portal-access-pedestrian-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Pedestrian Gate" />
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Driveway Gate</div>
-                            <div id="portal-access-driveway" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Driveway Gate</div>
+                                <div id="portal-access-driveway" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-driveway-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Driveway Gate')">
+                                <img id="portal-access-driveway-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Driveway Gate" />
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Street Level Glass Doors</div>
-                            <div id="portal-access-street-glass" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Street Level Glass Doors</div>
+                                <div id="portal-access-street-glass" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-street-glass-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Street Level Glass Doors')">
+                                <img id="portal-access-street-glass-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Street Level Glass Doors" />
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Basement Glass Doors</div>
-                            <div id="portal-access-basement-glass" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Basement Glass Doors</div>
+                                <div id="portal-access-basement-glass" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-basement-glass-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Basement Glass Doors')">
+                                <img id="portal-access-basement-glass-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Basement Glass Doors" />
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Apartment Door</div>
-                            <div id="portal-access-apartment" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Apartment Door</div>
+                                <div id="portal-access-apartment" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-apartment-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Apartment Door')">
+                                <img id="portal-access-apartment-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Apartment Door" />
+                            </div>
                         </div>
-                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px;">
-                            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Garage</div>
-                            <div id="portal-access-garage" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: 6px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Garage</div>
+                                <div id="portal-access-garage" style="font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; font-family: monospace; letter-spacing: 1px;"></div>
+                            </div>
+                            <div id="portal-access-garage-img-container" style="display: none; width: 45px; height: 45px; border-radius: 4px; border: 1px solid var(--border); overflow: hidden; background: #000; cursor: pointer;" onclick="openAccessPhotoModal(this.querySelector('img').src, 'Garage')">
+                                <img id="portal-access-garage-img" style="width: 100%; height: 100%; object-fit: cover;" alt="Garage" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2431,12 +2461,71 @@
             document.getElementById('portal-address').textContent = manual.address || '';
             
             // Populate Access Codes (falling back to checkinCode if needed)
-            document.getElementById('portal-access-pedestrian').textContent = manual.accessPedestrian || manual.checkinCode || '';
-            document.getElementById('portal-access-driveway').textContent = manual.accessDriveway || manual.checkinCode || '';
-            document.getElementById('portal-access-street-glass').textContent = manual.accessStreetGlass || manual.checkinCode || '';
-            document.getElementById('portal-access-basement-glass').textContent = manual.accessBasementGlass || manual.checkinCode || '';
-            document.getElementById('portal-access-apartment').textContent = manual.accessApartment || manual.checkinCode || '';
-            document.getElementById('portal-access-garage').textContent = manual.accessGarage || manual.checkinCode || '';
+            const pedestrianCode = manual.accessPedestrian || manual.checkinCode || '';
+            document.getElementById('portal-access-pedestrian').textContent = pedestrianCode;
+            const pedestrianImg = manual.accessPedestrianImage || '';
+            if (pedestrianImg) {
+                document.getElementById('portal-access-pedestrian-img').src = pedestrianImg;
+                document.getElementById('portal-access-pedestrian-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-pedestrian-img').src = '';
+                document.getElementById('portal-access-pedestrian-img-container').style.display = 'none';
+            }
+
+            const drivewayCode = manual.accessDriveway || manual.checkinCode || '';
+            document.getElementById('portal-access-driveway').textContent = drivewayCode;
+            const drivewayImg = manual.accessDrivewayImage || '';
+            if (drivewayImg) {
+                document.getElementById('portal-access-driveway-img').src = drivewayImg;
+                document.getElementById('portal-access-driveway-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-driveway-img').src = '';
+                document.getElementById('portal-access-driveway-img-container').style.display = 'none';
+            }
+
+            const streetGlassCode = manual.accessStreetGlass || manual.checkinCode || '';
+            document.getElementById('portal-access-street-glass').textContent = streetGlassCode;
+            const streetGlassImg = manual.accessStreetGlassImage || '';
+            if (streetGlassImg) {
+                document.getElementById('portal-access-street-glass-img').src = streetGlassImg;
+                document.getElementById('portal-access-street-glass-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-street-glass-img').src = '';
+                document.getElementById('portal-access-street-glass-img-container').style.display = 'none';
+            }
+
+            const basementGlassCode = manual.accessBasementGlass || manual.checkinCode || '';
+            document.getElementById('portal-access-basement-glass').textContent = basementGlassCode;
+            const basementGlassImg = manual.accessBasementGlassImage || '';
+            if (basementGlassImg) {
+                document.getElementById('portal-access-basement-glass-img').src = basementGlassImg;
+                document.getElementById('portal-access-basement-glass-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-basement-glass-img').src = '';
+                document.getElementById('portal-access-basement-glass-img-container').style.display = 'none';
+            }
+
+            const apartmentCode = manual.accessApartment || manual.checkinCode || '';
+            document.getElementById('portal-access-apartment').textContent = apartmentCode;
+            const apartmentImg = manual.accessApartmentImage || '';
+            if (apartmentImg) {
+                document.getElementById('portal-access-apartment-img').src = apartmentImg;
+                document.getElementById('portal-access-apartment-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-apartment-img').src = '';
+                document.getElementById('portal-access-apartment-img-container').style.display = 'none';
+            }
+
+            const garageCode = manual.accessGarage || manual.checkinCode || '';
+            document.getElementById('portal-access-garage').textContent = garageCode;
+            const garageImg = manual.accessGarageImage || '';
+            if (garageImg) {
+                document.getElementById('portal-access-garage-img').src = garageImg;
+                document.getElementById('portal-access-garage-img-container').style.display = 'block';
+            } else {
+                document.getElementById('portal-access-garage-img').src = '';
+                document.getElementById('portal-access-garage-img-container').style.display = 'none';
+            }
 
             document.getElementById('portal-checkin-details').innerHTML = (manual.checkinDetails || '').replace(/\n/g, '<br/>') || '';
             const checkinImg = manual.checkinDetailsImage || '';
@@ -2897,6 +2986,45 @@
             img.style.border = '2px solid var(--border)';
             img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
             overlay.appendChild(img);
+
+            document.body.appendChild(overlay);
+        }
+
+        function openAccessPhotoModal(url, caption) {
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.background = 'rgba(0,0,0,0.95)';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'column';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '999999';
+            overlay.style.cursor = 'zoom-out';
+            overlay.onclick = () => overlay.remove();
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxWidth = '90%';
+            img.style.maxHeight = '80%';
+            img.style.borderRadius = '8px';
+            img.style.border = '2px solid var(--border)';
+            img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+            overlay.appendChild(img);
+
+            if (caption) {
+                const cap = document.createElement('div');
+                cap.style.color = '#fff';
+                cap.style.marginTop = '15px';
+                cap.style.fontSize = '1.1rem';
+                cap.style.fontWeight = '500';
+                cap.style.fontFamily = "'Outfit', sans-serif";
+                cap.textContent = caption;
+                overlay.appendChild(cap);
+            }
 
             document.body.appendChild(overlay);
         }
