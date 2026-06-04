@@ -904,7 +904,7 @@
                 <p class="no-indent">7.2 If requested in writing by the Licensee, the Licensor can provide a complete premium linen and bed sheet replacement service at an additional cost of NZD $45.00 + GST ($51.75 incl. GST) per bed, per week. This service will be invoiced separately and must be paid in advance alongside the main Licence Fee block.</p>
 
                 <p class="no-indent"><strong>8. Conduct, House Rules & Liability Penalties</strong></p>
-                <p class="no-indent">8.1 Occupancy Restrictions: Only the specific individuals permitted to reside in the Premises are: <strong class="fill-occupants-list">_____</strong>. Sub-licensing rooms or hosting additional permanent overnight guests is strictly prohibited.</p>
+                <p class="no-indent">8.1 Occupancy Restrictions: Only the specific individuals permitted to reside in the Premises are: <strong class="fill-occupants-list">_____</strong><span class="fill-company-occupancy-extra"></span>. Sub-licensing rooms or hosting additional permanent overnight guests is strictly prohibited.</p>
                 <p class="no-indent">8.2 Quiet Hours & Social Gatherings: The Premises is located in a strict residential building. Quiet hours must be observed between 10:00 PM and 7:00 AM daily. No parties or large social gatherings are permitted. If building management or noise control protocols require a security guard call-out due to loud behavior from the occupants, a mandatory NZD $250.00 enforcement fee will be billed instantly to the Licensee, alongside serving as immediate grounds for Licence revocation.</p>
                 <p class="no-indent">8.3 Fire Alarm False Call-Outs: Smoking and vaping are strictly prohibited inside the Premises or on the balconies. If the occupants trigger a false fire alarm via cooking negligence, smoking, or tampering with sensors that results in a Fire and Emergency New Zealand (FENZ) call-out, the Licensee is strictly liable for the full penalty fine levied by emergency services (historically $1,000.00+ GST), plus a 15% administrative fee.</p>
                 <p class="no-indent">8.4 Supervision of Minors: In strict accordance with New Zealand child safety laws, no children under the age of 14 years may be left unattended or without adult supervision anywhere within the Premises or common property of the building complex at any time.</p>
@@ -2018,6 +2018,11 @@
             }
             const occupantsText = occupantsList.length > 0 ? occupantsList.join(', ') : 'None declared';
             document.querySelectorAll('.fill-occupants-list').forEach(el => el.textContent = occupantsText);
+
+            const extraOccupancyText = isCompany 
+                ? ", together with any additional direct employees of the Licensee company, with the Licensee company assuming full responsibility and liability for all such individuals while they reside at the Premises" 
+                : "";
+            document.querySelectorAll('.fill-company-occupancy-extra').forEach(el => el.textContent = extraOccupancyText);
             const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
 
             document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = licenseeDisplayName);
