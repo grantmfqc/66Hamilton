@@ -423,27 +423,7 @@
                     </tr>
                 </table>
 
-                <!-- Personal Guarantee Section for Corporate Entities -->
-                <div id="personal-guarantee-section" style="display: none; margin-top: 40px; border-top: 1px dashed #000; padding-top: 30px;">
-                    <h2 style="font-size: 12pt;">Personal Guarantee of Licence Obligations</h2>
-                    <p class="no-indent" style="font-style: italic;">To be executed where the Licensee is a Corporate Entity (Company).</p>
-                    <p class="no-indent">In consideration of the Licensor entering into this Licence to Occupy at the request of the Licensee, the Guarantor (being the Authorized Representative executing this agreement on behalf of the Licensee) hereby personally, unconditionally, and irrevocably guarantees to the Licensor the due and punctual performance by the Licensee of all covenants, conditions, payment terms, and obligations under this Licence.</p>
-                    <p class="no-indent">The Guarantor covenants and agrees that they shall be personally, jointly, and severally liable with the Licensee as a principal debtor for the payment of all Licence Fees, damages, insurance excesses, legal fees, and other monies payable under this agreement, and that no granting of time, indulgence, or waiver by the Licensor shall release or discharge the Guarantor from their personal liability hereunder.</p>
-                    
-                    <table style="width: 100%; margin-top: 30px; border-collapse: collapse;" border="0" cellpadding="10">
-                        <tr>
-                            <td style="width: 50%; vertical-align: bottom;">
-                                <strong>Guarantor Digital Signature:</strong><br/>
-                                <div id="render-guarantor-sig" style="height: 60px; border-bottom: 1px solid #000; margin-top: 10px;">
-                                    <span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Guarantor Signature (Mirrored)</span>
-                                </div>
-                                <div style="margin-top: 8px; font-size: 0.9rem; color: #000;"><strong>Guarantor Name:</strong> <span class="fill-guarantor-name">_____</span></div>
-                                <div style="margin-top: 5px;">Date: <span id="render-guarantor-date">__________</span></div>
-                            </td>
-                            <td style="width: 50%; vertical-align: bottom;"></td>
-                        </tr>
-                    </table>
-                </div>
+
 
                 <!-- PDF-Only Premium Footer -->
                 <div class="pdf-only-footer" style="display: none; border-top: 1px solid #ccc; padding-top: 12px; margin-top: 40px;">
@@ -806,15 +786,7 @@
             document.querySelectorAll('.fill-cleaning-frequency-desc').forEach(el => el.textContent = cleanFreqDesc);
             document.querySelectorAll('.fill-cleaning-frequency-adj').forEach(el => el.textContent = cleanFreqAdj);
 
-            // Personal Guarantee Toggle
-            if (isCompany) {
-                document.querySelectorAll('.fill-guarantor-name').forEach(el => el.textContent = td.companyRep || '_____');
-                const pgSec = document.getElementById('personal-guarantee-section');
-                if (pgSec) pgSec.style.display = 'block';
-            } else {
-                const pgSec = document.getElementById('personal-guarantee-section');
-                if (pgSec) pgSec.style.display = 'none';
-            }
+
 
             // Operative Clause 3 Dynamic Injections
             const pTerms = applicationData.paymentTermsChoice || 'full';
@@ -911,23 +883,9 @@
             if (applicationData.tenantSignature) {
                 document.getElementById('render-tenant-sig').innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
                 
-                // Mirror to guarantor signature block if company
-                if (isCompany) {
-                    const guarantorSigContainer = document.getElementById('render-guarantor-sig');
-                    if (guarantorSigContainer) guarantorSigContainer.innerHTML = `<img src="${applicationData.tenantSignature}" style="max-height: 50px;" />`;
-                    const guarantorDateEl = document.getElementById('render-guarantor-date');
-                    if (guarantorDateEl) guarantorDateEl.textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
-                }
             } else {
                 document.getElementById('render-tenant-sig').innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Tenant Signature</span>`;
                 document.getElementById('render-tenant-date').textContent = '__________';
-                
-                if (isCompany) {
-                    const guarantorSigContainer = document.getElementById('render-guarantor-sig');
-                    if (guarantorSigContainer) guarantorSigContainer.innerHTML = `<span style="color: #888; font-style: italic; font-size: 0.9rem;">Pending Guarantor Signature (Mirrored)</span>`;
-                    const guarantorDateEl = document.getElementById('render-guarantor-date');
-                    if (guarantorDateEl) guarantorDateEl.textContent = '__________';
-                }
             }
             if (applicationData.tenantSignedAt) {
                 document.getElementById('render-tenant-date').textContent = new Date(applicationData.tenantSignedAt).toLocaleDateString('en-NZ');
