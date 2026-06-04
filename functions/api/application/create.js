@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { passcode, rent, startDate, endDate, linenService, rateType, rateValue, paymentTermsChoice } = data;
+    const { passcode, rent, startDate, endDate, linenService, rateType, rateValue, paymentTermsChoice, securityBond, cleaningFrequency } = data;
 
     const kv = context.env.APPLICATIONS_KV;
     if (!kv) {
@@ -52,6 +52,8 @@ export async function onRequestPost(context) {
       startDate: startDate || new Date().toISOString().split('T')[0],
       endDate: endDate || null,
       linenService: !!linenService,
+      securityBond: securityBond !== undefined ? securityBond : 5000,
+      cleaningFrequency: cleaningFrequency || 'weekly',
       tenantDetails: null,
       tenantSignature: null,
       tenantSignedAt: null,
