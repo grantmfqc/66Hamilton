@@ -349,8 +349,8 @@
                 <p class="no-indent">5.3 If no discrepancy notice is received within this 24-hour window, the Premises and all listed chattels shall be legally deemed to have been delivered in immaculate condition. The Licensee shall be held fully liable for any defects, damages, or missing items recorded at the final checkout inspection.</p>
 
                 <p class="no-indent"><strong>6. Winter Utility Fair Use Cap Clause</strong></p>
-                <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $600.00 (inclusive of GST) per calendar month.</p>
-                <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $600.00 NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
+                <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $<span class="fill-utility-baseline">600.00</span> (inclusive of GST) per calendar month.</p>
+                <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $<span class="fill-utility-baseline">600.00</span> NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
                 <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 15% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
 
                 <p class="no-indent"><strong>7. Optional Linen & Bed Sheet Service</strong></p>
@@ -788,10 +788,15 @@
                 el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No';
             });
 
-            // Security Bond and Cleaning Frequency dynamic populating
+            // Security Bond, Utility Baseline and Cleaning Frequency dynamic populating
             const securityBond = applicationData.securityBond !== undefined ? applicationData.securityBond : 5000;
             document.querySelectorAll('.fill-security-bond').forEach(el => {
                 el.textContent = `$${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+            });
+
+            const utilityBaseline = applicationData.utilityBaseline !== undefined ? applicationData.utilityBaseline : 600;
+            document.querySelectorAll('.fill-utility-baseline').forEach(el => {
+                el.textContent = utilityBaseline.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             });
 
             const cleanFreq = applicationData.cleaningFrequency || 'weekly';
