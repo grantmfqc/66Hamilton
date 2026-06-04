@@ -453,6 +453,10 @@
                             <input type="date" id="date-input" required />
                         </div>
                         <div class="form-group">
+                            <label for="duration-input">Contract Duration (Days)</label>
+                            <input type="number" id="duration-input" min="1" placeholder="e.g. 90" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); color: var(--text-primary); border-radius: 4px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box;" />
+                        </div>
+                        <div class="form-group">
                             <label for="end-date-input">Contract End Date</label>
                             <input type="date" id="end-date-input" required />
                         </div>
@@ -729,6 +733,62 @@
     <script>
         // Set default commencement date to today
         document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
+
+        // Dynamic contract duration and date calculations
+        const startDateInput = document.getElementById('date-input');
+        const endDateInput = document.getElementById('end-date-input');
+        const durationInput = document.getElementById('duration-input');
+
+        function updateEndDate() {
+            const startVal = startDateInput.value;
+            const durationVal = parseInt(durationInput.value);
+            if (startVal && durationVal && durationVal >= 1) {
+                const start = new Date(startVal);
+                start.setHours(0,0,0,0);
+                if (!isNaN(start.getTime())) {
+                    const end = new Date(start);
+                    end.setDate(start.getDate() + durationVal - 1);
+                    endDateInput.value = end.toISOString().split('T')[0];
+                }
+            }
+        }
+
+        function updateDuration() {
+            const startVal = startDateInput.value;
+            const endVal = endDateInput.value;
+            if (startVal && endVal) {
+                const start = new Date(startVal);
+                const end = new Date(endVal);
+                start.setHours(0,0,0,0);
+                end.setHours(0,0,0,0);
+                if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end >= start) {
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    durationInput.value = diffDays;
+                } else {
+                    durationInput.value = '';
+                }
+            } else {
+                durationInput.value = '';
+            }
+        }
+
+        startDateInput.addEventListener('input', () => {
+            if (durationInput.value) {
+                updateEndDate();
+            } else if (endDateInput.value) {
+                updateDuration();
+            }
+        });
+
+        durationInput.addEventListener('input', () => {
+            updateEndDate();
+        });
+
+        endDateInput.addEventListener('input', () => {
+            updateDuration();
+        });
+
 
         let sessionToken = localStorage.getItem('session_token') || '';
         let adminPasscode = localStorage.getItem('admin_passcode') || ''; // legacy fallback
