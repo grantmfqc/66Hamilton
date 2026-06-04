@@ -35,6 +35,40 @@ export async function onRequestPost(context) {
     if (context.env.RESEND_API_KEY) {
       const ownerSignUrl = `${new URL(context.request.url).origin}/sign-owner.html?token=${token}`;
       
+      const rateType = app.rateType || 'weekly';
+      const rateValue = app.rateValue || app.rent || 2400;
+      
+      let weeklyRent = 0;
+      if (rateType === 'weekly') {
+        weeklyRent = rateValue;
+      } else if (rateType === 'daily') {
+        weeklyRent = rateValue * 7;
+      } else if (rateType === 'monthly') {
+        weeklyRent = (rateValue / 30) * 7;
+      }
+
+      const weeklyRentFormatted = `NZD $${weeklyRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const rentRateFormatted = `NZD $${rateValue.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per ${rateType}`;
+      
+      const commencementDateFormatted = app.tenantDetails?.arrivalDate 
+        ? new Date(app.tenantDetails.arrivalDate).toLocaleDateString('en-NZ', { dateStyle: 'long' }) 
+        : app.startDate;
+
+      const expiryDateFormatted = app.tenantDetails?.departureDate 
+        ? new Date(app.tenantDetails.departureDate).toLocaleDateString('en-NZ', { dateStyle: 'long' }) 
+        : (app.endDate || 'N/A');
+
+      const paymentTermsChoice = app.paymentTermsChoice || 'full';
+      let paymentOptionStr = '';
+      if (paymentTermsChoice === 'full') {
+        paymentOptionStr = `Option 1: Full Payment Upfront (Sub-option ${app.tenantDetails?.bookingOption || 'A'})`;
+      } else {
+        paymentOptionStr = 'Option 2: Monthly Installments';
+      }
+
+      const securityBond = app.securityBond !== undefined ? app.securityBond : 5000;
+      const securityBondFormatted = `NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
       const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -55,9 +89,12 @@ export async function onRequestPost(context) {
                 <h3 style="color: #C9A96E; margin-top: 0;">Application Summary:</h3>
                 <table style="width: 100%; border-collapse: collapse; color: #a0a0a5; font-size: 14px;">
                   <tr><td style="padding: 6px 0; font-weight: bold; width: 40%;">Applicant Name:</td><td>${app.tenantDetails.name}</td></tr>
-                  <tr><td style="padding: 6px 0; font-weight: bold;">Weekly Rent:</td><td>NZD $2,400.00</td></tr>
-                  <tr><td style="padding: 6px 0; font-weight: bold;">Commencement Date:</td><td>${app.startDate}</td></tr>
-                  <tr><td style="padding: 6px 0; font-weight: bold;">Booking Deposit Option:</td><td>Option ${app.tenantDetails.bookingOption}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Rent Rate:</td><td>${rentRateFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Equivalent Weekly Rent:</td><td>${weeklyRentFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Commencement Date:</td><td>${commencementDateFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Expiry Date:</td><td>${expiryDateFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Payment Terms:</td><td>${paymentOptionStr}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Commercial Security Bond:</td><td>${securityBondFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Linen Service Selected:</td><td>${app.linenService ? 'Yes ($45+GST/wk)' : 'No'}</td></tr>
                 </table>
               </div>
