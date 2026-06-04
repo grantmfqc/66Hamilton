@@ -44,11 +44,16 @@ export async function onRequestPost(context) {
       } else if (rateType === 'daily') {
         weeklyRent = rateValue * 7;
       } else if (rateType === 'monthly') {
-        weeklyRent = (rateValue / 30) * 7;
+        weeklyRent = (rateValue * 12) / 52;
       }
 
+      let rateTypeDisplay = rateType;
+      if (rateType === 'daily') rateTypeDisplay = 'day';
+      else if (rateType === 'weekly') rateTypeDisplay = 'week';
+      else if (rateType === 'monthly') rateTypeDisplay = 'month';
+
       const weeklyRentFormatted = `NZD $${weeklyRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      const rentRateFormatted = `NZD $${rateValue.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per ${rateType}`;
+      const rentRateFormatted = `NZD $${rateValue.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per ${rateTypeDisplay}`;
       
       const commencementDateFormatted = app.tenantDetails?.arrivalDate 
         ? new Date(app.tenantDetails.arrivalDate).toLocaleDateString('en-NZ', { dateStyle: 'long' }) 

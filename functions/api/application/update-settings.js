@@ -68,7 +68,7 @@ export async function onRequestPost(context) {
       } else if (app.rateType === 'daily') {
         app.rent = app.rateValue * 7;
       } else if (app.rateType === 'monthly') {
-        app.rent = Math.round((app.rateValue / 30) * 7);
+        app.rent = Math.round((app.rateValue * 12) / 52);
       }
     }
 

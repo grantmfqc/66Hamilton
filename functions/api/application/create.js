@@ -41,13 +41,23 @@ export async function onRequestPost(context) {
     const applicationId = crypto.randomUUID();
 
     // 4. Initialize application data
+    const finalRateType = rateType || 'weekly';
+    const finalRateValue = rateValue || rent || 2400;
+
+    let computedWeeklyRent = finalRateValue;
+    if (finalRateType === 'daily') {
+      computedWeeklyRent = finalRateValue * 7;
+    } else if (finalRateType === 'monthly') {
+      computedWeeklyRent = Math.round((finalRateValue * 12) / 52);
+    }
+
     const application = {
       id: applicationId,
       status: 'pending_tenant', // pending_tenant | pending_owner | completed
       createdAt: new Date().toISOString(),
-      rent: rent || 2400, // weekly rate
-      rateType: rateType || 'weekly',
-      rateValue: rateValue || rent || 2400,
+      rent: computedWeeklyRent, // weekly rate
+      rateType: finalRateType,
+      rateValue: finalRateValue,
       paymentTermsChoice: paymentTermsChoice || 'full', // 'full' | 'monthly'
       startDate: startDate || new Date().toISOString().split('T')[0],
       endDate: endDate || null,
