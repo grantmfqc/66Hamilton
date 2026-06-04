@@ -858,7 +858,7 @@
                 <h3 style="text-align: left; font-size: 11pt;">Parties:</h3>
                 <ol>
                     <li><strong>GRANT DENNIS</strong> (the "Licensor")</li>
-                    <li><strong><span class="fill-tenant-name">_____</span></strong>, identified as the Primary Licensee in Section 1 of the attached Onboarding Portal (the "Licensee")</li>
+                    <li><strong><span class="fill-tenant-name">_____</span></strong> of <strong><span class="fill-tenant-address">_____</span></strong> (the "Licensee")</li>
                 </ol>
 
                 <h3 style="text-align: left; font-size: 11pt;">Background:</h3>
@@ -2026,6 +2026,7 @@
             const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
 
             document.querySelectorAll('.fill-tenant-name').forEach(el => el.textContent = licenseeDisplayName);
+            document.querySelectorAll('.fill-tenant-address').forEach(el => el.textContent = td.address || '_____');
             
             const start = new Date(td.arrivalDate);
             const end = new Date(td.departureDate);
