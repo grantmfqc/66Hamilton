@@ -745,6 +745,10 @@
                                 <span style="color: var(--text-muted);">15% Goods & Services Tax (GST):</span>
                                 <span id="preview-gst" style="font-weight: 600; color: #fff;">—</span>
                             </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Commercial Security Bond (RTA exempt):</span>
+                                <span id="preview-security-bond" style="font-weight: 600; color: #fff;">—</span>
+                            </div>
                             <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; border-top: 1px solid rgba(201, 169, 110, 0.3); padding-top: 10px; margin-top: 5px;">
                                 <span style="color: var(--accent-gold);">Total Contract Value (Inclusive of GST):</span>
                                 <span id="preview-price-incl" style="color: var(--accent-gold);">—</span>
@@ -1618,6 +1622,8 @@
             calculatedGst = gst;
             calculatedPriceIncl = total;
 
+            const securityBond = applicationData.securityBond !== undefined ? applicationData.securityBond : 5000;
+
             // Update UI
             if (previewCommence) previewCommence.textContent = start.toLocaleDateString('en-NZ', { dateStyle: 'long' });
             if (previewExpiry) previewExpiry.textContent = end.toLocaleDateString('en-NZ', { dateStyle: 'long' });
@@ -1626,6 +1632,8 @@
             if (previewMonthlyRate) previewMonthlyRate.textContent = `$${monthlyRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD/month`;
             if (previewPriceExcl) previewPriceExcl.textContent = `$${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
             if (previewGst) previewGst.textContent = `$${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+            const previewSecurityBond = document.getElementById('preview-security-bond');
+            if (previewSecurityBond) previewSecurityBond.textContent = `$${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
             if (previewPriceIncl) previewPriceIncl.textContent = `$${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
 
             // Dynamically update the Booking Payments Section 6 details based on selected dates and option
@@ -1643,11 +1651,13 @@
                         <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
                             <h5 style="color: var(--accent-gold); margin: 0 0 10px 0; font-size: 0.95rem;">Dynamic Payment Breakdown:</h5>
                             <ul style="margin: 0; padding-left: 20px; color: var(--text-light); font-size: 0.9rem; line-height: 1.6;">
-                                <li><strong>Option A (Full Upfront):</strong> $${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (due within 24 hours).</li>
+                                <li><strong>Option A (Full Upfront):</strong> $${total.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD + $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (Commercial Security Bond). <strong style="color: var(--accent-gold);">First Payment Required Total: $${(total + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> (due within 24 hours).</li>
                                 ${balanceAmount > 0 ? `
                                 <li><strong>Option B (1-Month Deposit):</strong>
                                     <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--text-muted);">
                                         <li>Securement Deposit (due now): <strong style="color: #fff;">$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                        <li>Commercial Security Bond (due now): <strong style="color: #fff;">$${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                        <li style="font-size: 0.9rem; margin-top: 3px; color: var(--accent-gold);">First Payment Required Total (due now): <strong>$${(depositAmount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                         <li>Remaining Balance (due 14 days before check-in): <strong style="color: #fff;">$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                     </ul>
                                 </li>
@@ -1662,12 +1672,15 @@
                     const schedule = getPaymentSchedule(arrivalDateVal, diffDays, dailyRate);
                     let scheduleRowsHtml = '';
                     schedule.forEach(p => {
+                        const isPayment1 = p.paymentNumber === 1;
+                        const bondHtml = isPayment1 ? `<br/><span style="color: var(--text-muted); font-size: 0.85rem;">+ Commercial Security Bond: $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span><br/><strong style="font-size: 0.85rem; color: #fff;">First Payment Required Total: $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>` : '';
+
                         scheduleRowsHtml += `
                             <tr style="border-bottom: 1px solid var(--glass-border);">
                                 <td style="padding: 10px; text-align: center; border-right: 1px solid var(--glass-border);">${p.paymentNumber}</td>
                                 <td style="padding: 10px; border-right: 1px solid var(--glass-border); line-height: 1.3;">
                                     <strong>${p.label}</strong><br/>
-                                    <small style="color: var(--text-muted); font-size: 0.85rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
+                                    <small style="color: var(--text-muted); font-size: 0.85rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>${bondHtml}
                                 </td>
                                 <td style="padding: 10px; text-align: center; border-right: 1px solid var(--glass-border); font-weight: 600;">${p.dueDate}</td>
                                 <td style="padding: 10px; text-align: right; font-weight: 600; color: var(--accent-gold);">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -2062,9 +2075,9 @@
                     <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> inclusive of GST (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + 15% GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
                     <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
                     ${subOpt === 'A' || balanceAmount <= 0 ? `
-                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement.</p>
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement, plus the Commercial Security Bond of $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD. <strong>First Payment Required Total: $${(totalVal + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>.</p>
                     ` : `
-                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> The Licensee has elected to pay a securement deposit equal to approximately one (1) month of occupancy (<strong>$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>) immediately upon booking to secure the dates. The remaining balance of <strong>$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> must clear into the Licensor's nominated account no later than 14 days prior to the Commencement Date.</p>
+                        <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> The Licensee has elected to pay a securement deposit equal to approximately one (1) month of occupancy (<strong>$${depositAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>) immediately upon booking to secure the dates, plus the Commercial Security Bond of $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD. <strong>First Payment Required Total (due now): $${(depositAmount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>. The remaining balance of <strong>$${balanceAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong> must clear into the Licensor's nominated account no later than 14 days prior to the Commencement Date.</p>
                     `}
                     <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * 1.15).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                     <p class="no-indent">3.4 Commercial Security Bond: The Licensee shall pay a security bond of <strong>NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> to the Licensor upon execution of this Licence. This bond is held directly by the Licensor as a commercial security deposit to secure the performance of the Licensee’s obligations under this Licence. Because this arrangement is a serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, the bond will not be lodged with the Tenancy Services Bond Centre, but will be held in trust in the Licensor’s nominated account. The bond shall be refunded in full to the Licensee within five (5) business days following the Expiry Date, subject to the inspection of the Premises, the return of all keys/passes, and the reconciliation of any outstanding utility charges, damage costs, or penalty fees.</p>
@@ -2079,10 +2092,13 @@
                 
                 let scheduleRowsHtml = '';
                 schedule.forEach(p => {
+                    const isPayment1 = p.paymentNumber === 1;
+                    const bondHtml = isPayment1 ? `<br/><span style="color: #666; font-size: 0.9em;">+ Commercial Security Bond: $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span><br/><strong>First Payment Required Total: $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>` : '';
+
                     scheduleRowsHtml += `
                         <tr style="border: 1px solid #000;">
                             <td style="text-align: center; border: 1px solid #000; padding: 6px;">${p.paymentNumber}</td>
-                            <td style="border: 1px solid #000; padding: 6px;">${p.label}<br/><small style="color: #555; font-size: 0.85em;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small></td>
+                            <td style="border: 1px solid #000; padding: 6px;">${p.label}<br/><small style="color: #555; font-size: 0.85em;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>${bondHtml}</td>
                             <td style="text-align: center; border: 1px solid #000; padding: 6px; font-weight: bold;">${p.dueDate}</td>
                             <td style="text-align: right; border: 1px solid #000; padding: 6px; font-weight: bold;">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
                         </tr>
