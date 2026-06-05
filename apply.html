@@ -873,14 +873,18 @@
                 <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
                 <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
 
-                <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
-                <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
-                <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+                <div id="contract-clause-2-container">
+                    <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
+                    <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+                    <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+                </div>
 
                 <div id="contract-clause-3">
                     <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
                     <p class="no-indent">3.1 Property Availability Status: The Premises shall remain actively advertised, listed on the open market, and available for booking to third parties until the upfront payment terms have been fully cleared.</p>
-                  <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
+                </div>
+
+                <p class="no-indent"><strong>4. Bundled Services & Mandatory Right of Entry</strong></p>
                 <p class="no-indent" id="contract-clause-4-1-text">4.1 The weekly Licence Fee includes the active provision of the following commercial services by the Licensor:</p>
                 <ul style="margin-left: 40px; list-style-type: square; margin-bottom: 10px;" id="contract-clause-4-1-list">
                     <li>Full provisioning and baseline usage allocation of residential utilities (electricity, gas, water, and unlimited high-speed broadband internet).</li>
@@ -927,7 +931,7 @@
                 <div id="contract-clause-jurisdiction-container">
                     <p class="no-indent"><strong>11. Jurisdiction</strong></p>
                     <p class="no-indent">11.1 This agreement is governed exclusively by the laws of New Zealand. Any contractual disputes that cannot be settled by mutual agreement shall be directed to the courts of New Zealand.</p>
-                </div>ts of New Zealand.</p>
+                </div>
 
                 <h2 style="margin-top: 30px; font-size: 12pt;">Execution Schedule</h2>
                 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 10pt; color: #000; box-sizing: border-box; word-wrap: break-word;" border="1" cellpadding="8">
@@ -990,6 +994,8 @@
                         </tr>
                     </table>
                 </div>
+                <!-- BODY CORPORATE RULES DIV (APPENDED DYNAMICALLY) -->
+                <div id="body-corporate-rules-appendix" style="display: none;"></div>
             </div>
 
             <!-- Signature Pad UI -->
@@ -2170,17 +2176,33 @@
                 monthlyRate = rateValue;
             }
 
+            // Check app settings
+            const noGst = applicationData.noGst || false;
+            const gstMultiplier = noGst ? 1.0 : 1.15;
+            const gstRate = noGst ? 0.0 : 0.15;
+            const separateUtilitiesEnabled = applicationData.separateUtilitiesEnabled || false;
+            const separateUtilitiesRate = applicationData.separateUtilitiesRate !== undefined ? applicationData.separateUtilitiesRate : 1080;
+            const carHireEnabled = applicationData.carHireEnabled || false;
+            const carHireRate = applicationData.carHireRate !== undefined ? applicationData.carHireRate : 1500;
+            const totalMonthlyServices = (separateUtilitiesEnabled ? separateUtilitiesRate : 0) + (carHireEnabled ? carHireRate : 0);
+
             const subtotal = dailyRate * diffDays;
-            const gst = subtotal * 0.15;
+            const gst = subtotal * gstRate;
             const totalVal = subtotal + gst;
 
+            const gstLabelSuffix = noGst ? " (GST Exempt)" : " + GST";
+            const gstInclLabel = noGst ? " (GST Exempt)" : " (incl. GST)";
+            const gstLabelName = noGst ? "GST Not Applicable" : "15% Goods & Services Tax (GST)";
+
             document.querySelectorAll('.fill-rent').forEach(el => {
-                el.innerHTML = `$${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD (inclusive of GST)<br/>` +
+                el.innerHTML = `$${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD${gstInclLabel}<br/>` +
                                `<small style="font-weight: normal; color: #555;">Calculated at a rate of $${rateValue.toLocaleString()}/${rateType} for exactly ${diffDays} days (${diffDays} days total, including check-in/out). Equivalent reference monthly rate: $${monthlyRate.toLocaleString('en-NZ', { maximumFractionDigits: 2 })} NZD.</small>`;
             });
 
             document.querySelectorAll('.fill-linen-service').forEach(el => {
-                el.textContent = applicationData.linenService ? 'Yes (Included at $45.00+GST/wk)' : 'No';
+                el.textContent = applicationData.linenService 
+                    ? (separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed in arrears)' : 'Yes (Included at $45.00+GST/wk)')
+                    : 'No';
             });
 
             // Security Bond, Utility Baseline and Cleaning Frequency dynamic populating
@@ -2201,25 +2223,9 @@
             document.querySelectorAll('.fill-cleaning-frequency-desc').forEach(el => el.textContent = cleanFreqDesc);
             document.querySelectorAll('.fill-cleaning-frequency-adj').forEach(el => el.textContent = cleanFreqAdj);
 
-
-
-            // Check app settings
-            const noGst = applicationData.noGst || false;
-            const gstMultiplier = noGst ? 1.0 : 1.15;
-            const gstRate = noGst ? 0.0 : 0.15;
-            const separateUtilitiesEnabled = applicationData.separateUtilitiesEnabled || false;
-            const separateUtilitiesRate = applicationData.separateUtilitiesRate !== undefined ? applicationData.separateUtilitiesRate : 1080;
-            const carHireEnabled = applicationData.carHireEnabled || false;
-            const carHireRate = applicationData.carHireRate !== undefined ? applicationData.carHireRate : 1500;
-            const totalMonthlyServices = (separateUtilitiesEnabled ? separateUtilitiesRate : 0) + (carHireEnabled ? carHireRate : 0);
-
             // Operative Clause 3 Dynamic Injections
             const pTerms = applicationData.paymentTermsChoice || 'full';
             let paymentClauseHtml = '';
-            
-            const gstLabelSuffix = noGst ? " (GST Exempt)" : " + GST";
-            const gstInclLabel = noGst ? " (GST Exempt)" : " (incl. GST)";
-            const gstLabelName = noGst ? "GST Not Applicable" : "15% Goods & Services Tax (GST)";
 
             if (pTerms === 'full') {
                 const subOpt = td.bookingOption || 'A';
@@ -2430,15 +2436,43 @@
                 }
             }
 
+            // Dynamic Clause 2 & 9 Injection
+            const autoRenew = applicationData.autoRenew || false;
+            const clause2Container = document.getElementById('contract-clause-2-container');
+            if (clause2Container) {
+                if (autoRenew) {
+                    clause2Container.innerHTML = `
+                        <p class="no-indent"><strong>2. Term & Rolling Renewal</strong></p>
+                        <p class="no-indent">2.1 The term of this Licence shall be for an initial period of exactly 90 days, beginning on the Commencement Date, and shall automatically renew for subsequent consecutive rolling terms of 90 days as per Clause 9, unless terminated in accordance with the notice provisions.</p>
+                        <p class="no-indent">2.2 The Licensee acknowledges that this arrangement is a commercial serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, and that upon final termination/expiry of this Licence, no periodic tenancy is created.</p>
+                    `;
+                } else {
+                    clause2Container.innerHTML = `
+                        <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
+                        <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">${diffDays} days</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
+                        <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+                    `;
+                }
+            }
+
             // Dynamic Clause 9 Injection
             const clause9Container = document.getElementById('contract-clause-9-container');
             if (clause9Container) {
-                clause9Container.innerHTML = `
-                    <p class="no-indent"><strong>9. Rolling 90-Day Automatic Renewal Term</strong></p>
-                    <p class="no-indent">9.1 This agreement is for an initial fixed term of 90 days. Unless either party provides written notice of non-renewal to the other party at least fourteen (14) days prior to the scheduled Expiry Date (or the end of the then-current renewal term), this agreement shall automatically renew for a consecutive rolling term of ninety (90) days upon the same terms and conditions.</p>
-                    <p class="no-indent">9.2 Either party may terminate this agreement at the end of the initial term or any rolling 90-day renewal term by giving written notice to the other party at least fourteen (14) days prior to the expiry of the then-current term.</p>
-                    <p class="no-indent">9.3 All Licence Fees, separate services fees, and vehicle rental fees shall continue to apply and be payable in advance for each renewal period in accordance with the payment schedule.</p>
-                `;
+                if (autoRenew) {
+                    clause9Container.innerHTML = `
+                        <p class="no-indent"><strong>9. Rolling 90-Day Automatic Renewal Term</strong></p>
+                        <p class="no-indent">9.1 This agreement is for an initial fixed term of 90 days. Unless either party provides written notice of non-renewal to the other party at least fourteen (14) days prior to the scheduled Expiry Date (or the end of the then-current renewal term), this agreement shall automatically renew for a consecutive rolling term of ninety (90) days upon the same terms and conditions.</p>
+                        <p class="no-indent">9.2 Either party may terminate this agreement at the end of the initial term or any rolling 90-day renewal term by giving written notice to the other party at least fourteen (14) days prior to the expiry of the then-current term.</p>
+                        <p class="no-indent">9.3 All Licence Fees, separate services fees, and vehicle rental fees shall continue to apply and be payable in advance for each renewal period in accordance with the payment schedule.</p>
+                    `;
+                } else {
+                    clause9Container.innerHTML = `
+                        <p class="no-indent"><strong>9. Option to Request Extension</strong></p>
+                        <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of between 1 and 90 additional days) by providing written notice to the Licensor no later than thirty (30) days prior to the Expiry Date.</p>
+                        <p class="no-indent">9.2 The Licensor retains absolute discretion to accept or deny an extension request based on apartment availability, master lease parameters, or past conduct.</p>
+                        <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the extension fee block in cleared funds at least ten (10) days prior to the original Expiry Date. All commercial services and <span class="fill-cleaning-frequency-adj">${cleanFreqAdj}</span> cleaning entry mandates will continue throughout any extension.</p>
+                    `;
+                }
             }
 
             // Dynamic Clause 11 and Jurisdiction Injection
@@ -2448,10 +2482,11 @@
                 if (carHireEnabled) {
                     clause11Container.innerHTML = `
                         <p class="no-indent"><strong>11. Vehicle Hire & Corporate Liability Clause</strong></p>
-                        <p class="no-indent">11.1 Vehicle Access Rights: The Licensor grants the corporate Licensee the right to use the vehicle (Kia Sportage 2022, Registration PGS970, parked in the apartment garage) for a fixed hire charge of NZD $${carHireRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month, billed and payable monthly in advance alongside the main Licence Fee block.</p>
+                        <p class="no-indent">11.1 Vehicle Access Rights & Term: The Licensor grants the corporate Licensee the right to use the vehicle (Kia Sportage 2022, Registration PGS970, parked in the apartment garage) for a fixed hire charge of NZD $${carHireRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month, billed and payable monthly in advance alongside the main Licence Fee block. The vehicle hire is tied directly to the serviced accommodation licence and must be rented for the same term as the apartment.</p>
                         <p class="no-indent">11.2 Permitted Drivers: Any staff member, agent, or representative authorized by the corporate Licensee may operate the vehicle, provided they hold a valid, clean driver's licence suitable for operating motor vehicles in New Zealand.</p>
-                        <p class="no-indent">11.3 Insurance and Liability: The Licensee accepts 100% responsibility and liability for the vehicle during the term. The Licensee warrants that their corporate insurance policy fully covers the operation of this vehicle for any damage, loss, theft, and third-party liability. In the event of any damage, loss, or third-party claim, the Licensee shall fully indemnify the Licensor and pay any repair costs, insurance excesses, or losses immediately upon demand.</p>
-                        <p class="no-indent">11.4 Vehicle Return: The vehicle must be returned to its designated parking spot in the garage in clean condition, with a full tank of fuel, upon the expiration or termination of this Licence.</p>
+                        <p class="no-indent">11.3 Insurance and Liability: The Licensee accepts 100% responsibility and liability for the vehicle during the term. The Licensee warrants that their corporate insurance policy fully covers the operation of this vehicle for any damage, loss, theft, and third-party liability. Insurance for drivers will not be provided by the Licensor and is the full responsibility of the corporate Licensee. In the event of any damage, loss, or third-party claim, the Licensee shall fully indemnify the Licensor and pay any repair costs, insurance excesses, or losses immediately upon demand.</p>
+                        <p class="no-indent">11.4 Maintenance and Compliance: Ongoing servicing, registration, and Warrant of Fitness (WOF) will remain the responsibility of the Licensor.</p>
+                        <p class="no-indent">11.5 Vehicle Return: The vehicle must be returned to the same apartment garage in clean condition, with a full tank of fuel, and without any damage, upon the expiration or termination of this Licence.</p>
                     `;
                     jurisdictionContainer.innerHTML = `
                         <p class="no-indent"><strong>12. Jurisdiction</strong></p>
@@ -2464,6 +2499,33 @@
                         <p class="no-indent">11.1 This agreement is governed exclusively by the laws of New Zealand. Any contractual disputes that cannot be settled by mutual agreement shall be directed to the courts of New Zealand.</p>
                     `;
                 }
+            }
+
+            // Load Body Corporate Rules appendix dynamically
+            loadBodyCorporateRules();
+        }
+
+        async function loadBodyCorporateRules() {
+            try {
+                const res = await fetch('/body-corporate-rules.html');
+                if (!res.ok) throw new Error("Rules loaded failed");
+                const htmlText = await res.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+                const rulesContent = doc.querySelector('.rules-content').innerHTML;
+
+                const appendixDiv = document.getElementById('body-corporate-rules-appendix');
+                appendixDiv.innerHTML = `
+                    <div style="page-break-before: always; margin-top: 40px;"></div>
+                    <h2 style="text-align: center; text-transform: uppercase; margin-top: 30px !important; margin-bottom: 25px; font-family: 'Times New Roman', serif; font-size: 14pt; font-weight: bold; color: #000;">Body Corporate Operational Rules</h2>
+                    <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.55; text-align: justify; color: #000;">
+                        ${rulesContent}
+                    </div>
+                `;
+                appendixDiv.style.display = 'block';
+            } catch (err) {
+                console.error("Could not fetch Body Corporate rules appendix:", err);
             }
         }
 

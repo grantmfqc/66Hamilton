@@ -493,6 +493,10 @@
                             <input type="checkbox" id="no-gst-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
                             <label for="no-gst-checkbox" style="margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">GST Not Applicable (GST Exempt / Exclude GST)</label>
                         </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="auto-renew-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
+                            <label for="auto-renew-checkbox" style="margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">Rolling 90-Day Automatic Renewal</label>
+                        </div>
                         <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <input type="checkbox" id="separate-utilities-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'" />
@@ -1283,6 +1287,11 @@
                                         <input type="checkbox" class="edit-no-gst" ${app.noGst ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> GST Not Applicable
                                     </label>
                                 </div>
+                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">
+                                        <input type="checkbox" class="edit-auto-renew" ${app.autoRenew ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Rolling 90-Day Automatic Renewal
+                                    </label>
+                                </div>
                                 <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
                                     <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
                                         <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
@@ -1450,10 +1459,12 @@
                 const noGstVal = app.noGst ? '✅ GST Exempt / Not Applicable' : '❌ GST 15% Applicable';
                 const sepUtilsVal = app.separateUtilitiesEnabled ? `✅ Separately Invoiced ($${(app.separateUtilitiesRate || 1080).toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD/month)` : '❌ Bundled';
                 const carHireVal = app.carHireEnabled ? `✅ Vehicle Hire ($${(app.carHireRate || 1500).toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD/month)` : '❌ No Vehicle Hire';
+                const autoRenewVal = app.autoRenew ? '✅ Enabled (Rolling 90-Day Auto Renewal)' : '❌ Disabled (Definite Expiry)';
                 
                 html += `  <div><span style="${labelStyle}">GST Charging:</span><br/><span style="${valStyle}">${noGstVal}</span></div>`;
                 html += `  <div><span style="${labelStyle}">Separate Utilities:</span><br/><span style="${valStyle}">${sepUtilsVal}</span></div>`;
                 html += `  <div><span style="${labelStyle}">Vehicle Hire (Kia Sportage):</span><br/><span style="${valStyle}">${carHireVal}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Rolling 90-Day Renewal:</span><br/><span style="${valStyle}">${autoRenewVal}</span></div>`;
                 
                 if (diffDays > 0) {
                     html += `  <div><span style="${labelStyle}">Price Subtotal (excl. GST):</span><br/><span style="${valStyle}">$${subtotal.toLocaleString('en-NZ', {minimumFractionDigits: 2})} NZD</span></div>`;
@@ -1654,6 +1665,7 @@
             const separateUtilitiesRate = parseInt(panel.querySelector('.edit-separate-utilities-rate').value) || 0;
             const carHireEnabled = panel.querySelector('.edit-car-hire').checked;
             const carHireRate = parseInt(panel.querySelector('.edit-car-hire-rate').value) || 0;
+            const autoRenew = panel.querySelector('.edit-auto-renew').checked;
 
             try {
                 showToast('Updating application settings...');
@@ -1676,7 +1688,8 @@
                         separateUtilitiesEnabled,
                         separateUtilitiesRate,
                         carHireEnabled,
-                        carHireRate
+                        carHireRate,
+                        autoRenew
                     })
                 });
 
@@ -2214,6 +2227,7 @@
             const separateUtilitiesRate = parseInt(document.getElementById('separate-utilities-rate-input').value) || 0;
             const carHireEnabled = document.getElementById('car-hire-checkbox').checked;
             const carHireRate = parseInt(document.getElementById('car-hire-rate-input').value) || 0;
+            const autoRenew = document.getElementById('auto-renew-checkbox').checked;
 
             try {
                 const res = await fetchAdmin('/api/application/create', {
@@ -2235,7 +2249,8 @@
                         separateUtilitiesEnabled,
                         separateUtilitiesRate,
                         carHireEnabled,
-                        carHireRate
+                        carHireRate,
+                        autoRenew
                     })
                 });
 

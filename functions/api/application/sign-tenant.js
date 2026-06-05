@@ -84,6 +84,8 @@ export async function onRequestPost(context) {
         ? `Yes (Kia Sportage 2022, Reg PGS970 - NZD $${(app.carHireRate || 1500).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}/mo)` 
         : 'No';
 
+      const autoRenewFormatted = app.autoRenew ? 'Yes (Rolling 90-Day Auto Renewal)' : 'No (Definite Expiry / Request Extension)';
+
       const gstFormatted = app.noGst ? 'GST Exempt / Not Applicable' : '15% GST Applicable';
 
       const linenFormatted = app.linenService 
@@ -118,6 +120,7 @@ export async function onRequestPost(context) {
                   <tr><td style="padding: 6px 0; font-weight: bold;">Commercial Security Bond:</td><td>${securityBondFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Separate Utilities:</td><td>${utilitiesFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Vehicle Hire:</td><td>${carHireFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Rolling 90-Day Renewal:</td><td>${autoRenewFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">GST Status:</td><td>${gstFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Linen Service Selected:</td><td>${linenFormatted}</td></tr>
                 </table>

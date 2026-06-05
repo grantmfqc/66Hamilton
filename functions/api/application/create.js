@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { passcode, rent, startDate, endDate, linenService, rateType, rateValue, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate } = data;
+    const { passcode, rent, startDate, endDate, linenService, rateType, rateValue, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate, autoRenew } = data;
 
     const kv = context.env.APPLICATIONS_KV;
     if (!kv) {
@@ -70,6 +70,7 @@ export async function onRequestPost(context) {
       separateUtilitiesRate: separateUtilitiesRate !== undefined ? Number(separateUtilitiesRate) : 1080,
       carHireEnabled: !!carHireEnabled,
       carHireRate: carHireRate !== undefined ? Number(carHireRate) : 1500,
+      autoRenew: !!autoRenew,
       tenantDetails: null,
       tenantSignature: null,
       tenantSignedAt: null,

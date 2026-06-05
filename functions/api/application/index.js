@@ -79,7 +79,8 @@ export async function onRequestGet(context) {
               separateUtilitiesEnabled: !!parsed.separateUtilitiesEnabled,
               separateUtilitiesRate: parsed.separateUtilitiesRate !== undefined ? parsed.separateUtilitiesRate : 1080,
               carHireEnabled: !!parsed.carHireEnabled,
-              carHireRate: parsed.carHireRate !== undefined ? parsed.carHireRate : 1500
+              carHireRate: parsed.carHireRate !== undefined ? parsed.carHireRate : 1500,
+              autoRenew: !!parsed.autoRenew
             });
           }
         }
