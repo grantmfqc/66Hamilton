@@ -1526,6 +1526,8 @@
                     }
                     
                     if (diffDays > 0) {
+                        const utilitiesDailyRate = app.separateUtilitiesEnabled ? ((app.separateUtilitiesRate !== undefined ? app.separateUtilitiesRate : 1080) / 28) : 0;
+                        const carHireDailyRate = app.carHireEnabled ? ((app.carHireRate !== undefined ? app.carHireRate : 1500) / 30) : 0;
                         const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate, app);
                         let scheduleRowsHtml = '';
                         schedule.forEach(p => {
@@ -1533,8 +1535,7 @@
                             let amountHtml = `$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
                             
                             if (app.separateUtilitiesEnabled || app.carHireEnabled) {
-                                const totalMonthlyServices = (app.separateUtilitiesEnabled ? (app.separateUtilitiesRate || 1080) : 0) + (app.carHireEnabled ? (app.carHireRate || 1500) : 0);
-                                const servicesAmount = (p.daysCovered / 30) * totalMonthlyServices;
+                                const servicesAmount = p.daysCovered * (utilitiesDailyRate + carHireDailyRate);
                                 
                                 itemHtml += `<br/><small style="color: #bbb;">- Rental Invoice: $${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>`;
                                 itemHtml += `<br/><small style="color: #bbb;">- Services Invoice: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>`;
@@ -1558,7 +1559,7 @@
                         let totalHtml = `$${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
                         
                         if (app.separateUtilitiesEnabled || app.carHireEnabled) {
-                            const totalServicesAmount = schedule.reduce((sum, p) => sum + ((p.daysCovered / 30) * ((app.separateUtilitiesEnabled ? (app.separateUtilitiesRate || 1080) : 0) + (app.carHireEnabled ? (app.carHireRate || 1500) : 0))), 0);
+                            const totalServicesAmount = schedule.reduce((sum, p) => sum + (p.daysCovered * (utilitiesDailyRate + carHireDailyRate)), 0);
                             totalHtml = `<span style="font-size: 0.75rem;">Rent Total: $${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.75rem;">Services Total: $${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
                         }
 
@@ -1588,6 +1589,38 @@
                                      </div>
                                    </div>`;
                     }
+                }
+
+                if (app.status === 'completed') {
+                    html += `  <div style="grid-column: 1 / -1; margin-top: 15px; border-top: 1px dashed rgba(201, 169, 110, 0.15); padding-top: 15px;">
+                                 <span style="${labelStyle}">Generated Contract Invoices:</span>
+                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 10px;">
+                                     <a href="/view-invoice.html?id=HB0001&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0001</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent + Bond (Immediate)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0002&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0002</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (Immediate)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0003&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0003</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (24 June 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0004&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0004</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (24 June 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0005&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0005</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (24 July 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0006&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0006</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (24 July 2026)</span>
+                                     </a>
+                                 </div>
+                               </div>`;
                 }
 
                 html += `</div>`;

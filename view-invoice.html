@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice — 66 Hamilton Road</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0B0D;
+            --bg-card: #121214;
+            --accent-gold: #C9A96E;
+            --text-primary: #F2EFE9;
+            --text-muted: rgba(242, 239, 233, 0.6);
+            --border: rgba(201, 169, 110, 0.2);
+            --border-hover: rgba(201, 169, 110, 0.4);
+            --error: #e57373;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* --- Sticky Header --- */
+        .header-bar {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #121214;
+            border-bottom: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            font-size: 0.82rem;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-gold {
+            background: var(--accent-gold);
+            color: #000;
+            border: 1px solid var(--accent-gold);
+        }
+
+        .btn-gold:hover {
+            background: #d4b882;
+            border-color: #d4b882;
+            box-shadow: 0 0 15px rgba(201, 169, 110, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* --- Main Layout --- */
+        .viewer-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* --- Invoice Styled Sheet --- */
+        .invoice-box {
+            background: #ffffff;
+            color: #1a1a1a;
+            padding: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+            position: relative;
+            border-radius: 6px;
+        }
+
+        /* --- Typography inside Invoice --- */
+        .invoice-box h1 {
+            font-family: 'Cormorant Garamond', serif;
+            color: #1a1a1a;
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .invoice-box h2 {
+            font-family: 'Outfit', sans-serif;
+            color: #c9a96e;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        /* --- Grid Structure --- */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .meta-column p {
+            margin-bottom: 6px;
+            color: #4a5568;
+        }
+        
+        .meta-column strong {
+            color: #1a1a1a;
+        }
+
+        .invoice-details-card {
+            background: #f7fafc;
+            border: 1px solid #edf2f7;
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .invoice-details-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-details-card td {
+            padding: 4px 0;
+            color: #4a5568;
+        }
+
+        .invoice-details-card td.val {
+            text-align: right;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* --- Items Table --- */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .items-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            padding: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #edf2f7;
+            color: #2d3748;
+        }
+
+        .items-table tr.total-row td {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding-top: 20px;
+            color: #1a1a1a;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        /* --- Bank & Payment details --- */
+        .payment-instructions {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px dashed #c9a96e;
+            background: #fcf9f2;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            color: #4a5568;
+        }
+
+        .payment-instructions h3 {
+            font-family: 'Outfit', sans-serif;
+            color: #1a1a1a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-instructions table {
+            margin-top: 8px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .payment-instructions td {
+            padding: 3px 0;
+        }
+
+        .payment-instructions td.lbl {
+            width: 150px;
+            color: #718096;
+        }
+
+        .payment-instructions td.val {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* --- Footer --- */
+        .invoice-footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.8rem;
+            border-top: 1px solid #edf2f7;
+            padding-top: 20px;
+        }
+
+        /* --- States --- */
+        .loading-view {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(201, 169, 110, 0.2);
+            border-top: 3px solid var(--accent-gold);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-view {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 6px;
+            text-align: center;
+            max-width: 500px;
+            margin: 100px auto;
+        }
+
+        .error-view h3 {
+            color: var(--error);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .viewer-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .invoice-box {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+
+            .payment-instructions {
+                background: #ffffff !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Header -->
+    <div class="header-bar no-print">
+        <div class="header-title" id="page-header-title">Tax Invoice — Loading...</div>
+        <div class="header-buttons">
+            <button class="btn btn-outline" onclick="goBack()">Back</button>
+            <button class="btn btn-gold" onclick="window.print()">Print / Save PDF</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="viewer-container">
+        
+        <!-- Loading State -->
+        <div id="loading" class="loading-view">
+            <div class="spinner"></div>
+            <p style="color: var(--text-muted); font-family: 'Outfit', sans-serif;">Retrieving database record...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-view" class="error-view" style="display: none;">
+            <h3>Failed to Load Invoice</h3>
+            <p id="error-message" style="color: var(--text-muted); margin-bottom: 25px;"></p>
+            <button class="btn btn-outline" onclick="goBack()">Go Back</button>
+        </div>
+
+        <!-- Invoice Box -->
+        <div id="invoice-content" class="invoice-box" style="display: none;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                <div>
+                    <h1>Tax Invoice</h1>
+                    <p style="color: #718096; font-size: 0.9rem; margin-top: -15px;">Reference: <strong>LICENCE TO OCCUPY AGREEMENT 1/66 Hamilton Rd</strong></p>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 600; color: #c9a96e;" id="invoice-id-display">HB0000</div>
+                    <div style="color: #718096; font-size: 0.85rem; margin-top: 5px;">Auckland, New Zealand</div>
+                </div>
+            </div>
+
+            <div class="grid-2col">
+                <div class="meta-column">
+                    <h2>From</h2>
+                    <p><strong>Grant Dennis</strong></p>
+                    <p>1/66 Hamilton Road</p>
+                    <p>Herne Bay</p>
+                    <p>Auckland</p>
+                    <p style="margin-top: 10px; font-size: 0.85rem; color: #a0aec0;">GST Registration: Exempt</p>
+                </div>
+                <div class="meta-column">
+                    <h2>Bill To</h2>
+                    <p><strong id="billing-tenant-name">Tenant Name</strong></p>
+                    <p id="billing-tenant-address">Tenant Address</p>
+                </div>
+            </div>
+
+            <div class="grid-2col" style="margin-bottom: 30px;">
+                <div class="invoice-details-card" style="grid-column: 1 / -1;">
+                    <table>
+                        <tr>
+                            <td><strong>Invoice Number:</strong></td>
+                            <td class="val" id="meta-invoice-number">HB0000</td>
+                            <td style="width: 10%;"></td>
+                            <td><strong>Invoice Date:</strong></td>
+                            <td class="val" id="meta-invoice-date">09/06/2026</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reference:</strong></td>
+                            <td class="val">1/66 Hamilton Road Licence</td>
+                            <td></td>
+                            <td><strong>Due Date:</strong></td>
+                            <td class="val" id="meta-due-date" style="color: #e53e3e;">Immediate</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <h2>Invoice Line Items</h2>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 55%;">Description</th>
+                        <th style="width: 15%;">Period</th>
+                        <th style="width: 15%; text-align: right;">Rate (NZD)</th>
+                        <th style="width: 15%; text-align: right;">Amount (NZD)</th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-items-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+
+            <!-- Bank & Payment Details -->
+            <div class="payment-instructions">
+                <h3>Direct Credit Payment Instructions</h3>
+                <p>Please pay via direct bank transfer into the account below, referencing the invoice number:</p>
+                <table>
+                    <tr>
+                        <td class="lbl">Account Name:</td>
+                        <td class="val">Grant Dennis</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">Account Number:</td>
+                        <td class="val">02-0192-0028298-097</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">Bank:</td>
+                        <td class="val">BNZ (Bank of New Zealand)</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">Reference to use:</td>
+                        <td class="val" style="color: #c9a96e;" id="payment-reference">HB0000</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="invoice-footer">
+                <p>Thank you for your business.</p>
+                <p style="margin-top: 5px; font-size: 0.75rem;">Premium Serviced Accommodation — 1/66 Hamilton Road, Herne Bay, Auckland</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const invoiceId = urlParams.get('id') || 'HB0001';
+
+        if (!token) {
+            showError("Invalid Access URL — secure token parameter is missing.");
+        } else {
+            fetchAgreementAndRender();
+        }
+
+        function showError(msg) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('invoice-content').style.display = 'none';
+            document.getElementById('error-message').textContent = msg;
+            document.getElementById('error-view').style.display = 'block';
+        }
+
+        function goBack() {
+            // Check document referrer
+            if (document.referrer && (document.referrer.includes('admin') || document.referrer.includes('apply') || document.referrer.includes('view-agreement'))) {
+                window.location.href = document.referrer;
+            } else {
+                // Default fallback based on dashboard access or view-agreement
+                window.location.href = `view-agreement.html?token=${token}`;
+            }
+        }
+
+        async function fetchAgreementAndRender() {
+            try {
+                const res = await fetch(`/api/application?token=${token}`);
+                if (!res.ok) throw new Error("Could not connect to database or invalid token.");
+                
+                const applicationData = await res.json();
+                renderInvoice(applicationData);
+            } catch (err) {
+                showError("Error loading invoice: " + err.message);
+            }
+        }
+
+        function renderInvoice(appData) {
+            const td = appData.tenantDetails;
+            if (!td) {
+                showError("Corrupt application data structure.");
+                return;
+            }
+
+            // Title and Header info
+            document.getElementById('page-header-title').textContent = `Tax Invoice ${invoiceId} — 66 Hamilton Road`;
+            document.getElementById('invoice-id-display').textContent = invoiceId;
+            document.getElementById('meta-invoice-number').textContent = invoiceId;
+            document.getElementById('payment-reference').textContent = invoiceId;
+
+            // Bill To
+            const isCompany = td.licenseeType === 'company' || (td.name && (td.name.includes('Pty Ltd') || td.name.includes('Ltd') || td.name.includes('Limited') || td.name.includes('Total Drain')));
+            const licenseeDisplayName = isCompany ? `${td.name}${td.companyRep ? ` (represented by ${td.companyRep})` : ''}` : td.name;
+            document.getElementById('billing-tenant-name').textContent = licenseeDisplayName;
+            document.getElementById('billing-tenant-address').innerHTML = (td.address || 'N/A').replace(/\n/g, '<br/>');
+
+            // Date formatting
+            // For TDG Environmental, we explicitly want the Invoice Date to be 09/06/2026 (9 June 2026) as requested
+            let invoiceDateStr = '09/06/2026';
+            
+            // Try to align checkin date
+            const checkin = new Date(td.arrivalDate);
+            const checkinStrFormatted = checkin.toLocaleDateString('en-NZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            // If the licensee name matches TDG Environmental or token matches, force the requested dates
+            const isTdg = td.name && (td.name.toLowerCase().includes('tdg') || td.name.toLowerCase().includes('drain') || token === '43f1fd84-49c3-45fd-81dc-3bc9abe505a8');
+            
+            if (!isTdg) {
+                // Fallback to check-in date as invoice date for other agreements
+                invoiceDateStr = checkinStrFormatted;
+            }
+
+            document.getElementById('meta-invoice-date').textContent = invoiceDateStr;
+
+            // Rates
+            const rateType = appData.rateType || 'weekly';
+            const rateValue = appData.rateValue || appData.rent || 2400;
+            const noGst = appData.noGst || false;
+            const gstMultiplier = noGst ? 1.0 : 1.15;
+            
+            let dailyRentRate = 0;
+            if (rateType === 'daily') {
+                dailyRentRate = rateValue;
+            } else if (rateType === 'weekly') {
+                dailyRentRate = rateValue / 7;
+            } else if (rateType === 'monthly') {
+                dailyRentRate = rateValue / 30;
+            }
+            const dailyRentRateInclGst = dailyRentRate * gstMultiplier;
+
+            // Utilities and Car Hire daily rates
+            const utilitiesDailyRate = appData.separateUtilitiesEnabled ? (appData.separateUtilitiesRate !== undefined ? appData.separateUtilitiesRate : 1080) / 28 : 0;
+            const carHireDailyRate = appData.carHireEnabled ? (appData.carHireRate !== undefined ? appData.carHireRate : 1500) / 30 : 0;
+            const servicesDailyRateTotal = utilitiesDailyRate + carHireDailyRate;
+
+            const securityBond = appData.securityBond !== undefined ? appData.securityBond : 5000;
+
+            // Parse Invoice Number to determine content
+            // Structure: HB0001 to HB0006
+            const match = invoiceId.match(/HB0*(\d+)/i);
+            const invoiceNum = match ? parseInt(match[1], 10) : 1;
+
+            let itemsHtml = '';
+            let totalAmount = 0;
+            let dueDateStr = 'Immediate';
+
+            // Odd numbers are Rent, Even numbers are Services
+            const isRentInvoice = (invoiceNum % 2 !== 0);
+            const billingBlockIndex = Math.floor((invoiceNum - 1) / 2); // 0 for Block 1 (Days 1-30), 1 for Block 2 (Days 31-60), 2 for Block 3 (Days 61-90)
+
+            // Let's compute date intervals
+            const dayStart = billingBlockIndex * 30 + 1;
+            const dayEnd = dayStart + 29;
+
+            // Set due dates
+            if (isTdg) {
+                if (invoiceNum === 1 || invoiceNum === 2) {
+                    dueDateStr = 'Immediate';
+                } else if (invoiceNum === 3 || invoiceNum === 4) {
+                    dueDateStr = '24/06/2026';
+                } else if (invoiceNum === 5 || invoiceNum === 6) {
+                    dueDateStr = '24/07/2026';
+                }
+            } else {
+                // General logic for other agreements
+                if (invoiceNum === 1 || invoiceNum === 2) {
+                    dueDateStr = 'Immediate';
+                } else {
+                    // Due dates are 14 days after check-in for Block 2, and then every 30 days
+                    const due = new Date(checkin);
+                    if (billingBlockIndex === 1) {
+                        due.setDate(due.getDate() + 14);
+                    } else if (billingBlockIndex > 1) {
+                        due.setDate(due.getDate() + 14 + (billingBlockIndex - 1) * 30);
+                    }
+                    dueDateStr = due.toLocaleDateString('en-NZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+            }
+
+            document.getElementById('meta-due-date').textContent = dueDateStr;
+
+            if (isRentInvoice) {
+                // Rent Invoice
+                const rentVal = 30 * dailyRentRateInclGst;
+                const gstText = noGst ? " (GST Exempt)" : " (incl. GST)";
+                
+                itemsHtml += `
+                    <tr>
+                        <td>
+                            <strong>Serviced Accommodation Licence Fee (Rent)</strong><br/>
+                            <span style="font-size: 0.8rem; color: #718096;">Licence occupancy charge for Days ${dayStart} to ${dayEnd} at $${dailyRentRateInclGst.toFixed(4)}/day</span>
+                        </td>
+                        <td>30 Days</td>
+                        <td class="text-right">$${dailyRentRateInclGst.toFixed(2)}</td>
+                        <td class="text-right">$${rentVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+                totalAmount += rentVal;
+
+                // HB0001 includes Bond
+                if (invoiceNum === 1) {
+                    itemsHtml += `
+                        <tr>
+                            <td>
+                                <strong>Commercial Security Bond</strong><br/>
+                                <span style="font-size: 0.8rem; color: #718096;">Refundable commercial security deposit held in trust</span>
+                            </td>
+                            <td>N/A</td>
+                            <td class="text-right">N/A</td>
+                            <td class="text-right">$${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                    totalAmount += securityBond;
+                }
+
+            } else {
+                // Services Invoice
+                const utilsVal = 30 * utilitiesDailyRate;
+                const carVal = 30 * carHireDailyRate;
+
+                if (appData.separateUtilitiesEnabled) {
+                    itemsHtml += `
+                        <tr>
+                            <td>
+                                <strong>Utility Service Charges (Utilities)</strong><br/>
+                                <span style="font-size: 0.8rem; color: #718096;">Agreed utility fee for Days ${dayStart} to ${dayEnd} at $${utilitiesDailyRate.toFixed(4)}/day (derived from $270/week rate)</span>
+                            </td>
+                            <td>30 Days</td>
+                            <td class="text-right">$${utilitiesDailyRate.toFixed(2)}</td>
+                            <td class="text-right">$${utilsVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                    totalAmount += utilsVal;
+                }
+
+                if (appData.carHireEnabled) {
+                    itemsHtml += `
+                        <tr>
+                            <td>
+                                <strong>Vehicle Rental / Car Hire Charge</strong><br/>
+                                <span style="font-size: 0.8rem; color: #718096;">Non-exclusive motor vehicle hire for Days ${dayStart} to ${dayEnd} at $${carHireDailyRate.toFixed(4)}/day ($1,500/month rate)</span>
+                            </td>
+                            <td>30 Days</td>
+                            <td class="text-right">$${carHireDailyRate.toFixed(2)}</td>
+                            <td class="text-right">$${carVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                    totalAmount += carVal;
+                }
+            }
+
+            // Total Row
+            itemsHtml += `
+                <tr class="total-row">
+                    <td colspan="2" style="border-top: 2px solid #e2e8f0;"></td>
+                    <td class="text-right" style="border-top: 2px solid #e2e8f0; font-weight: bold;">TOTAL:</td>
+                    <td class="text-right" style="border-top: 2px solid #e2e8f0; font-weight: bold; color: #c9a96e; font-size: 1.15rem;">
+                        $${totalAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD
+                    </td>
+                </tr>
+            `;
+
+            document.getElementById('invoice-items-body').innerHTML = itemsHtml;
+
+            // Show invoice contents
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('invoice-content').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
