@@ -38,22 +38,24 @@ export async function onRequestPost(context) {
       const rateType = app.rateType || 'weekly';
       const rateValue = app.rateValue || app.rent || 2400;
       
-      let weeklyRent = 0;
+      let dailyRent = 0;
       if (rateType === 'weekly') {
-        weeklyRent = rateValue;
+        dailyRent = rateValue / 7;
       } else if (rateType === 'daily') {
-        weeklyRent = rateValue * 7;
+        dailyRent = rateValue;
       } else if (rateType === 'monthly') {
-        weeklyRent = (rateValue * 12) / 52;
+        dailyRent = rateValue / 30;
       }
+      const weeklyRent = dailyRent * 7;
 
       let rateTypeDisplay = rateType;
       if (rateType === 'daily') rateTypeDisplay = 'day';
       else if (rateType === 'weekly') rateTypeDisplay = 'week';
       else if (rateType === 'monthly') rateTypeDisplay = 'month';
 
-      const weeklyRentFormatted = `NZD $${weeklyRent.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      const rentRateFormatted = `NZD $${rateValue.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per ${rateTypeDisplay}`;
+      const gstMultiplier = app.noGst ? 1.0 : 1.15;
+      const weeklyRentFormatted = `NZD $${(weeklyRent * gstMultiplier).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${app.noGst ? '(GST Exempt)' : '(incl. GST)'}`;
+      const rentRateFormatted = `NZD $${rateValue.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per ${rateTypeDisplay} ${app.noGst ? '(GST Exempt)' : '(excl. GST)'}`;
       
       const commencementDateFormatted = app.tenantDetails?.arrivalDate 
         ? new Date(app.tenantDetails.arrivalDate).toLocaleDateString('en-NZ', { dateStyle: 'long' }) 
@@ -74,6 +76,20 @@ export async function onRequestPost(context) {
       const securityBond = app.securityBond !== undefined ? app.securityBond : 5000;
       const securityBondFormatted = `NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+      const utilitiesFormatted = app.separateUtilitiesEnabled 
+        ? `Yes (NZD $${(app.separateUtilitiesRate || 1080).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}/mo)` 
+        : 'No (Bundled)';
+
+      const carHireFormatted = app.carHireEnabled 
+        ? `Yes (Kia Sportage 2022, Reg PGS970 - NZD $${(app.carHireRate || 1500).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}/mo)` 
+        : 'No';
+
+      const gstFormatted = app.noGst ? 'GST Exempt / Not Applicable' : '15% GST Applicable';
+
+      const linenFormatted = app.linenService 
+        ? (app.separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed in arrears)' : 'Yes ($45+GST/wk)')
+        : 'No';
+
       const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -93,14 +109,17 @@ export async function onRequestPost(context) {
               <div style="background-color: #121214; border: 1px solid #2a2a2f; padding: 20px; border-radius: 4px; margin: 25px 0;">
                 <h3 style="color: #C9A96E; margin-top: 0;">Application Summary:</h3>
                 <table style="width: 100%; border-collapse: collapse; color: #a0a0a5; font-size: 14px;">
-                  <tr><td style="padding: 6px 0; font-weight: bold; width: 40%;">Applicant Name:</td><td>${app.tenantDetails.name}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold; width: 45%;">Applicant Name:</td><td>${app.tenantDetails.name}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Rent Rate:</td><td>${rentRateFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Equivalent Weekly Rent:</td><td>${weeklyRentFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Commencement Date:</td><td>${commencementDateFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Expiry Date:</td><td>${expiryDateFormatted}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Payment Terms:</td><td>${paymentOptionStr}</td></tr>
                   <tr><td style="padding: 6px 0; font-weight: bold;">Commercial Security Bond:</td><td>${securityBondFormatted}</td></tr>
-                  <tr><td style="padding: 6px 0; font-weight: bold;">Linen Service Selected:</td><td>${app.linenService ? 'Yes ($45+GST/wk)' : 'No'}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Separate Utilities:</td><td>${utilitiesFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Vehicle Hire:</td><td>${carHireFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">GST Status:</td><td>${gstFormatted}</td></tr>
+                  <tr><td style="padding: 6px 0; font-weight: bold;">Linen Service Selected:</td><td>${linenFormatted}</td></tr>
                 </table>
               </div>
 

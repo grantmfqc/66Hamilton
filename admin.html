@@ -489,6 +489,28 @@
                             <input type="checkbox" id="cleaning-frequency-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
                             <label for="cleaning-frequency-checkbox" style="margin-bottom: 0;">Cleaning every two weeks (instead of weekly)</label>
                         </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="no-gst-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
+                            <label for="no-gst-checkbox" style="margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">GST Not Applicable (GST Exempt / Exclude GST)</label>
+                        </div>
+                        <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="separate-utilities-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'" />
+                                <label for="separate-utilities-checkbox" style="margin-bottom: 0;">Invoice Utilities Separately</label>
+                            </div>
+                            <div id="separate-utilities-rate-container" class="form-group" style="display: none; padding-left: 28px; margin-bottom: 0;">
+                                <label for="separate-utilities-rate-input" style="font-size: 0.75rem; margin-bottom: 4px;">Utilities Fixed Rate (NZD/month)</label>
+                                <input type="number" id="separate-utilities-rate-input" value="1080" min="0" style="padding: 6px 10px; font-size: 0.85rem;" />
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="car-hire-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('car-hire-rate-container').style.display = this.checked ? 'block' : 'none'" />
+                                <label for="car-hire-checkbox" style="margin-bottom: 0;">Include Vehicle Hire (Kia Sportage 2022)</label>
+                            </div>
+                            <div id="car-hire-rate-container" class="form-group" style="display: none; padding-left: 28px; margin-bottom: 0;">
+                                <label for="car-hire-rate-input" style="font-size: 0.75rem; margin-bottom: 4px;">Car Hire Fixed Rate (NZD/month)</label>
+                                <input type="number" id="car-hire-rate-input" value="1500" min="0" style="padding: 6px 10px; font-size: 0.85rem;" />
+                            </div>
+                        </div>
                         <button type="submit" class="btn-primary" style="width: 100%;">Create Invite</button>
                     </form>
 
@@ -854,8 +876,11 @@
             return fetch(url, options);
         }
 
-        function getPaymentSchedule(checkinDateStr, totalDays, dailyRateValue) {
-            const dailyRateInclGst = dailyRateValue * 1.15;
+        function getPaymentSchedule(checkinDateStr, totalDays, dailyRateValue, appData) {
+            const data = appData || (typeof applicationData !== 'undefined' ? applicationData : {});
+            const noGst = data.noGst || false;
+            const gstMultiplier = noGst ? 1.0 : 1.15;
+            const dailyRateInclGst = dailyRateValue * gstMultiplier;
             const checkinDate = new Date(checkinDateStr);
             
             let remainingDays = totalDays;
@@ -881,7 +906,6 @@
                 const daysCovered = Math.min(30, remainingDays);
                 const amount = daysCovered * dailyRateInclGst;
                 
-                // Due date = checkinDate + 14 days
                 const dueDate = new Date(checkinDate);
                 dueDate.setDate(dueDate.getDate() + 14);
                 
@@ -905,7 +929,6 @@
                 const daysCovered = Math.min(30, remainingDays);
                 const amount = daysCovered * dailyRateInclGst;
                 
-                // Due date = Payment 2 Due Date + 30 days
                 const prevDueDate = schedule[1].dueDateObj;
                 const dueDate = new Date(prevDueDate);
                 dueDate.setDate(dueDate.getDate() + 30);
@@ -931,7 +954,6 @@
                 const daysCovered = Math.min(30, remainingDays);
                 const amount = daysCovered * dailyRateInclGst;
                 
-                // Due date = previous payment due date + 30 days
                 const prevDueDate = schedule[schedule.length - 1].dueDateObj;
                 const dueDate = new Date(prevDueDate);
                 dueDate.setDate(dueDate.getDate() + 30);
@@ -948,7 +970,6 @@
                     daysCovered: daysCovered,
                     periodCovered: `Days ${startDayIndex} to ${endDayIndex}`
                 });
-                
                 remainingDays -= daysCovered;
                 paymentIdx++;
             }
@@ -1256,6 +1277,36 @@
                                 </div>
                             </div>
                             
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; margin-top: 5px;">
+                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">
+                                        <input type="checkbox" class="edit-no-gst" ${app.noGst ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> GST Not Applicable
+                                    </label>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
+                                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
+                                            <input type="checkbox" class="edit-separate-utilities" ${app.separateUtilitiesEnabled ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} onchange="this.closest('form').querySelector('.edit-separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Invoice Utilities Separately
+                                        </label>
+                                    </div>
+                                    <div class="edit-separate-utilities-rate-container" style="display: ${app.separateUtilitiesEnabled ? 'block' : 'none'};">
+                                        <label style="font-size: 0.7rem; margin-bottom: 4px;">Utilities Fixed Rate ($/mo)</label>
+                                        <input type="number" class="edit-separate-utilities-rate" value="${app.separateUtilitiesRate !== undefined ? app.separateUtilitiesRate : 1080}" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
+                                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
+                                        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
+                                            <input type="checkbox" class="edit-car-hire" ${app.carHireEnabled ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} onchange="this.closest('form').querySelector('.edit-car-hire-rate-container').style.display = this.checked ? 'block' : 'none'" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Include Vehicle Hire
+                                        </label>
+                                    </div>
+                                    <div class="edit-car-hire-rate-container" style="display: ${app.carHireEnabled ? 'block' : 'none'};">
+                                        <label style="font-size: 0.7rem; margin-bottom: 4px;">Car Hire Fixed Rate ($/mo)</label>
+                                        <input type="number" class="edit-car-hire-rate" value="${app.carHireRate !== undefined ? app.carHireRate : 1500}" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
+                                    </div>
+                                </div>
+                            </div>
+                            
                             ${(app.status !== 'pending_owner' && app.status !== 'completed') ? `
                                 <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 4px; width: fit-content; margin-top: 5px;">Save Settings</button>
                             ` : ''}
@@ -1372,12 +1423,42 @@
                 html += `  <div><span style="${labelStyle}">Cleaning Frequency:</span><br/><span style="${valStyle}">${cleanFreq === 'fortnightly' ? 'Fortnightly' : 'Weekly'}</span></div>`;
                 html += `  <div><span style="${labelStyle}">Utilities Baseline Cap:</span><br/><span style="${valStyle}">$${utilBase.toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD/month</span></div>`;
                 
-                // Renders billing calculations if checkin details populated
-                if (app.rentCalculation) {
-                    const rc = app.rentCalculation;
-                    html += `  <div><span style="${labelStyle}">Price Subtotal (excl. GST):</span><br/><span style="${valStyle}">$${rc.subtotal ? rc.subtotal.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</span></div>`;
-                    html += `  <div><span style="${labelStyle}">GST (15%):</span><br/><span style="${valStyle}">$${rc.gst ? rc.gst.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</span></div>`;
-                    html += `  <div><span style="${labelStyle}">Total Price (incl. GST):</span><br/><span style="${valStyle}"><strong>$${rc.total ? rc.total.toLocaleString('en-NZ', {minimumFractionDigits: 2}) : 'N/A'} NZD</strong></span></div>`;
+                // Renders billing calculations dynamically
+                let diffDays = 0;
+                if (td.arrivalDate && td.departureDate) {
+                    const startD = new Date(td.arrivalDate);
+                    const endD = new Date(td.departureDate);
+                    startD.setHours(0,0,0,0);
+                    endD.setHours(0,0,0,0);
+                    diffDays = Math.ceil(Math.abs(endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+                }
+                
+                let dailyRate = 0;
+                if (rateType === 'daily') {
+                    dailyRate = totalVal;
+                } else if (rateType === 'weekly') {
+                    dailyRate = totalVal / 7;
+                } else if (rateType === 'monthly') {
+                    dailyRate = totalVal / 30;
+                }
+                
+                const subtotal = dailyRate * diffDays;
+                const gstRate = app.noGst ? 0 : 0.15;
+                const gst = subtotal * gstRate;
+                const total = subtotal + gst;
+
+                const noGstVal = app.noGst ? '✅ GST Exempt / Not Applicable' : '❌ GST 15% Applicable';
+                const sepUtilsVal = app.separateUtilitiesEnabled ? `✅ Separately Invoiced ($${(app.separateUtilitiesRate || 1080).toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD/month)` : '❌ Bundled';
+                const carHireVal = app.carHireEnabled ? `✅ Vehicle Hire ($${(app.carHireRate || 1500).toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD/month)` : '❌ No Vehicle Hire';
+                
+                html += `  <div><span style="${labelStyle}">GST Charging:</span><br/><span style="${valStyle}">${noGstVal}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Separate Utilities:</span><br/><span style="${valStyle}">${sepUtilsVal}</span></div>`;
+                html += `  <div><span style="${labelStyle}">Vehicle Hire (Kia Sportage):</span><br/><span style="${valStyle}">${carHireVal}</span></div>`;
+                
+                if (diffDays > 0) {
+                    html += `  <div><span style="${labelStyle}">Price Subtotal (excl. GST):</span><br/><span style="${valStyle}">$${subtotal.toLocaleString('en-NZ', {minimumFractionDigits: 2})} NZD</span></div>`;
+                    html += `  <div><span style="${labelStyle}">GST (15%):</span><br/><span style="${valStyle}">$${gst.toLocaleString('en-NZ', {minimumFractionDigits: 2})} NZD ${app.noGst ? '(Exempt)' : ''}</span></div>`;
+                    html += `  <div><span style="${labelStyle}">Total Price:</span><br/><span style="${valStyle}"><strong>$${total.toLocaleString('en-NZ', {minimumFractionDigits: 2})} NZD ${app.noGst ? '(GST Exempt)' : '(incl. GST)'}</strong></span></div>`;
                 }
                 
                 const termsChoice = app.paymentTermsChoice || 'full';
@@ -1407,27 +1488,46 @@
                     }
                     
                     if (diffDays > 0) {
-                        const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate);
+                        const schedule = getPaymentSchedule(td.arrivalDate, diffDays, dailyRate, app);
                         let scheduleRowsHtml = '';
                         schedule.forEach(p => {
+                            let itemHtml = `<strong>${p.label}</strong><br/><small style="color: var(--text-muted); font-size: 0.75rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>`;
+                            let amountHtml = `$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+                            
+                            if (app.separateUtilitiesEnabled || app.carHireEnabled) {
+                                const totalMonthlyServices = (app.separateUtilitiesEnabled ? (app.separateUtilitiesRate || 1080) : 0) + (app.carHireEnabled ? (app.carHireRate || 1500) : 0);
+                                const servicesAmount = (p.daysCovered / 30) * totalMonthlyServices;
+                                
+                                itemHtml += `<br/><small style="color: #bbb;">- Rental Invoice: $${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>`;
+                                itemHtml += `<br/><small style="color: #bbb;">- Services Invoice: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>`;
+                                
+                                amountHtml = `<span style="font-size: 0.75rem;">Rent: $${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.75rem;">Services: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                            }
+
                             scheduleRowsHtml += `
                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
                                     <td style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--text-muted);">${p.paymentNumber}</td>
                                     <td style="padding: 8px; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: #fff;">
-                                        <strong>${p.label}</strong><br/>
-                                        <small style="color: var(--text-muted); font-size: 0.75rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
+                                        ${itemHtml}
                                     </td>
                                     <td style="padding: 8px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: #fff; font-weight: 600;">${p.dueDate}</td>
-                                    <td style="padding: 8px; text-align: right; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600;">$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                                    <td style="padding: 8px; text-align: right; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; line-height: 1.3;">${amountHtml}</td>
                                 </tr>
                             `;
                         });
                         
                         const totalScheduleAmount = schedule.reduce((sum, p) => sum + p.amount, 0);
+                        let totalHtml = `$${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
+                        
+                        if (app.separateUtilitiesEnabled || app.carHireEnabled) {
+                            const totalServicesAmount = schedule.reduce((sum, p) => sum + ((p.daysCovered / 30) * ((app.separateUtilitiesEnabled ? (app.separateUtilitiesRate || 1080) : 0) + (app.carHireEnabled ? (app.carHireRate || 1500) : 0))), 0);
+                            totalHtml = `<span style="font-size: 0.75rem;">Rent Total: $${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.75rem;">Services Total: $${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+                        }
+
                         scheduleRowsHtml += `
                             <tr style="background: rgba(201, 169, 110, 0.05); font-weight: bold; border-top: 2px solid rgba(201, 169, 110, 0.15);">
-                                <td colspan="3" style="padding: 8px; text-align: right; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--accent-gold);">Total Contract Cost (incl. GST):</td>
-                                <td style="padding: 8px; text-align: right; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600;">$${totalScheduleAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</td>
+                                <td colspan="3" style="padding: 8px; text-align: right; border-right: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--accent-gold);">Total Contract Cost ${app.noGst ? '(GST Exempt)' : '(incl. GST)'}:</td>
+                                <td style="padding: 8px; text-align: right; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; line-height: 1.3;">${totalHtml}</td>
                             </tr>
                         `;
                         
@@ -1549,6 +1649,11 @@
             const securityBond = parseInt(panel.querySelector('.edit-bond').value) || 0;
             const utilityBaseline = parseInt(panel.querySelector('.edit-utility-baseline').value) || 600;
             const cleaningFrequency = panel.querySelector('.edit-cleaning-freq').value;
+            const noGst = panel.querySelector('.edit-no-gst').checked;
+            const separateUtilitiesEnabled = panel.querySelector('.edit-separate-utilities').checked;
+            const separateUtilitiesRate = parseInt(panel.querySelector('.edit-separate-utilities-rate').value) || 0;
+            const carHireEnabled = panel.querySelector('.edit-car-hire').checked;
+            const carHireRate = parseInt(panel.querySelector('.edit-car-hire-rate').value) || 0;
 
             try {
                 showToast('Updating application settings...');
@@ -1566,7 +1671,12 @@
                         paymentTermsChoice,
                         securityBond,
                         utilityBaseline,
-                        cleaningFrequency
+                        cleaningFrequency,
+                        noGst,
+                        separateUtilitiesEnabled,
+                        separateUtilitiesRate,
+                        carHireEnabled,
+                        carHireRate
                     })
                 });
 
@@ -2099,6 +2209,11 @@
             const securityBond = parseInt(document.getElementById('bond-input').value) || 0;
             const utilityBaseline = parseInt(document.getElementById('utility-baseline-input').value) || 600;
             const cleaningFrequency = document.getElementById('cleaning-frequency-checkbox').checked ? 'fortnightly' : 'weekly';
+            const noGst = document.getElementById('no-gst-checkbox').checked;
+            const separateUtilitiesEnabled = document.getElementById('separate-utilities-checkbox').checked;
+            const separateUtilitiesRate = parseInt(document.getElementById('separate-utilities-rate-input').value) || 0;
+            const carHireEnabled = document.getElementById('car-hire-checkbox').checked;
+            const carHireRate = parseInt(document.getElementById('car-hire-rate-input').value) || 0;
 
             try {
                 const res = await fetchAdmin('/api/application/create', {
@@ -2115,7 +2230,12 @@
                         linenService,
                         securityBond,
                         cleaningFrequency,
-                        utilityBaseline
+                        utilityBaseline,
+                        noGst,
+                        separateUtilitiesEnabled,
+                        separateUtilitiesRate,
+                        carHireEnabled,
+                        carHireRate
                     })
                 });
 

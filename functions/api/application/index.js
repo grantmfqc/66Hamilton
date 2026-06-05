@@ -71,7 +71,15 @@ export async function onRequestGet(context) {
               linenService: !!parsed.linenService,
               startDate: parsed.startDate,
               endDate: parsed.endDate || null,
-              tenantName: parsed.tenantDetails ? parsed.tenantDetails.name : 'Unknown'
+              tenantName: parsed.tenantDetails ? parsed.tenantDetails.name : 'Unknown',
+              securityBond: parsed.securityBond !== undefined ? parsed.securityBond : 5000,
+              utilityBaseline: parsed.utilityBaseline !== undefined ? parsed.utilityBaseline : 600,
+              cleaningFrequency: parsed.cleaningFrequency || 'weekly',
+              noGst: !!parsed.noGst,
+              separateUtilitiesEnabled: !!parsed.separateUtilitiesEnabled,
+              separateUtilitiesRate: parsed.separateUtilitiesRate !== undefined ? parsed.separateUtilitiesRate : 1080,
+              carHireEnabled: !!parsed.carHireEnabled,
+              carHireRate: parsed.carHireRate !== undefined ? parsed.carHireRate : 1500
             });
           }
         }

@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline } = data;
+    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate } = data;
 
     if (!token) {
       return new Response(JSON.stringify({ error: 'Application token is required.' }), { status: 400 });
@@ -63,6 +63,11 @@ export async function onRequestPost(context) {
     if (securityBond !== undefined) app.securityBond = Number(securityBond);
     if (cleaningFrequency !== undefined) app.cleaningFrequency = cleaningFrequency;
     if (utilityBaseline !== undefined) app.utilityBaseline = Number(utilityBaseline);
+    if (noGst !== undefined) app.noGst = !!noGst;
+    if (separateUtilitiesEnabled !== undefined) app.separateUtilitiesEnabled = !!separateUtilitiesEnabled;
+    if (separateUtilitiesRate !== undefined) app.separateUtilitiesRate = Number(separateUtilitiesRate);
+    if (carHireEnabled !== undefined) app.carHireEnabled = !!carHireEnabled;
+    if (carHireRate !== undefined) app.carHireRate = Number(carHireRate);
 
     // Synchronize legacy rent value for backwards compatibility
     if (app.rateValue) {
