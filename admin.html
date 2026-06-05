@@ -1218,12 +1218,28 @@
                     </div>
                     <div class="app-actions">
                         <a href="/apply.html?token=${app.id}" target="_blank" class="btn-link">Onboarding Page</a>
-                        <a href="#" onclick="toggleContractDetails('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Contract Details</a>
+                        <a href="#" onclick="toggleContractDetails('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Contract Details & Invoices</a>
                         ${app.status === 'pending_owner' ? `<a href="/sign-owner.html?token=${app.id}" class="btn-link" style="color: var(--accent-gold); font-weight: bold; margin-left: 10px;">Sign Contract</a>` : ''}
                         ${app.status === 'completed' ? `<a href="/view-agreement.html?token=${app.id}" target="_blank" class="btn-link" style="color: var(--success); font-weight: bold; margin-left: 10px;">View & Print Contract</a>` : ''}
                         <a href="#" onclick="toggleAppSettings('${app.id}'); return false;" class="btn-link" style="color: var(--accent-gold); margin-left: 10px;">Settings</a>
                         <a href="#" onclick="deleteApplication('${app.id}', '${escapeHTML(app.tenantName)}'); return false;" class="btn-link" style="color: #ff6b6b; margin-left: auto;">Delete</a>
                     </div>
+                    ${app.status === 'completed' ? `
+                    <div class="app-meta" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                        <span style="color: var(--accent-gold); font-weight: 500;">Quick Invoice Links:</span>
+                        <a href="/view-invoice.html?id=HB0001&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0001</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0002&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0002</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0003&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0003</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0004&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0004</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0005&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0005</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0006&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0006</a>
+                    </div>
+                    ` : ''}
                     
                     <!-- Expandable Contract Details Panel -->
                     <div id="details-panel-${app.id}" style="display: none; margin-top: 15px; padding: 18px; border: 1px solid rgba(201, 169, 110, 0.3); border-radius: 6px; background: rgba(0,0,0,0.25); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
