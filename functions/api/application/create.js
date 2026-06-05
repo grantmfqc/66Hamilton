@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
       linenService: !!linenService,
       securityBond: securityBond !== undefined ? securityBond : 5000,
       cleaningFrequency: cleaningFrequency || 'weekly',
-      utilityBaseline: utilityBaseline !== undefined ? Number(utilityBaseline) : 600,
+      utilityBaseline: utilityBaseline !== undefined ? Number(utilityBaseline) : 500,
       noGst: !!noGst,
       separateUtilitiesEnabled: !!separateUtilitiesEnabled,
       separateUtilitiesRate: separateUtilitiesRate !== undefined ? Number(separateUtilitiesRate) : 1080,

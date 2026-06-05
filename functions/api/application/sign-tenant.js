@@ -89,7 +89,7 @@ export async function onRequestPost(context) {
       const gstFormatted = app.noGst ? 'GST Exempt / Not Applicable' : '15% GST Applicable';
 
       const linenFormatted = app.linenService 
-        ? (app.separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed in arrears)' : 'Yes ($45+GST/wk)')
+        ? (app.separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed on next invoice due date)' : 'Yes ($45+GST/wk)')
         : 'No';
 
       const emailRes = await fetch('https://api.resend.com/emails', {

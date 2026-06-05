@@ -325,13 +325,13 @@
 
             <h3 style="text-align: left; font-size: 11pt;">Operative Terms:</h3>
             <p class="no-indent"><strong>1. Grant of Licence</strong></p>
-            <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises.</p>
+            <p class="no-indent">1.1 The Licensor grants to the Licensee a personal, revocable, and non-exclusive Licence to occupy the Premises for a fixed period of exactly <span class="fill-contract-days">_____</span>, alongside the right to use the chattels, furniture, and fittings inside the Premises<span class="fill-car-grant-extra"></span>.</p>
             <p class="no-indent">1.2 This agreement does not create any estate or legal interest in the land, nor does it grant exclusive possession of the Premises to the Licensee. The legal rights remain under the control of the Licensor.</p>
 
             <div id="contract-clause-2-container">
                 <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
                 <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">_____</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
-                <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+                <p class="no-indent">2.2 The Licensee acknowledges that, subject to the right to request an extension in accordance with Clause 9, there is no automatic right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
             </div>
 
             <div id="contract-clause-3">
@@ -353,10 +353,10 @@
             <p class="no-indent">5.3 If no discrepancy notice is received within this 24-hour window, the Premises and all listed chattels shall be legally deemed to have been delivered in immaculate condition. The Licensee shall be held fully liable for any defects, damages, or missing items recorded at the final checkout inspection.</p>
  
             <div id="contract-clause-6-container">
-                <p class="no-indent"><strong>6. Winter Utility Fair Use Cap Clause</strong></p>
-                <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $<span class="fill-utility-baseline">600.00</span> (inclusive of GST) per calendar month.</p>
-                <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $<span class="fill-utility-baseline">600.00</span> NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
-                <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 15% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
+                <p class="no-indent"><strong>6. Utility Fee Clause</strong></p>
+                <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $<span class="fill-utility-baseline">500.00</span> (inclusive of GST) per calendar month.</p>
+                <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $<span class="fill-utility-baseline">500.00</span> NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
+                <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 10% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
             </div>
  
             <p class="no-indent"><strong>7. Optional Linen & Bed Sheet Service</strong></p>
@@ -372,9 +372,9 @@
  
             <div id="contract-clause-9-container">
                 <p class="no-indent"><strong>9. Option to Request Extension</strong></p>
-                <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of between 1 and 90 additional days) by providing written notice to the Licensor no later than thirty (30) days prior to the Expiry Date.</p>
+                <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of ninety (90) days only) by providing written notice to the Licensor no later than seven (7) days prior to the Expiry Date.</p>
                 <p class="no-indent">9.2 The Licensor retains absolute discretion to accept or deny an extension request based on apartment availability, master lease parameters, or past conduct.</p>
-                <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the extension fee block in cleared funds at least ten (10) days prior to the original Expiry Date. All commercial services and <span class="fill-cleaning-frequency-adj">weekly</span> cleaning entry mandates will continue throughout any extension.</p>
+                <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the first month's extension fees in cleared funds at least fourteen (14) days prior to the original Expiry Date. All commercial services and <span class="fill-cleaning-frequency-adj">weekly</span> cleaning entry mandates will continue throughout any extension.</p>
             </div>
  
             <p class="no-indent"><strong>10. Immediate Revocation & Eviction</strong></p>
@@ -493,8 +493,8 @@
                 return;
             }
 
-            const isCompany = td.licenseeType === 'company';
-            const licenseeDisplayName = isCompany ? `${td.name} (represented by ${td.companyRep})` : td.name;
+            const isCompany = td.licenseeType === 'company' || (td.name && (td.name.includes('Pty Ltd') || td.name.includes('Ltd') || td.name.includes('Limited') || td.name.includes('Total Drain')));
+            const licenseeDisplayName = isCompany ? `${td.name}${td.companyRep ? ` (represented by ${td.companyRep})` : ''}` : td.name;
 
             // Format occupants list
             const formatDob = (dobStr) => {
@@ -523,7 +523,7 @@
             document.querySelectorAll('.fill-occupants-list').forEach(el => el.textContent = occupantsText);
 
             const extraOccupancyText = isCompany 
-                ? ", together with any additional direct employees of the Licensee company, with the Licensee company assuming full responsibility and liability for all such individuals while they reside at the Premises" 
+                ? ", with the understanding that any nominated employee of the Licensee business is permitted to be an overnight guest at the Premises, with the Licensee assuming full responsibility and liability for all such individuals" 
                 : "";
             document.querySelectorAll('.fill-company-occupancy-extra').forEach(el => el.textContent = extraOccupancyText);
 
@@ -584,7 +584,7 @@
 
             document.querySelectorAll('.fill-linen-service').forEach(el => {
                 el.textContent = applicationData.linenService 
-                    ? (separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed in arrears)' : 'Yes (Included at $45.00+GST/wk)')
+                    ? (separateUtilitiesEnabled ? 'Yes ($30.00 per bed, billed on next invoice due date)' : 'Yes (Included at $45.00+GST/wk)')
                     : 'No';
             });
 
@@ -594,10 +594,15 @@
                 el.textContent = `$${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
             });
 
-            const utilityBaseline = applicationData.utilityBaseline !== undefined ? applicationData.utilityBaseline : 600;
+            const utilityBaseline = applicationData.utilityBaseline !== undefined ? applicationData.utilityBaseline : 500;
             document.querySelectorAll('.fill-utility-baseline').forEach(el => {
                 el.textContent = utilityBaseline.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             });
+
+            const carGrantExtraText = carHireEnabled 
+                ? ", and the non-exclusive use of the motor vehicle referenced in Clause 11 of this Licence" 
+                : "";
+            document.querySelectorAll('.fill-car-grant-extra').forEach(el => el.textContent = carGrantExtraText);
 
             const cleanFreq = applicationData.cleaningFrequency || 'weekly';
             const cleanFreqDesc = cleanFreq === 'fortnightly' ? 'once per two calendar weeks' : 'once per calendar week';
@@ -612,6 +617,45 @@
             const pTerms = applicationData.paymentTermsChoice || 'full';
             let paymentClauseHtml = '';
 
+            const baseRateCalDescription = rateType === 'weekly'
+                ? `calculated at a base rate of $${rateValue.toLocaleString('en-NZ')} per week (which equals $${dailyRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per day) over a term of ${diffDays} days`
+                : `calculated at a base rate of $${rateValue.toLocaleString('en-NZ')} per day over a term of ${diffDays} days`;
+
+            let bondBreakdownHtml = '';
+            if (separateUtilitiesEnabled && carHireEnabled) {
+                const rent2w = (rateType === 'weekly' ? rateValue * 2 : dailyRate * 14) * gstMultiplier;
+                const utils2w = separateUtilitiesRate / 2;
+                const car2w = carHireRate / 2;
+                const computedBond = rent2w + utils2w + car2w;
+                bondBreakdownHtml = `
+                    <div style="margin-top: 12px; margin-bottom: 12px;">
+                        <strong style="font-size: 0.9em; display: block; margin-bottom: 6px;">Commercial Security Bond Calculation Breakdown:</strong>
+                        <table style="width: 280px; border-collapse: collapse; font-family: 'Times New Roman', serif; font-size: 9.5pt; color: #000; border: 1px solid #000;" border="1" cellpadding="4">
+                            <tr style="background-color: #f2f2f2; font-weight: bold;">
+                                <td style="border: 1px solid #000; padding: 4px 8px;">Breakdown Item</td>
+                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">Amount (NZD)</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 4px 8px;">2 weeks rent:</td>
+                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${rent2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Utils:</td>
+                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${utils2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Car:</td>
+                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${car2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                            <tr style="font-weight: bold; background-color: #f2f2f2;">
+                                <td style="border: 1px solid #000; padding: 4px 8px;">Total:</td>
+                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${computedBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            }
+
             if (pTerms === 'full') {
                 const subOpt = td.bookingOption || 'A';
                 const depositAmount = (dailyRate * 30) * gstMultiplier; // 1 month deposit (30 days) incl GST
@@ -624,7 +668,7 @@
 
                     paymentClauseHtml = `
                         <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                        <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}). Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
+                        <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
                         <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
                         ${subOpt === 'A' || balanceAmount <= 0 ? `
                             <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> Under this plan, the Licensee pays the following separate upfront invoices:
@@ -650,11 +694,12 @@
                         `}
                         <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent rental payment ($${((dailyRate * 30) * gstMultiplier).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) and first month's services block remain strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                         <p class="no-indent">3.4 Commercial Security Bond: The Licensee shall pay a security bond of <strong>NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> to the Licensor upon execution of this Licence. This bond is held directly by the Licensor as a commercial security deposit to secure the performance of the Licensee’s obligations under this Licence. Because this arrangement is a serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, the bond will not be lodged with the Tenancy Services Bond Centre, but will be held in trust in the Licensor’s nominated account. The bond shall be refunded in full to the Licensee within five (5) business days following the Expiry Date, subject to the inspection of the Premises, the return of all keys/passes, and the reconciliation of any outstanding utility charges, damage costs, or penalty fees.</p>
+                        ${bondBreakdownHtml}
                     `;
                 } else {
                     paymentClauseHtml = `
                         <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                        <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).</p>
+                        <p class="no-indent">3.1 The total bundled cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}.</p>
                         <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
                         ${subOpt === 'A' || balanceAmount <= 0 ? `
                             <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> The Licensee has elected to pay 100% of the total Licence Fee ($${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) upfront within 24 hours of booking securement, plus the Commercial Security Bond of $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD. <strong>First Payment Required Total: $${(totalVal + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>.</p>
@@ -663,6 +708,7 @@
                         `}
                         <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's equivalent payment ($${((dailyRate * 30) * gstMultiplier).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD) remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                         <p class="no-indent">3.4 Commercial Security Bond: The Licensee shall pay a security bond of <strong>NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> to the Licensor upon execution of this Licence. This bond is held directly by the Licensor as a commercial security deposit to secure the performance of the Licensee’s obligations under this Licence. Because this arrangement is a serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, the bond will not be lodged with the Tenancy Services Bond Centre, but will be held in trust in the Licensor’s nominated account. The bond shall be refunded in full to the Licensee within five (5) business days following the Expiry Date, subject to the inspection of the Premises, the return of all keys/passes, and the reconciliation of any outstanding utility charges, damage costs, or penalty fees.</p>
+                        ${bondBreakdownHtml}
                     `;
                 }
                 
@@ -679,11 +725,23 @@
                     let itemHtml = `<strong>${p.label}</strong><br/><small style="color: #555; font-size: 0.85em;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>`;
                     let amountHtml = `$${p.amount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD`;
 
+                    if (isPayment1) {
+                        const totalRentValStr = totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const dailyRateStr = dailyRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const rateValStr = rateValue.toLocaleString('en-NZ');
+                        
+                        let baseCalcStr = rateType === 'weekly'
+                            ? `Covers Day 1 to 30 (${p.daysCovered} days) charged at the base rate of $${rateValStr} per week which equals $${dailyRateStr} per day. ${diffDays} days is $${totalRentValStr} NZD${gstInclLabel}.`
+                            : `Covers Day 1 to 30 (${p.daysCovered} days) charged at the base rate of $${rateValStr} per day. ${diffDays} days is $${totalRentValStr} NZD${gstInclLabel}.`;
+                        
+                        itemHtml = `<strong>${p.label}</strong><br/><small style="color: #555; font-size: 0.85em;">${baseCalcStr}</small>`;
+                    }
+
                     if (separateUtilitiesEnabled || carHireEnabled) {
                         const servicesAmount = (p.daysCovered / 30) * totalMonthlyServices;
                         
                         if (isPayment1) {
-                            itemHtml += `<br/><span style="color: #666; font-size: 0.85em;">- Upfront Rental Invoice (first 30 days rent + Bond): $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
+                            itemHtml += `<br/><span style="color: #666; font-size: 0.85em;">- Upfront Rental Invoice (first 30 days rent + Bond of $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}): $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
                                          <br/><span style="color: #666; font-size: 0.85em;">- Upfront Services Invoice (first month utilities & car hire): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
                                          <br/><strong>First Payment Required Total (due now): $${(p.amount + securityBond + servicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>`;
                             
@@ -751,11 +809,12 @@
 
                 paymentClauseHtml = `
                     <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                    <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}). Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
+                    <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
                     <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period. Under your application settings, invoices for serviced accommodation license fees (rent) and services (utilities/car hire) are generated separately:</p>
                     ${scheduleTableHtml}
                     <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront securement payment remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                     <p class="no-indent">3.4 Commercial Security Bond: The Licensee shall pay a security bond of <strong>NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> to the Licensor upon execution of this Licence. This bond is held directly by the Licensor as a commercial security deposit to secure the performance of the Licensee’s obligations under this Licence. Because this arrangement is a serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, the bond will not be lodged with the Tenancy Services Bond Centre, but will be held in trust in the Licensor’s nominated account. The bond shall be refunded in full to the Licensee within five (5) business days following the Expiry Date, subject to the inspection of the Premises, the return of all keys/passes, and the reconciliation of any outstanding utility charges, damage costs, or penalty fees.</p>
+                    ${bondBreakdownHtml}
                 `;
                 
                 // Show payment schedule
@@ -792,17 +851,17 @@
             if (clause6Container) {
                 if (separateUtilitiesEnabled) {
                     clause6Container.innerHTML = `
-                        <p class="no-indent"><strong>6. Separate Fixed Utility Fee Clause</strong></p>
+                        <p class="no-indent"><strong>6. Utility Fee Clause</strong></p>
                         <p class="no-indent">6.1 Residential utilities (electricity, gas, water, and broadband internet) are excluded from the main weekly Licence Fee and are charged separately.</p>
                         <p class="no-indent">6.2 The Licensee shall pay a fixed utility charge of NZD $${separateUtilitiesRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month, payable in advance in accordance with the monthly installments schedule.</p>
-                        <p class="no-indent">6.3 Because this is a fixed rate charge, no monthly baseline limits or winter usage reconciliations apply. The utility charges are fully inclusive of all standard usage.</p>
+                        <p class="no-indent">6.3 The utility fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $500.00 (inclusive of GST) per calendar month. In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $500.00 NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount. The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 10% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
                     `;
                 } else {
                     clause6Container.innerHTML = `
-                        <p class="no-indent"><strong>6. Winter Utility Fair Use Cap Clause</strong></p>
+                        <p class="no-indent"><strong>6. Utility Fee Clause</strong></p>
                         <p class="no-indent">6.1 The bundled weekly Licence Fee covers standard domestic utility usage up to a maximum baseline actual cost of NZD $<span class="fill-utility-baseline">${utilityBaseline.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> (inclusive of GST) per calendar month.</p>
                         <p class="no-indent">6.2 In the event that actual utility statements (comprising cumulative electricity, gas, water, and internet bills) exceed $<span class="fill-utility-baseline">${utilityBaseline.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> NZD in any single calendar month of the term, the Licensee shall be directly liable for the excess amount.</p>
-                        <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 15% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
+                        <p class="no-indent">6.3 The Licensor will provide copy statements of the utility bills to the Licensee. The excess amount, plus a 10% administrative and processing surcharge, will be invoiced immediately to the Licensee and must be paid via electronic transfer within five (5) business days of the invoice date. Failure to pay constitutes a material breach of this Licence.</p>
                     `;
                 }
             }
@@ -811,7 +870,7 @@
             const clause72Text = document.getElementById('contract-clause-7-2-text');
             if (clause72Text) {
                 if (separateUtilitiesEnabled) {
-                    clause72Text.innerHTML = `7.2 If requested in writing by the Licensee, the Licensor can provide a complete premium linen and bed sheet replacement service at an additional cost of NZD $30.00 per bed. This service will be invoiced separately and must be paid in arrears.`;
+                    clause72Text.innerHTML = `7.2 If requested in writing by the Licensee, the Licensor can provide a complete premium linen and bed sheet replacement service at an additional cost of NZD $30.00 per bed. This service will be invoiced separately and must be paid on the next invoice due date.`;
                 } else {
                     const linenGst = noGst ? 0.0 : 0.15;
                     const linenIncl = 45.00 * (1 + linenGst);
@@ -833,7 +892,7 @@
                     clause2Container.innerHTML = `
                         <p class="no-indent"><strong>2. Term & Definite Expiry</strong></p>
                         <p class="no-indent">2.1 The term of this Licence shall be for exactly <span class="fill-contract-days">${diffDays} days</span>, beginning on the Commencement Date and automatically terminating without notice on the Expiry Date as defined in the execution schedule.</p>
-                        <p class="no-indent">2.2 The Licensee acknowledges that there is no right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
+                        <p class="no-indent">2.2 The Licensee acknowledges that, subject to the right to request an extension in accordance with Clause 9, there is no automatic right of renewal, no right of rollover, and no transition into a periodic residential arrangement upon the passing of the Expiry Date.</p>
                     `;
                 }
             }
@@ -851,9 +910,9 @@
                 } else {
                     clause9Container.innerHTML = `
                         <p class="no-indent"><strong>9. Option to Request Extension</strong></p>
-                        <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of between 1 and 90 additional days) by providing written notice to the Licensor no later than thirty (30) days prior to the Expiry Date.</p>
+                        <p class="no-indent">9.1 The Licensee may request an extension to the term of this Licence (for a block period of ninety (90) days only) by providing written notice to the Licensor no later than seven (7) days prior to the Expiry Date.</p>
                         <p class="no-indent">9.2 The Licensor retains absolute discretion to accept or deny an extension request based on apartment availability, master lease parameters, or past conduct.</p>
-                        <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the extension fee block in cleared funds at least ten (10) days prior to the original Expiry Date. All commercial services and <span class="fill-cleaning-frequency-adj">${cleanFreqAdj}</span> cleaning entry mandates will continue throughout any extension.</p>
+                        <p class="no-indent">9.3 If an extension is mutually agreed, it will only become legally binding upon the execution of a formal "Licence Extension Addendum" and the receipt of 100% of the first month's extension fees in cleared funds at least fourteen (14) days prior to the original Expiry Date. All commercial services and <span class="fill-cleaning-frequency-adj">${cleanFreqAdj}</span> cleaning entry mandates will continue throughout any extension.</p>
                     `;
                 }
             }
@@ -866,7 +925,7 @@
                     clause11Container.innerHTML = `
                         <p class="no-indent"><strong>11. Vehicle Hire & Corporate Liability Clause</strong></p>
                         <p class="no-indent">11.1 Vehicle Access Rights & Term: The Licensor grants the corporate Licensee the right to use the vehicle (Kia Sportage 2022, Registration PGS970, parked in the apartment garage) for a fixed hire charge of NZD $${carHireRate.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per month, billed and payable monthly in advance alongside the main Licence Fee block. The vehicle hire is tied directly to the serviced accommodation licence and must be rented for the same term as the apartment.</p>
-                        <p class="no-indent">11.2 Permitted Drivers: Any staff member, agent, or representative authorized by the corporate Licensee may operate the vehicle, provided they hold a valid, clean driver's licence suitable for operating motor vehicles in New Zealand.</p>
+                        <p class="no-indent">11.2 Permitted Drivers: Any staff member, agent, or representative authorized by the corporate Licensee may operate the vehicle, provided they hold a valid, clean driver's licence suitable for operating motor vehicles in New Zealand, and are fully insured to drive the vehicle by the Licensee company as per Clause 11.3.</p>
                         <p class="no-indent">11.3 Insurance and Liability: The Licensee accepts 100% responsibility and liability for the vehicle during the term. The Licensee warrants that their corporate insurance policy fully covers the operation of this vehicle for any damage, loss, theft, and third-party liability. Insurance for drivers will not be provided by the Licensor and is the full responsibility of the corporate Licensee. In the event of any damage, loss, or third-party claim, the Licensee shall fully indemnify the Licensor and pay any repair costs, insurance excesses, or losses immediately upon demand.</p>
                         <p class="no-indent">11.4 Maintenance and Compliance: Ongoing servicing, registration, and Warrant of Fitness (WOF) will remain the responsibility of the Licensor.</p>
                         <p class="no-indent">11.5 Vehicle Return: The vehicle must be returned to the same apartment garage in clean condition, with a full tank of fuel, and without any damage, upon the expiration or termination of this Licence.</p>

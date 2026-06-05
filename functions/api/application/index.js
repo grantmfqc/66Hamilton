@@ -73,14 +73,15 @@ export async function onRequestGet(context) {
               endDate: parsed.endDate || null,
               tenantName: parsed.tenantDetails ? parsed.tenantDetails.name : 'Unknown',
               securityBond: parsed.securityBond !== undefined ? parsed.securityBond : 5000,
-              utilityBaseline: parsed.utilityBaseline !== undefined ? parsed.utilityBaseline : 600,
+              utilityBaseline: parsed.utilityBaseline !== undefined ? parsed.utilityBaseline : 500,
               cleaningFrequency: parsed.cleaningFrequency || 'weekly',
               noGst: !!parsed.noGst,
               separateUtilitiesEnabled: !!parsed.separateUtilitiesEnabled,
               separateUtilitiesRate: parsed.separateUtilitiesRate !== undefined ? parsed.separateUtilitiesRate : 1080,
               carHireEnabled: !!parsed.carHireEnabled,
               carHireRate: parsed.carHireRate !== undefined ? parsed.carHireRate : 1500,
-              autoRenew: !!parsed.autoRenew
+              autoRenew: !!parsed.autoRenew,
+              licenseeType: parsed.tenantDetails ? (parsed.tenantDetails.licenseeType || 'individual') : 'individual'
             });
           }
         }

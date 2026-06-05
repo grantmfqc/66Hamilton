@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate, autoRenew } = data;
+    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate, autoRenew, licenseeType } = data;
 
     if (!token) {
       return new Response(JSON.stringify({ error: 'Application token is required.' }), { status: 400 });
@@ -48,10 +48,10 @@ export async function onRequestPost(context) {
 
     const app = JSON.parse(rawApp);
 
-    // Prevent updates if already signed by the tenant
-    if (app.status === 'pending_owner' || app.status === 'completed') {
-      return new Response(JSON.stringify({ error: 'Cannot update settings after the contract has been signed by the tenant.' }), { status: 400 });
-    }
+    // Prevent updates if already signed by the tenant (Bypassed by admin request to allow updates to active agreements)
+    // if (app.status === 'pending_owner' || app.status === 'completed') {
+    //   return new Response(JSON.stringify({ error: 'Cannot update settings after the contract has been signed by the tenant.' }), { status: 400 });
+    // }
 
     // 3. Update settings
     if (rateValue !== undefined) app.rateValue = Number(rateValue);
@@ -69,6 +69,9 @@ export async function onRequestPost(context) {
     if (carHireEnabled !== undefined) app.carHireEnabled = !!carHireEnabled;
     if (carHireRate !== undefined) app.carHireRate = Number(carHireRate);
     if (autoRenew !== undefined) app.autoRenew = !!autoRenew;
+    if (licenseeType !== undefined && app.tenantDetails) {
+      app.tenantDetails.licenseeType = licenseeType;
+    }
 
     // Synchronize legacy rent value for backwards compatibility
     if (app.rateValue) {

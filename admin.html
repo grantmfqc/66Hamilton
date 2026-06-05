@@ -479,7 +479,7 @@
                         </div>
                         <div class="form-group">
                             <label for="utility-baseline-input">Utilities Baseline Cap (NZD/month)</label>
-                            <input type="number" id="utility-baseline-input" value="600" min="0" required />
+                            <input type="number" id="utility-baseline-input" value="500" min="0" required />
                         </div>
                         <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
                             <input type="checkbox" id="linen-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" />
@@ -499,7 +499,7 @@
                         </div>
                         <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="checkbox" id="separate-utilities-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'" />
+                                <input type="checkbox" id="separate-utilities-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'; updateBondDefault();" />
                                 <label for="separate-utilities-checkbox" style="margin-bottom: 0;">Invoice Utilities Separately</label>
                             </div>
                             <div id="separate-utilities-rate-container" class="form-group" style="display: none; padding-left: 28px; margin-bottom: 0;">
@@ -507,7 +507,7 @@
                                 <input type="number" id="separate-utilities-rate-input" value="1080" min="0" style="padding: 6px 10px; font-size: 0.85rem;" />
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="checkbox" id="car-hire-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('car-hire-rate-container').style.display = this.checked ? 'block' : 'none'" />
+                                <input type="checkbox" id="car-hire-checkbox" style="width: 18px; height: 18px; accent-color: var(--accent-gold);" onchange="document.getElementById('car-hire-rate-container').style.display = this.checked ? 'block' : 'none'; updateBondDefault();" />
                                 <label for="car-hire-checkbox" style="margin-bottom: 0;">Include Vehicle Hire (Kia Sportage 2022)</label>
                             </div>
                             <div id="car-hire-rate-container" class="form-group" style="display: none; padding-left: 28px; margin-bottom: 0;">
@@ -809,6 +809,26 @@
     <div id="toast">Copied to clipboard.</div>
 
     <script>
+        function updateBondDefault() {
+            const sepUtils = document.getElementById('separate-utilities-checkbox').checked;
+            const carHire = document.getElementById('car-hire-checkbox').checked;
+            const bondInput = document.getElementById('bond-input');
+            if (sepUtils && carHire) {
+                bondInput.value = 4890;
+            }
+        }
+
+        function updateEditBondDefault(checkboxEl) {
+            const form = checkboxEl.closest('form');
+            if (!form) return;
+            const sepUtils = form.querySelector('.edit-separate-utilities').checked;
+            const carHire = form.querySelector('.edit-car-hire').checked;
+            const bondInput = form.querySelector('.edit-bond');
+            if (sepUtils && carHire && bondInput) {
+                bondInput.value = 4890;
+            }
+        }
+
         // Set default commencement date to today
         document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
 
@@ -1228,11 +1248,11 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Rate Value (NZD)</label>
-                                    <input type="number" class="edit-rate-val" value="${app.rateValue || app.rent || 2400}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                    <input type="number" class="edit-rate-val" value="${app.rateValue || app.rent || 2400}" required style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Rate Period</label>
-                                    <select class="edit-rate-type" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
+                                    <select class="edit-rate-type" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
                                         <option value="daily" ${app.rateType === 'daily' ? 'selected' : ''}>Daily</option>
                                         <option value="weekly" ${app.rateType === 'weekly' ? 'selected' : ''}>Weekly</option>
                                         <option value="monthly" ${app.rateType === 'monthly' ? 'selected' : ''}>Monthly</option>
@@ -1242,39 +1262,46 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Commencement Date</label>
-                                    <input type="date" class="edit-start-date" value="${app.startDate}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                    <input type="date" class="edit-start-date" value="${app.startDate}" required style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Contract End Date</label>
-                                    <input type="date" class="edit-end-date" value="${app.endDate || ''}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                    <input type="date" class="edit-end-date" value="${app.endDate || ''}" required style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
+                            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr 0.8fr; gap: 10px; align-items: center;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Booking Payment Option</label>
-                                    <select class="edit-payment-choice" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
+                                    <select class="edit-payment-choice" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
                                         <option value="full" ${app.paymentTermsChoice === 'full' ? 'selected' : ''}>Option 1: Full Payment Prior to Check-in (1 Month Deposit Option)</option>
                                         <option value="monthly" ${app.paymentTermsChoice === 'monthly' ? 'selected' : ''}>Option 2: Monthly Installments (1 Month Upfront)</option>
                                     </select>
                                 </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.7rem; margin-bottom: 4px;">Licensee Type</label>
+                                    <select class="edit-licensee-type" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
+                                        <option value="individual" ${app.licenseeType === 'individual' ? 'selected' : ''}>Individual Person</option>
+                                        <option value="company" ${app.licenseeType === 'company' ? 'selected' : ''}>Company Entity</option>
+                                    </select>
+                                </div>
                                 <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; margin-top: 15px;">
                                     <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
-                                        <input type="checkbox" class="edit-linen" ${app.linenService ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Linen service ($45/wk)
+                                        <input type="checkbox" class="edit-linen" ${app.linenService ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Linen service ($45/wk)
                                     </label>
                                 </div>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Commercial Bond (NZD)</label>
-                                    <input type="number" class="edit-bond" value="${app.securityBond !== undefined ? app.securityBond : 5000}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                    <input type="number" class="edit-bond" value="${app.securityBond !== undefined ? app.securityBond : 5000}" required style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Utilities Baseline (NZD)</label>
-                                    <input type="number" class="edit-utility-baseline" value="${app.utilityBaseline !== undefined ? app.utilityBaseline : 600}" required ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 8px 10px; font-size: 0.85rem;" />
+                                    <input type="number" class="edit-utility-baseline" value="${app.utilityBaseline !== undefined ? app.utilityBaseline : 500}" required style="padding: 8px 10px; font-size: 0.85rem;" />
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0;">
                                     <label style="font-size: 0.7rem; margin-bottom: 4px;">Cleaning Frequency</label>
-                                    <select class="edit-cleaning-freq" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
+                                    <select class="edit-cleaning-freq" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;">
                                         <option value="weekly" ${app.cleaningFrequency !== 'fortnightly' ? 'selected' : ''}>Weekly</option>
                                         <option value="fortnightly" ${app.cleaningFrequency === 'fortnightly' ? 'selected' : ''}>Fortnightly</option>
                                     </select>
@@ -1284,41 +1311,41 @@
                             <div style="display: grid; grid-template-columns: 1fr; gap: 10px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; margin-top: 5px;">
                                 <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
                                     <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">
-                                        <input type="checkbox" class="edit-no-gst" ${app.noGst ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> GST Not Applicable
+                                        <input type="checkbox" class="edit-no-gst" ${app.noGst ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> GST Not Applicable
                                     </label>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
                                     <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0; font-weight: bold; color: var(--accent-gold);">
-                                        <input type="checkbox" class="edit-auto-renew" ${app.autoRenew ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Rolling 90-Day Automatic Renewal
+                                        <input type="checkbox" class="edit-auto-renew" ${app.autoRenew ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Rolling 90-Day Automatic Renewal
                                     </label>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
                                     <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
                                         <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
-                                            <input type="checkbox" class="edit-separate-utilities" ${app.separateUtilitiesEnabled ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} onchange="this.closest('form').querySelector('.edit-separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Invoice Utilities Separately
+                                            <input type="checkbox" class="edit-separate-utilities" ${app.separateUtilitiesEnabled ? 'checked' : ''} onchange="this.closest('form').querySelector('.edit-separate-utilities-rate-container').style.display = this.checked ? 'block' : 'none'; updateEditBondDefault(this);" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Invoice Utilities Separately
                                         </label>
                                     </div>
                                     <div class="edit-separate-utilities-rate-container" style="display: ${app.separateUtilitiesEnabled ? 'block' : 'none'};">
                                         <label style="font-size: 0.7rem; margin-bottom: 4px;">Utilities Fixed Rate ($/mo)</label>
-                                        <input type="number" class="edit-separate-utilities-rate" value="${app.separateUtilitiesRate !== undefined ? app.separateUtilitiesRate : 1080}" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
+                                        <input type="number" class="edit-separate-utilities-rate" value="${app.separateUtilitiesRate !== undefined ? app.separateUtilitiesRate : 1080}" style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
                                     </div>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; align-items: center;">
                                     <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
                                         <label style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0;">
-                                            <input type="checkbox" class="edit-car-hire" ${app.carHireEnabled ? 'checked' : ''} ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} onchange="this.closest('form').querySelector('.edit-car-hire-rate-container').style.display = this.checked ? 'block' : 'none'" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Include Vehicle Hire
+                                            <input type="checkbox" class="edit-car-hire" ${app.carHireEnabled ? 'checked' : ''} onchange="this.closest('form').querySelector('.edit-car-hire-rate-container').style.display = this.checked ? 'block' : 'none'; updateEditBondDefault(this);" style="width: 16px; height: 16px; accent-color: var(--accent-gold);" /> Include Vehicle Hire
                                         </label>
                                     </div>
                                     <div class="edit-car-hire-rate-container" style="display: ${app.carHireEnabled ? 'block' : 'none'};">
                                         <label style="font-size: 0.7rem; margin-bottom: 4px;">Car Hire Fixed Rate ($/mo)</label>
-                                        <input type="number" class="edit-car-hire-rate" value="${app.carHireRate !== undefined ? app.carHireRate : 1500}" ${(app.status === 'pending_owner' || app.status === 'completed') ? 'disabled' : ''} style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
+                                        <input type="number" class="edit-car-hire-rate" value="${app.carHireRate !== undefined ? app.carHireRate : 1500}" style="padding: 6px 10px; font-size: 0.8rem; width: 100%; box-sizing: border-box;" />
                                     </div>
                                 </div>
                             </div>
                             
-                            ${(app.status !== 'pending_owner' && app.status !== 'completed') ? `
-                                <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 4px; width: fit-content; margin-top: 5px;">Save Settings</button>
-                            ` : ''}
+                            <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem; border-radius: 4px; width: fit-content; margin-top: 10px;">
+                                ${(app.status === 'completed' || app.status === 'pending_owner') ? 'Force Update Active Terms' : 'Save Settings'}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -1426,7 +1453,7 @@
                 
                 const bondVal = app.securityBond !== undefined ? app.securityBond : 5000;
                 const cleanFreq = app.cleaningFrequency || 'weekly';
-                const utilBase = app.utilityBaseline !== undefined ? app.utilityBaseline : 600;
+                const utilBase = app.utilityBaseline !== undefined ? app.utilityBaseline : 500;
                 
                 html += `  <div><span style="${labelStyle}">Commercial Security Bond:</span><br/><span style="${valStyle}">$${bondVal.toLocaleString('en-NZ', { minimumFractionDigits: 2 })} NZD</span></div>`;
                 html += `  <div><span style="${labelStyle}">Cleaning Frequency:</span><br/><span style="${valStyle}">${cleanFreq === 'fortnightly' ? 'Fortnightly' : 'Weekly'}</span></div>`;
@@ -1658,7 +1685,7 @@
             const linenService = panel.querySelector('.edit-linen').checked;
             const paymentTermsChoice = panel.querySelector('.edit-payment-choice').value;
             const securityBond = parseInt(panel.querySelector('.edit-bond').value) || 0;
-            const utilityBaseline = parseInt(panel.querySelector('.edit-utility-baseline').value) || 600;
+            const utilityBaseline = parseInt(panel.querySelector('.edit-utility-baseline').value) || 500;
             const cleaningFrequency = panel.querySelector('.edit-cleaning-freq').value;
             const noGst = panel.querySelector('.edit-no-gst').checked;
             const separateUtilitiesEnabled = panel.querySelector('.edit-separate-utilities').checked;
@@ -1666,6 +1693,8 @@
             const carHireEnabled = panel.querySelector('.edit-car-hire').checked;
             const carHireRate = parseInt(panel.querySelector('.edit-car-hire-rate').value) || 0;
             const autoRenew = panel.querySelector('.edit-auto-renew').checked;
+            const licenseeTypeEl = panel.querySelector('.edit-licensee-type');
+            const licenseeType = licenseeTypeEl ? licenseeTypeEl.value : undefined;
 
             try {
                 showToast('Updating application settings...');
@@ -1689,7 +1718,8 @@
                         separateUtilitiesRate,
                         carHireEnabled,
                         carHireRate,
-                        autoRenew
+                        autoRenew,
+                        licenseeType
                     })
                 });
 
@@ -2220,7 +2250,7 @@
             const endDate = document.getElementById('end-date-input').value;
             const linenService = document.getElementById('linen-checkbox').checked;
             const securityBond = parseInt(document.getElementById('bond-input').value) || 0;
-            const utilityBaseline = parseInt(document.getElementById('utility-baseline-input').value) || 600;
+            const utilityBaseline = parseInt(document.getElementById('utility-baseline-input').value) || 500;
             const cleaningFrequency = document.getElementById('cleaning-frequency-checkbox').checked ? 'fortnightly' : 'weekly';
             const noGst = document.getElementById('no-gst-checkbox').checked;
             const separateUtilitiesEnabled = document.getElementById('separate-utilities-checkbox').checked;
