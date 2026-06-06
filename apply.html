@@ -1639,6 +1639,30 @@
             const utilitiesDailyRate = separateUtilitiesEnabled ? (separateUtilitiesRate / 28) : 0;
             const carHireDailyRate = carHireEnabled ? (carHireRate / 30) : 0;
 
+            const separateServicesText = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11" 
+                : (separateUtilitiesEnabled ? "Residential utilities are charged separately as per Clause 6" : (carHireEnabled ? "Vehicle rental is charged separately as per Clause 11" : ""));
+
+            const servicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "Full Utilities & Vehicle Hire" 
+                : (separateUtilitiesEnabled ? "Full Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+            const firstMonthServicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "First Month Utilities & Vehicle Hire" 
+                : (separateUtilitiesEnabled ? "First Month Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+            const servicesParenthetical = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "services (utilities/car hire)" 
+                : (separateUtilitiesEnabled ? "services (utilities)" : (carHireEnabled ? "services (vehicle hire)" : ""));
+
+            const firstMonthServicesDescription = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "first month utilities & car hire" 
+                : (separateUtilitiesEnabled ? "first month utilities" : (carHireEnabled ? "first month vehicle hire" : ""));
+
+            const renewalFeesText = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "All Licence Fees, separate services fees, and vehicle rental fees" 
+                : (separateUtilitiesEnabled ? "All Licence Fees and separate services fees" : (carHireEnabled ? "All Licence Fees and vehicle rental fees" : "All Licence Fees"));
+
             // Price calculations
             const subtotal = dailyRate * diffDays;
             const gst = subtotal * gstRate;
@@ -1688,7 +1712,7 @@
 
                         displayEl.innerHTML = `
                             <h4>Option 1: Full Contract Term Payment terms</h4>
-                            <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the full contract term payment to be cleared prior to check-in. Under your application settings, invoices for serviced accommodation license fees (rent) and services (utilities/car hire) are generated separately.</p>
+                            <p style="margin: 0; line-height: 1.5; color: var(--text-muted);">Requires the full contract term payment to be cleared prior to check-in. Under your application settings, invoices for serviced accommodation license fees (rent) and ${servicesParenthetical} are generated separately.</p>
                             
                             <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
                                 <h5 style="color: var(--accent-gold); margin: 0 0 10px 0; font-size: 0.95rem;">Dynamic Payment Breakdown (Separate Invoices):</h5>
@@ -1696,7 +1720,7 @@
                                     <li><strong>Option A (Full Upfront):</strong>
                                         <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--text-muted);">
                                             <li>Upfront Rental Invoice (Full Rent + Bond): <strong style="color: #fff;">$${(total + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
-                                            <li>Upfront Services Invoice (Full Utilities & Vehicle Hire): <strong style="color: #fff;">$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                            <li>Upfront Services Invoice (${servicesInvoiceLabel}): <strong style="color: #fff;">$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                             <li style="font-size: 0.9rem; margin-top: 3px; color: var(--accent-gold);">Total Required (due within 24 hours): <strong>$${(total + securityBond + totalServicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                         </ul>
                                     </li>
@@ -1704,7 +1728,7 @@
                                     <li style="margin-top: 10px;"><strong>Option B (1-Month Deposit):</strong>
                                         <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--text-muted);">
                                             <li>Upfront Rental Invoice (First 30 days Rent + Bond): <strong style="color: #fff;">$${(depositAmount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
-                                            <li>Upfront Services Invoice (First Month Utilities & Vehicle Hire): <strong style="color: #fff;">$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                            <li>Upfront Services Invoice (${firstMonthServicesInvoiceLabel}): <strong style="color: #fff;">$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                             <li style="font-size: 0.9rem; margin-top: 3px; color: var(--accent-gold);">First Payment Required Total (due now): <strong>$${(depositAmount + securityBond + firstMonthServices).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                             <li>Remaining Balance (due 14 days before check-in):
                                                 <ul style="margin: 2px 0 0 10px; padding-left: 10px;">
@@ -1761,7 +1785,7 @@
                                 itemHtml = `<strong>${p.label}</strong><br/>
                                             <small style="color: var(--text-muted); font-size: 0.85rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
                                             <br/><small style="color: #bbb;">- Upfront Rental Invoice (first 30 days rent + Bond): $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
-                                            <br/><small style="color: #bbb;">- Upfront Services Invoice (first month utilities & car hire): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
+                                            <br/><small style="color: #bbb;">- Upfront Services Invoice (${firstMonthServicesDescription}): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
                                             <br/><strong style="font-size: 0.85rem; color: var(--accent-gold);">First Payment Required Total (due now): $${(p.amount + securityBond + servicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>`;
                                 
                                 amountHtml = `<span style="font-size: 0.75rem;">Rent+Bond: $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.75rem;">Services: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -2126,14 +2150,12 @@
 
             const occupantsList = [];
             if (td.primaryOccupantName) {
-                const dobFormatted = formatDob(td.primaryOccupantDob);
-                occupantsList.push(`${td.primaryOccupantName}${dobFormatted ? ` (DOB: ${dobFormatted})` : ''}`);
+                occupantsList.push(td.primaryOccupantName);
             }
             if (td.occupants && Array.isArray(td.occupants)) {
                 td.occupants.forEach(occ => {
                     if (occ.name) {
-                        const dobFormatted = formatDob(occ.dob);
-                        occupantsList.push(`${occ.name}${dobFormatted ? ` (DOB: ${dobFormatted})` : ''}`);
+                        occupantsList.push(occ.name);
                     }
                 });
             }
@@ -2190,6 +2212,30 @@
             const utilitiesDailyRate = separateUtilitiesEnabled ? (separateUtilitiesRate / 28) : 0;
             const carHireDailyRate = carHireEnabled ? (carHireRate / 30) : 0;
 
+            const separateServicesText = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11" 
+                : (separateUtilitiesEnabled ? "Residential utilities are charged separately as per Clause 6" : (carHireEnabled ? "Vehicle rental is charged separately as per Clause 11" : ""));
+
+            const servicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "Full Utilities & Vehicle Hire" 
+                : (separateUtilitiesEnabled ? "Full Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+            const firstMonthServicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "First Month Utilities & Vehicle Hire" 
+                : (separateUtilitiesEnabled ? "First Month Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+            const servicesParenthetical = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "services (utilities/car hire)" 
+                : (separateUtilitiesEnabled ? "services (utilities)" : (carHireEnabled ? "services (vehicle hire)" : ""));
+
+            const firstMonthServicesDescription = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "first month utilities & car hire" 
+                : (separateUtilitiesEnabled ? "first month utilities" : (carHireEnabled ? "first month vehicle hire" : ""));
+
+            const renewalFeesText = (separateUtilitiesEnabled && carHireEnabled) 
+                ? "All Licence Fees, separate services fees, and vehicle rental fees" 
+                : (separateUtilitiesEnabled ? "All Licence Fees and separate services fees" : (carHireEnabled ? "All Licence Fees and vehicle rental fees" : "All Licence Fees"));
+
             const subtotal = dailyRate * diffDays;
             const gst = subtotal * gstRate;
             const totalVal = subtotal + gst;
@@ -2241,11 +2287,37 @@
                 : `calculated at a base rate of $${rateValue.toLocaleString('en-NZ')} per day over a term of ${diffDays} days`;
 
             let bondBreakdownHtml = '';
-            if (separateUtilitiesEnabled && carHireEnabled) {
+            if (separateUtilitiesEnabled || carHireEnabled) {
                 const rent2w = (rateType === 'weekly' ? rateValue * 2 : dailyRate * 14) * gstMultiplier;
-                const utils2w = separateUtilitiesRate / 2;
-                const car2w = carHireRate / 2;
+                const utils2w = separateUtilitiesEnabled ? separateUtilitiesRate / 2 : 0;
+                const car2w = carHireEnabled ? carHireRate / 2 : 0;
                 const computedBond = rent2w + utils2w + car2w;
+                
+                let breakdownRowsHtml = `
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 4px 8px;">2 weeks rent:</td>
+                        <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${rent2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+                
+                if (separateUtilitiesEnabled) {
+                    breakdownRowsHtml += `
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Utils:</td>
+                            <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${utils2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                }
+                
+                if (carHireEnabled) {
+                    breakdownRowsHtml += `
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Car:</td>
+                            <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${car2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                }
+                
                 bondBreakdownHtml = `
                     <div style="margin-top: 12px; margin-bottom: 12px;">
                         <strong style="font-size: 0.9em; display: block; margin-bottom: 6px;">Commercial Security Bond Calculation Breakdown:</strong>
@@ -2254,18 +2326,7 @@
                                 <td style="border: 1px solid #000; padding: 4px 8px;">Breakdown Item</td>
                                 <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">Amount (NZD)</td>
                             </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 4px 8px;">2 weeks rent:</td>
-                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${rent2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Utils:</td>
-                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${utils2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 4px 8px;">2 Weeks Car:</td>
-                                <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${car2w.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            </tr>
+                            ${breakdownRowsHtml}
                             <tr style="font-weight: bold; background-color: #f2f2f2;">
                                 <td style="border: 1px solid #000; padding: 4px 8px;">Total:</td>
                                 <td style="border: 1px solid #000; padding: 4px 8px; text-align: right;">$${computedBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -2287,13 +2348,13 @@
 
                     paymentClauseHtml = `
                         <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                        <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
+                        <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. ${separateServicesText}.</p>
                         <p class="no-indent">3.2 The property shall be withdrawn from the public trade channels exclusively for the Licensee upon execution of this agreement and receipt of payment under the selected Option below:</p>
                         ${subOpt === 'A' || balanceAmount <= 0 ? `
                             <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option A: Full Payment Upfront.</strong> Under this plan, the Licensee shall pay the following separate invoices upfront within 24 hours of booking securement:
                                 <ul style="margin: 5px 0 0 20px; padding-left: 10px; font-size: 0.9em;">
                                     <li>Upfront Rental Invoice (Full Rent + Bond): <strong>$${(totalVal + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
-                                    <li>Upfront Services Invoice (Full Utilities & Vehicle Hire): <strong>$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                    <li>Upfront Services Invoice (${servicesInvoiceLabel}): <strong>$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                     <li>First Payment Required Total: <strong>$${(totalVal + securityBond + totalServicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                 </ul>
                             </p>
@@ -2301,7 +2362,7 @@
                             <p class="no-indent" style="margin-left: 20px;"><strong>[SELECTED] Option B: 1-Month Deposit.</strong> Under this plan, the Licensee shall pay the following separate upfront securement invoices immediately upon booking:
                                 <ul style="margin: 5px 0 0 20px; padding-left: 10px; font-size: 0.9em;">
                                     <li>Upfront Rental Invoice (First 30 days Rent + Bond): <strong>$${(depositAmount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
-                                    <li>Upfront Services Invoice (First Month Utilities & Vehicle Hire): <strong>$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
+                                    <li>Upfront Services Invoice (${firstMonthServicesInvoiceLabel}): <strong>$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                     <li>First Payment Required Total (due now): <strong>$${(depositAmount + securityBond + firstMonthServices).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong></li>
                                 </ul>
                                 The remaining balance of the contract term shall clear no later than 14 days prior to the Commencement Date, split into the following separate invoices:
@@ -2361,7 +2422,7 @@
                         
                         if (isPayment1) {
                             itemHtml += `<br/><span style="color: #666; font-size: 0.85em;">- Upfront Rental Invoice (first 30 days rent + Bond of $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}): $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
-                                         <br/><span style="color: #666; font-size: 0.85em;">- Upfront Services Invoice (first month utilities & car hire): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
+                                         <br/><span style="color: #666; font-size: 0.85em;">- Upfront Services Invoice (${firstMonthServicesDescription}): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</span>
                                          <br/><strong>First Payment Required Total (due now): $${(p.amount + securityBond + servicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>`;
                             
                             amountHtml = `<span style="font-size: 0.8em;">Rent+Bond: $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.8em;">Services: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
@@ -2428,8 +2489,8 @@
 
                 paymentClauseHtml = `
                     <p class="no-indent"><strong>3. Booking Securement, Payment Terms & Cancellation</strong></p>
-                    <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11.</p>
-                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period. Under your application settings, invoices for serviced accommodation license fees (rent) and services (utilities/car hire) are generated separately:</p>
+                    <p class="no-indent">3.1 The total cost for the serviced accommodation Licence is <strong>NZD $${totalVal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> ${noGst ? 'GST Exempt' : 'inclusive of GST'} (comprising a base Licence Fee of $${subtotal.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + ${noGst ? '0%' : '15%'} GST of $${gst.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}), ${baseRateCalDescription}. ${separateServicesText}.</p>
+                    <p class="no-indent">3.2 The Licensee has selected <strong>Option 2: Monthly Installments.</strong> The parties agree to adhere strictly to the calculated payment schedule below. The monthly payments are structured to always clear 14 days in advance of the corresponding covered occupancy period. Under your application settings, invoices for serviced accommodation license fees (rent) and ${servicesParenthetical} are generated separately:</p>
                     ${scheduleTableHtml}
                     <p class="no-indent">3.3 Cancellation & Refund Policy: A partial refund of the contract value can be issued if the contract is cancelled in writing at least 24 hours prior to the scheduled Commencement Date. The first month's upfront securement payment remains strictly non-refundable under all cancellation circumstances. No refunds are possible under any circumstances after the Commencement Date has occurred.</p>
                     <p class="no-indent">3.4 Commercial Security Bond: The Licensee shall pay a security bond of <strong>NZD $${securityBond.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> to the Licensor upon execution of this Licence. This bond is held directly by the Licensor as a commercial security deposit to secure the performance of the Licensee’s obligations under this Licence. Because this arrangement is a serviced accommodation licence and is excluded from the Residential Tenancies Act 1986, the bond will not be lodged with the Tenancy Services Bond Centre, but will be held in trust in the Licensor’s nominated account. The bond shall be refunded in full to the Licensee within five (5) business days following the Expiry Date, subject to the inspection of the Premises, the return of all keys/passes, and the reconciliation of any outstanding utility charges, damage costs, or penalty fees.</p>
@@ -2526,7 +2587,7 @@
                         <p class="no-indent"><strong>9. Rolling 90-Day Automatic Renewal Term</strong></p>
                         <p class="no-indent">9.1 This agreement is for an initial fixed term of 90 days. Unless either party provides written notice of non-renewal to the other party at least fourteen (14) days prior to the scheduled Expiry Date (or the end of the then-current renewal term), this agreement shall automatically renew for a consecutive rolling term of ninety (90) days upon the same terms and conditions.</p>
                         <p class="no-indent">9.2 Either party may terminate this agreement at the end of the initial term or any rolling 90-day renewal term by giving written notice to the other party at least fourteen (14) days prior to the expiry of the then-current term.</p>
-                        <p class="no-indent">9.3 All Licence Fees, separate services fees, and vehicle rental fees shall continue to apply and be payable in advance for each renewal period in accordance with the payment schedule.</p>
+                        <p class="no-indent">9.3 ${renewalFeesText} shall continue to apply and be payable in advance for each renewal period in accordance with the payment schedule.</p>
                     `;
                 } else {
                     clause9Container.innerHTML = `
@@ -2800,6 +2861,30 @@
                 const utilitiesDailyRate = separateUtilitiesEnabled ? (separateUtilitiesRate / 28) : 0;
                 const carHireDailyRate = carHireEnabled ? (carHireRate / 30) : 0;
 
+                const separateServicesText = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "Residential utilities and vehicle rental are charged separately as per Clauses 6 and 11" 
+                    : (separateUtilitiesEnabled ? "Residential utilities are charged separately as per Clause 6" : (carHireEnabled ? "Vehicle rental is charged separately as per Clause 11" : ""));
+
+                const servicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "Full Utilities & Vehicle Hire" 
+                    : (separateUtilitiesEnabled ? "Full Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+                const firstMonthServicesInvoiceLabel = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "First Month Utilities & Vehicle Hire" 
+                    : (separateUtilitiesEnabled ? "First Month Utilities" : (carHireEnabled ? "Vehicle Hire" : ""));
+
+                const servicesParenthetical = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "services (utilities/car hire)" 
+                    : (separateUtilitiesEnabled ? "services (utilities)" : (carHireEnabled ? "services (vehicle hire)" : ""));
+
+                const firstMonthServicesDescription = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "first month utilities & car hire" 
+                    : (separateUtilitiesEnabled ? "first month utilities" : (carHireEnabled ? "first month vehicle hire" : ""));
+
+                const renewalFeesText = (separateUtilitiesEnabled && carHireEnabled) 
+                    ? "All Licence Fees, separate services fees, and vehicle rental fees" 
+                    : (separateUtilitiesEnabled ? "All Licence Fees and separate services fees" : (carHireEnabled ? "All Licence Fees and vehicle rental fees" : "All Licence Fees"));
+
                 const subtotal = dailyRate * diffDays;
                 const gst = subtotal * gstRate;
                 const total = subtotal + gst;
@@ -2821,12 +2906,12 @@
                                     ${subOpt === 'A' || balanceAmount <= 0 ? `
                                         <strong>Plan A: Full Payment Upfront</strong><br/>
                                         - Upfront Rental Invoice (Full Rent + Bond): <strong style="color: var(--accent-gold);">$${(total + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
-                                        - Upfront Services Invoice (Full Utilities & Vehicle Hire): <strong style="color: var(--accent-gold);">$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
+                                        - Upfront Services Invoice (${servicesInvoiceLabel}): <strong style="color: var(--accent-gold);">$${totalServicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
                                         Total Amount due within 24 hours of booking securement: <strong style="color: var(--accent-gold);">$${(total + securityBond + totalServicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>
                                     ` : `
                                         <strong>Plan B: 1-Month Securement Deposit</strong><br/>
                                         1. Upfront Rental Invoice (First 30 days Rent + Bond): <strong style="color: var(--accent-gold); font-size: 1.05rem;">$${(depositAmount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
-                                        2. Upfront Services Invoice (First Month Utilities & Vehicle Hire): <strong style="color: var(--accent-gold); font-size: 1.05rem;">$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
+                                        2. Upfront Services Invoice (${firstMonthServicesInvoiceLabel}): <strong style="color: var(--accent-gold); font-size: 1.05rem;">$${firstMonthServices.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong><br/>
                                         <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 10px 0;"/>
                                         <strong>First Payment Required Total (due now): $${(depositAmount + securityBond + firstMonthServices).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>
                                         <br/><br/>
@@ -2874,7 +2959,7 @@
                                 itemHtml = `<strong>${p.label}</strong><br/>
                                             <small style="color: var(--text-muted); font-size: 0.85rem;">Covers: ${p.periodCovered} (${p.daysCovered} days)</small>
                                             <br/><small style="color: #bbb;">- Upfront Rental Invoice (first 30 days rent + Bond): $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
-                                            <br/><small style="color: #bbb;">- Upfront Services Invoice (first month utilities & car hire): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
+                                            <br/><small style="color: #bbb;">- Upfront Services Invoice (${firstMonthServicesDescription}): $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</small>
                                             <br/><strong style="font-size: 0.85rem; color: var(--accent-gold);">First Payment Required Total (due now): $${(p.amount + securityBond + servicesAmount).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} NZD</strong>`;
                                 
                                 amountHtml = `<span style="font-size: 0.75rem;">Rent+Bond: $${(p.amount + securityBond).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span><br/><span style="font-size: 0.75rem;">Services: $${servicesAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
