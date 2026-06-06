@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate, autoRenew, licenseeType } = data;
+    const { token, passcode, rateValue, rateType, startDate, endDate, linenService, paymentTermsChoice, securityBond, cleaningFrequency, utilityBaseline, noGst, separateUtilitiesEnabled, separateUtilitiesRate, carHireEnabled, carHireRate, autoRenew, licenseeType, primaryEmail } = data;
 
     if (!token) {
       return new Response(JSON.stringify({ error: 'Application token is required.' }), { status: 400 });
@@ -69,6 +69,7 @@ export async function onRequestPost(context) {
     if (carHireEnabled !== undefined) app.carHireEnabled = !!carHireEnabled;
     if (carHireRate !== undefined) app.carHireRate = Number(carHireRate);
     if (autoRenew !== undefined) app.autoRenew = !!autoRenew;
+    if (primaryEmail !== undefined) app.primaryEmail = primaryEmail ? primaryEmail.trim().toLowerCase() : null;
     if (licenseeType !== undefined && app.tenantDetails) {
       app.tenantDetails.licenseeType = licenseeType;
     }

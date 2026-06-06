@@ -104,6 +104,36 @@ export async function onRequestGet(context) {
 
     const app = JSON.parse(data);
 
+    // Enforce authentication check if primaryEmail is set
+    if (app.primaryEmail) {
+      let isAuthorized = false;
+      const authHeader = context.request.headers.get('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const sessionToken = authHeader.substring(7);
+        const sessionStr = await kv.get(`session:${sessionToken}`);
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
+          if (session.userAgent === userAgent) {
+            const sessionEmail = session.email?.trim().toLowerCase();
+            const expectedAdminEmail = (context.env.ADMIN_EMAIL || 'grant@orcacom.co.nz').trim().toLowerCase();
+            if (session.role === 'admin' || sessionEmail === expectedAdminEmail || sessionEmail === app.primaryEmail.trim().toLowerCase()) {
+              isAuthorized = true;
+            } else if (app.tenantDetails) {
+              const billingEmail = app.tenantDetails.email?.trim().toLowerCase();
+              const primaryOccupantEmail = app.tenantDetails.primaryOccupantEmail?.trim().toLowerCase();
+              if (sessionEmail === billingEmail || sessionEmail === primaryOccupantEmail) {
+                isAuthorized = true;
+              }
+            }
+          }
+        }
+      }
+      if (!isAuthorized) {
+        return new Response(JSON.stringify({ error: 'Identity verification required', emailRequired: true }), { status: 401 });
+      }
+    }
+
     // If fully completed, fetch the manual content to include in the response
     let responseData = { ...app };
     if (app.status === 'completed') {

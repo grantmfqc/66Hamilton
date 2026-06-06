@@ -20,6 +20,36 @@ export async function onRequestPost(context) {
 
     const app = JSON.parse(rawApp);
 
+    // Enforce authentication check if primaryEmail is set
+    if (app.primaryEmail) {
+      let isAuthorized = false;
+      const authHeader = context.request.headers.get('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const sessionToken = authHeader.substring(7);
+        const sessionStr = await kv.get(`session:${sessionToken}`);
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          const userAgent = context.request.headers.get('user-agent') || 'unknown-agent';
+          if (session.userAgent === userAgent) {
+            const sessionEmail = session.email?.trim().toLowerCase();
+            const expectedAdminEmail = (context.env.ADMIN_EMAIL || 'grant@orcacom.co.nz').trim().toLowerCase();
+            if (session.role === 'admin' || sessionEmail === expectedAdminEmail || sessionEmail === app.primaryEmail.trim().toLowerCase()) {
+              isAuthorized = true;
+            } else if (app.tenantDetails) {
+              const billingEmail = app.tenantDetails.email?.trim().toLowerCase();
+              const primaryOccupantEmail = app.tenantDetails.primaryOccupantEmail?.trim().toLowerCase();
+              if (sessionEmail === billingEmail || sessionEmail === primaryOccupantEmail) {
+                isAuthorized = true;
+              }
+            }
+          }
+        }
+      }
+      if (!isAuthorized) {
+        return new Response(JSON.stringify({ error: 'Identity verification required' }), { status: 401 });
+      }
+    }
+
     if (app.status !== 'pending_tenant_signature') {
       return new Response(JSON.stringify({ error: 'Application is not ready to sign, or has already been signed' }), { status: 400 });
     }

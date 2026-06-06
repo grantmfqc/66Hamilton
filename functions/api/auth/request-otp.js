@@ -35,23 +35,52 @@ export async function onRequestPost(context) {
     const expectedAdminEmail = (context.env.ADMIN_EMAIL || 'grant@orcacom.co.nz').trim().toLowerCase();
     let role = null;
     let tokenId = null;
+    const reqToken = data.token; // Optional application token passed from apply.html login overlay
 
     if (email === expectedAdminEmail) {
       role = 'admin';
     } else {
-      // Scan all applications to find matching tenant email (billing email or primary occupant email)
-      const list = await kv.list({ prefix: 'application:' });
-      for (const key of list.keys) {
-        const val = await kv.get(key.name);
-        if (val) {
-          const app = JSON.parse(val);
-          if (app.tenantDetails) {
-            const billingEmail = app.tenantDetails.email?.trim().toLowerCase();
-            const primaryOccupantEmail = app.tenantDetails.primaryOccupantEmail?.trim().toLowerCase();
-            if ((billingEmail && billingEmail === email) || (primaryOccupantEmail && primaryOccupantEmail === email)) {
+      // If a specific application token is provided, verify against that application first
+      if (reqToken) {
+        const appVal = await kv.get(`application:${reqToken}`);
+        if (appVal) {
+          const app = JSON.parse(appVal);
+          const primaryEmail = app.primaryEmail?.trim().toLowerCase();
+          const billingEmail = app.tenantDetails?.email?.trim().toLowerCase();
+          const primaryOccupantEmail = app.tenantDetails?.primaryOccupantEmail?.trim().toLowerCase();
+          if ((primaryEmail && primaryEmail === email) ||
+              (billingEmail && billingEmail === email) ||
+              (primaryOccupantEmail && primaryOccupantEmail === email)) {
+            role = 'tenant';
+            tokenId = app.id;
+          } else {
+            // Explicit error if they provide a token but the email is not authorized for that application
+            return new Response(JSON.stringify({ error: 'This email address is not authorized to access this application.' }), { status: 403 });
+          }
+        }
+      }
+
+      // Fallback: Scan all applications if not resolved yet
+      if (!role) {
+        const list = await kv.list({ prefix: 'application:' });
+        for (const key of list.keys) {
+          const val = await kv.get(key.name);
+          if (val) {
+            const app = JSON.parse(val);
+            const primaryEmail = app.primaryEmail?.trim().toLowerCase();
+            if (primaryEmail && primaryEmail === email) {
               role = 'tenant';
               tokenId = app.id;
               break;
+            }
+            if (app.tenantDetails) {
+              const billingEmail = app.tenantDetails.email?.trim().toLowerCase();
+              const primaryOccupantEmail = app.tenantDetails.primaryOccupantEmail?.trim().toLowerCase();
+              if ((billingEmail && billingEmail === email) || (primaryOccupantEmail && primaryOccupantEmail === email)) {
+                role = 'tenant';
+                tokenId = app.id;
+                break;
+              }
             }
           }
         }

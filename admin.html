@@ -461,6 +461,10 @@
                             <input type="date" id="end-date-input" required />
                         </div>
                         <div class="form-group">
+                            <label for="primary-email-input">Primary Tenant Email (Required for Secure Login)</label>
+                            <input type="email" id="primary-email-input" required placeholder="e.g. tenant@example.com" />
+                        </div>
+                        <div class="form-group">
                             <label>Booking Payments Option</label>
                             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">
                                 <div style="display: flex; align-items: flex-start; gap: 8px;">
@@ -1323,6 +1327,10 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 5px;">
+                                <label style="font-size: 0.7rem; margin-bottom: 4px;">Primary Tenant Email (Secure Login)</label>
+                                <input type="email" class="edit-primary-email" value="${app.primaryEmail || ''}" placeholder="tenant@example.com" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box; background: #121214; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-family: inherit;" />
+                            </div>
                             
                             <div style="display: grid; grid-template-columns: 1fr; gap: 10px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; margin-top: 5px;">
                                 <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 6px;">
@@ -1744,6 +1752,7 @@
             const autoRenew = panel.querySelector('.edit-auto-renew').checked;
             const licenseeTypeEl = panel.querySelector('.edit-licensee-type');
             const licenseeType = licenseeTypeEl ? licenseeTypeEl.value : undefined;
+            const primaryEmail = panel.querySelector('.edit-primary-email').value.trim();
 
             try {
                 showToast('Updating application settings...');
@@ -1768,7 +1777,8 @@
                         carHireEnabled,
                         carHireRate,
                         autoRenew,
-                        licenseeType
+                        licenseeType,
+                        primaryEmail
                     })
                 });
 
@@ -2307,6 +2317,7 @@
             const carHireEnabled = document.getElementById('car-hire-checkbox').checked;
             const carHireRate = parseInt(document.getElementById('car-hire-rate-input').value) || 0;
             const autoRenew = document.getElementById('auto-renew-checkbox').checked;
+            const primaryEmail = document.getElementById('primary-email-input').value.trim();
 
             try {
                 const res = await fetchAdmin('/api/application/create', {
@@ -2329,7 +2340,8 @@
                         separateUtilitiesRate,
                         carHireEnabled,
                         carHireRate,
-                        autoRenew
+                        autoRenew,
+                        primaryEmail
                     })
                 });
 
