@@ -1361,6 +1361,7 @@
         let points = [];
         let lastMidX = 0;
         let lastMidY = 0;
+        let hasDrawn = false;
 
         if (!token) {
             alert("Error: Secure application token is missing. Please access this page via your private invitation URL.");
@@ -2822,18 +2823,39 @@
             canvas.addEventListener('touchstart', startDrawingTouch, { passive: false });
             canvas.addEventListener('touchmove', drawTouch, { passive: false });
             canvas.addEventListener('touchend', stopDrawingTouch);
+
+            if (!window.signatureResizeBound) {
+                window.addEventListener('resize', () => {
+                    if (!hasDrawn) {
+                        resizeCanvas();
+                    }
+                });
+                window.signatureResizeBound = true;
+            }
         }
 
         function resizeCanvas() {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
+            let w = canvas.offsetWidth;
+            let h = canvas.offsetHeight;
+            if (w === 0) {
+                w = canvas.parentElement ? canvas.parentElement.offsetWidth : 0;
+            }
+            if (w === 0) {
+                w = 500;
+            }
+            if (h === 0) {
+                h = 150;
+            }
+            canvas.width = w * ratio;
+            canvas.height = h * ratio;
             ctx.scale(ratio, ratio);
             clearSignatureCanvas();
         }
 
         function startDrawing(e) {
             isDrawing = true;
+            hasDrawn = true;
             const x = e.offsetX;
             const y = e.offsetY;
             points = [{ x, y }];
@@ -2849,6 +2871,7 @@
 
         function draw(e) {
             if (!isDrawing) return;
+            hasDrawn = true;
             const x = e.offsetX;
             const y = e.offsetY;
             points.push({ x, y });
@@ -2895,6 +2918,7 @@
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
             isDrawing = true;
+            hasDrawn = true;
             points = [{ x, y }];
             lastMidX = x;
             lastMidY = y;
@@ -2909,6 +2933,7 @@
         function drawTouch(e) {
             e.preventDefault();
             if (!isDrawing) return;
+            hasDrawn = true;
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
             const x = touch.clientX - rect.left;
@@ -2953,9 +2978,14 @@
         function clearSignatureCanvas() {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            hasDrawn = false;
         }
 
         async function submitSignature() {
+            if (!hasDrawn) {
+                alert("Please sign the contract inside the signature pad before submitting.");
+                return;
+            }
             // Check canvas contents (not fully empty)
             const dataUrl = canvas.toDataURL();
             

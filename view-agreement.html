@@ -245,7 +245,6 @@
             }
 
             .watermark {
-                display: block !important;
                 color: rgba(0, 0, 0, 0.04) !important;
                 border-color: rgba(0, 0, 0, 0.04) !important;
             }
@@ -1064,6 +1063,8 @@
                 watermark.style.display = 'block';
                 document.title = "DRAFT Licence Agreement — 66 Hamilton Road";
             } else {
+                document.getElementById('draft-banner').style.display = 'none';
+                document.getElementById('contract-watermark').style.display = 'none';
                 document.title = `Licence Agreement — ${td.name}`;
             }
 
