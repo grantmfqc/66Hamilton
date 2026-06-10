@@ -443,7 +443,7 @@
             <!-- Bank & Payment Details -->
             <div class="payment-instructions">
                 <h3>Direct Credit Payment Instructions</h3>
-                <p>Please pay via direct bank transfer into the account below, referencing the invoice number:</p>
+                <p>Please pay via direct bank transfer into the account below, using the reference specified:</p>
                 <table>
                     <tr>
                         <td class="lbl">Account Name:</td>
@@ -451,15 +451,23 @@
                     </tr>
                     <tr>
                         <td class="lbl">Account Number:</td>
-                        <td class="val">02-0192-0028298-097</td>
+                        <td class="val">06-0254-00443418-000</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Bank:</td>
-                        <td class="val">BNZ (Bank of New Zealand)</td>
+                        <td class="lbl">Bank Name:</td>
+                        <td class="val">ANZ Bank New Zealand Ltd</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">SWIFT:</td>
+                        <td class="val">ANZBNZ22</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">ANZ Address:</td>
+                        <td class="val" style="font-size: 0.82rem; line-height: 1.4;">ANZ Bank New Zealand Limited, Ground Floor ANZ Centre, 23-29 Albert Street, Auckland, 1010, New Zealand</td>
                     </tr>
                     <tr>
                         <td class="lbl">Reference to use:</td>
-                        <td class="val" style="color: #c9a96e;" id="payment-reference">HB0000</td>
+                        <td class="val" style="color: #c9a96e;" id="payment-reference">66Hamilton</td>
                     </tr>
                 </table>
             </div>
@@ -525,7 +533,7 @@
             document.getElementById('page-header-title').textContent = `Tax Invoice ${invoiceId} — 66 Hamilton Road`;
             document.getElementById('invoice-id-display').textContent = invoiceId;
             document.getElementById('meta-invoice-number').textContent = invoiceId;
-            document.getElementById('payment-reference').textContent = invoiceId;
+            document.getElementById('payment-reference').textContent = '66Hamilton';
 
             // Bill To
             const isCompany = td.licenseeType === 'company' || (td.name && (td.name.includes('Pty Ltd') || td.name.includes('Ltd') || td.name.includes('Limited') || td.name.includes('Total Drain')));
