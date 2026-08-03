@@ -694,6 +694,21 @@
                     `;
                     totalAmount += carVal;
                 }
+
+                if (isTdg && invoiceNum === 6) {
+                    itemsHtml += `
+                        <tr>
+                            <td>
+                                <strong>Linen Change and wash service</strong><br/>
+                                <span style="font-size: 0.8rem; color: #718096;">Linen change and wash service @ $30 each 24th July x2</span>
+                            </td>
+                            <td>2 Services</td>
+                            <td class="text-right">$30.00</td>
+                            <td class="text-right">$60.00</td>
+                        </tr>
+                    `;
+                    totalAmount += 60;
+                }
             }
 
             // Total Row
