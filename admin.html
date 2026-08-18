@@ -1229,7 +1229,7 @@
                         <a href="#" onclick="deleteApplication('${app.id}', '${escapeHTML(app.tenantName)}'); return false;" class="btn-link" style="color: #ff6b6b; margin-left: auto;">Delete</a>
                     </div>
                     ${app.status === 'completed' ? `
-                    <div class="app-meta" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 8px; font-size: 0.8rem;">
+                    <div class="app-meta" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 8px; font-size: 0.8rem; flex-wrap: wrap;">
                         <span style="color: var(--accent-gold); font-weight: 500;">Quick Invoice Links:</span>
                         <a href="/view-invoice.html?id=HB0001&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0001</a>
                         <span style="color: var(--text-muted);">|</span>
@@ -1242,6 +1242,20 @@
                         <a href="/view-invoice.html?id=HB0005&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0005</a>
                         <span style="color: var(--text-muted);">|</span>
                         <a href="/view-invoice.html?id=HB0006&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline;">HB0006</a>
+                        ${(app.id === '43f1fd84-49c3-45fd-81dc-3bc9abe505a8' || (app.tenantName && app.tenantName.toLowerCase().includes('tdg'))) ? `
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0007&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0007</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0008&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0008</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0009&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0009</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0010&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0010</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0011&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0011</a>
+                        <span style="color: var(--text-muted);">|</span>
+                        <a href="/view-invoice.html?id=HB0012&token=${app.id}" target="_blank" style="color: #fff; text-decoration: underline; font-weight: bold;">HB0012</a>
+                        ` : ''}
                     </div>
                     ` : ''}
                     
@@ -1629,20 +1643,46 @@
                                      </a>
                                      <a href="/view-invoice.html?id=HB0003&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
                                          <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0003</strong>
-                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (24 June 2026)</span>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (09 July 2026)</span>
                                      </a>
                                      <a href="/view-invoice.html?id=HB0004&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
                                          <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0004</strong>
-                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (24 June 2026)</span>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (09 July 2026)</span>
                                      </a>
                                      <a href="/view-invoice.html?id=HB0005&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
                                          <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0005</strong>
-                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (24 July 2026)</span>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (08 August 2026)</span>
                                      </a>
                                      <a href="/view-invoice.html?id=HB0006&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
                                          <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0006</strong>
-                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (24 July 2026)</span>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (08 August 2026)</span>
                                      </a>
+                                     ${(app.id === '43f1fd84-49c3-45fd-81dc-3bc9abe505a8' || (app.tenantName && app.tenantName.toLowerCase().includes('tdg'))) ? `
+                                     <a href="/view-invoice.html?id=HB0007&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0007</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (09 Sept 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0008&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0008</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (09 Sept 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0009&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0009</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (09 Oct 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0010&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0010</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (09 Oct 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0011&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0011</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Rent (08 Nov 2026)</span>
+                                     </a>
+                                     <a href="/view-invoice.html?id=HB0012&token=${app.id}" target="_blank" style="display: flex; flex-direction: column; padding: 10px; background: rgba(201, 169, 110, 0.05); border: 1px solid rgba(201, 169, 110, 0.15); border-radius: 4px; text-decoration: none; color: #fff; transition: all 0.2s ease;">
+                                         <strong style="color: var(--accent-gold); font-size: 0.85rem;">Invoice HB0012</strong>
+                                         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Services (08 Nov 2026)</span>
+                                     </a>
+                                     ` : ''}
                                  </div>
                                </div>`;
                 }

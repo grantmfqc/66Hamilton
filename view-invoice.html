@@ -552,7 +552,13 @@
             // If the licensee name matches TDG Environmental or token matches, force the requested dates
             const isTdg = td.name && (td.name.toLowerCase().includes('tdg') || td.name.toLowerCase().includes('drain') || token === '43f1fd84-49c3-45fd-81dc-3bc9abe505a8');
             
-            if (!isTdg) {
+            if (isTdg) {
+                const match = invoiceId.match(/HB0*(\d+)/i);
+                const invoiceNum = match ? parseInt(match[1], 10) : 1;
+                if (invoiceNum >= 7 && invoiceNum <= 12) {
+                    invoiceDateStr = '01/09/2026';
+                }
+            } else {
                 // Fallback to check-in date as invoice date for other agreements
                 invoiceDateStr = checkinStrFormatted;
             }
@@ -599,6 +605,15 @@
             const dayStart = billingBlockIndex * 30 + 1;
             const dayEnd = dayStart + 29;
 
+            // Period labeling (Renewed term support)
+            let periodText = `Days ${dayStart} to ${dayEnd}`;
+            if (isTdg && invoiceNum >= 7 && invoiceNum <= 12) {
+                const renewedBlockIndex = billingBlockIndex - 3;
+                const startDay = renewedBlockIndex * 30 + 1;
+                const endDay = startDay + 29;
+                periodText = `Days ${startDay} to ${endDay} (Renewed Term)`;
+            }
+
             // Set due dates
             if (isTdg) {
                 if (invoiceNum === 1 || invoiceNum === 2) {
@@ -607,6 +622,12 @@
                     dueDateStr = '09/07/2026';
                 } else if (invoiceNum === 5 || invoiceNum === 6) {
                     dueDateStr = '08/08/2026';
+                } else if (invoiceNum === 7 || invoiceNum === 8) {
+                    dueDateStr = '09/09/2026';
+                } else if (invoiceNum === 9 || invoiceNum === 10) {
+                    dueDateStr = '09/10/2026';
+                } else if (invoiceNum === 11 || invoiceNum === 12) {
+                    dueDateStr = '08/11/2026';
                 }
             } else {
                 // General logic for other agreements
@@ -635,7 +656,7 @@
                     <tr>
                         <td>
                             <strong>Serviced Accommodation Licence Fee (Rent)</strong><br/>
-                            <span style="font-size: 0.8rem; color: #718096;">Licence occupancy charge for Days ${dayStart} to ${dayEnd} at $${dailyRentRateInclGst.toFixed(4)}/day</span>
+                            <span style="font-size: 0.8rem; color: #718096;">Licence occupancy charge for ${periodText} at $${dailyRentRateInclGst.toFixed(4)}/day</span>
                         </td>
                         <td>30 Days</td>
                         <td class="text-right">$${dailyRentRateInclGst.toFixed(2)}</td>
@@ -670,7 +691,7 @@
                         <tr>
                             <td>
                                 <strong>Utility Service Charges (Utilities)</strong><br/>
-                                <span style="font-size: 0.8rem; color: #718096;">Agreed utility fee for Days ${dayStart} to ${dayEnd} at $${utilitiesDailyRate.toFixed(4)}/day (derived from $270/week rate)</span>
+                                <span style="font-size: 0.8rem; color: #718096;">Agreed utility fee for ${periodText} at $${utilitiesDailyRate.toFixed(4)}/day (derived from $270/week rate)</span>
                             </td>
                             <td>30 Days</td>
                             <td class="text-right">$${utilitiesDailyRate.toFixed(2)}</td>
@@ -685,7 +706,7 @@
                         <tr>
                             <td>
                                 <strong>Vehicle Rental / Car Hire Charge</strong><br/>
-                                <span style="font-size: 0.8rem; color: #718096;">Non-exclusive motor vehicle hire for Days ${dayStart} to ${dayEnd} at $${carHireDailyRate.toFixed(4)}/day ($1,500/month rate)</span>
+                                <span style="font-size: 0.8rem; color: #718096;">Non-exclusive motor vehicle hire for ${periodText} at $${carHireDailyRate.toFixed(4)}/day ($1,500/month rate)</span>
                             </td>
                             <td>30 Days</td>
                             <td class="text-right">$${carHireDailyRate.toFixed(2)}</td>
